@@ -1,0 +1,16 @@
+<template>
+  <div class="main-layout">
+    <Navbar />
+
+    <main>
+      <RouterView />
+    </main>
+
+    <Footer />
+  </div>
+</template>
+
+<script setup>
+import Navbar from '../components/Navbar.vue'
+import Footer from '../components/Footer.vue'
+</script>
