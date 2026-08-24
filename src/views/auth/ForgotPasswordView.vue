@@ -20,24 +20,19 @@
             required
           />
         </div>
-
         <button class="btn btn-primary btn-full">
           Send Reset Request
         </button>
       </form>
-
       <RouterLink to="/auth/login" class="back-link">
         Back to Sign In
       </RouterLink>
     </div>
   </div>
 </template>
-
 <script setup>
 import { ref } from 'vue'
-
 const email = ref('')
-
 function submit() {
   alert(`Password reset request sent to ${email.value}`)
 }

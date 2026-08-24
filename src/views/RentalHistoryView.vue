@@ -31,10 +31,7 @@
           :key="booking.id"
           class="history-card"
         >
-          <div
-            class="timeline-dot"
-            :class="statusClass(booking.status)"
-          ></div>
+          <div class="timeline-dot" :class="statusClass(booking.status)"></div>
 
           <div class="history-card-body">
             <div class="history-card-header">
@@ -51,10 +48,7 @@
                 </div>
               </div>
 
-              <span
-                class="status"
-                :class="statusClass(booking.status)"
-              >
+              <span class="status" :class="statusClass(booking.status)">
                 {{ booking.status }}
               </span>
             </div>
@@ -87,6 +81,8 @@
 <script setup>
 import { computed, onMounted } from 'vue'
 import { useBookingStore } from '../stores/Booking'
+import audiA4Image from '../assets/Audi A4 Premium.jpg'
+import toyotaRav4Image from '../assets/Toyota RAV4 Hybrid.jpg'
 
 const bookingStore = useBookingStore()
 
@@ -101,7 +97,7 @@ const fallbackBookings = [
     totalPrice: 345,
     totalDays: 5,
     status: 'Active',
-    image: '/src/assets/hero.png',
+    image: toyotaRav4Image
   },
   {
     id: '0812',
@@ -113,8 +109,8 @@ const fallbackBookings = [
     totalPrice: 290,
     totalDays: 3,
     status: 'Completed',
-    image: '/src/assets/hero.png',
-  },
+    image: audiA4Image
+  }
 ]
 
 const apiBookings = computed(() =>
@@ -128,12 +124,12 @@ const apiBookings = computed(() =>
     totalPrice: booking.totalPrice || 0,
     totalDays: booking.totalDays || 0,
     status: booking.status || 'Completed',
-    image: booking.vehicleImage || booking.image || '/src/assets/hero.png',
-  })),
+    image: booking.vehicleImage || booking.image || '/src/assets/hero.png'
+  }))
 )
 
 const displayBookings = computed(() =>
-  apiBookings.value.length ? apiBookings.value : fallbackBookings,
+  apiBookings.value.length ? apiBookings.value : fallbackBookings
 )
 
 const summary = computed(() => {
@@ -141,24 +137,24 @@ const summary = computed(() => {
     return {
       totalRentals: 14,
       totalSpent: '2,840',
-      totalDays: 38,
+      totalDays: 38
     }
   }
 
   const totalSpent = apiBookings.value.reduce(
     (sum, booking) => sum + Number(booking.totalPrice || 0),
-    0,
+    0
   )
 
   const totalDays = apiBookings.value.reduce(
     (sum, booking) => sum + Number(booking.totalDays || 0),
-    0,
+    0
   )
 
   return {
     totalRentals: apiBookings.value.length,
     totalSpent: totalSpent.toLocaleString(),
-    totalDays,
+    totalDays
   }
 })
 
@@ -172,4 +168,3 @@ onMounted(() => {
   bookingStore.fetchBookings()
 })
 </script>
-

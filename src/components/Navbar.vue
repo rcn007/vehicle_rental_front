@@ -13,6 +13,8 @@
         <RouterLink to="/vehicles">Vehicles</RouterLink>
         <RouterLink to="/my-bookings">My Bookings</RouterLink>
         <RouterLink to="/rental-history">Rental History</RouterLink>
+        <RouterLink to="/locations">Locations</RouterLink>
+        <RouterLink to="/contact">Contact</RouterLink>
       </nav>
 
       <button
@@ -48,32 +50,26 @@
             {{ auth.user?.name || auth.user?.username || 'Profile' }}
           </RouterLink>
 
-          <button class="btn btn-outline" @click="logout">
-            Logout
-          </button>
+          <button class="btn btn-outline" @click="logout">Logout</button>
         </template>
       </div>
     </div>
 
     <nav class="mobile-nav" :class="{ open: menuOpen }">
-      <RouterLink to="/" @click="closeMenu">
-        Home
-      </RouterLink>
-      <RouterLink to="/vehicles" @click="closeMenu">
-        Vehicles
-      </RouterLink>
+      <RouterLink to="/" @click="closeMenu"> Home </RouterLink>
+      <RouterLink to="/vehicles" @click="closeMenu"> Vehicles </RouterLink>
       <RouterLink to="/my-bookings" @click="closeMenu">
         My Bookings
       </RouterLink>
       <RouterLink to="/rental-history" @click="closeMenu">
         Rental History
       </RouterLink>
+      <RouterLink to="/locations" @click="closeMenu"> Locations </RouterLink>
+      <RouterLink to="/contact" @click="closeMenu"> Contact </RouterLink>
 
       <div class="mobile-auth-links">
         <template v-if="!auth.isAuthenticated">
-          <RouterLink to="/auth/login" @click="closeMenu">
-            Sign In
-          </RouterLink>
+          <RouterLink to="/auth/login" @click="closeMenu"> Sign In </RouterLink>
           <span>/</span>
           <RouterLink to="/auth/register" @click="closeMenu">
             Register
@@ -84,9 +80,7 @@
           <RouterLink to="/profile" @click="closeMenu">
             {{ auth.user?.name || auth.user?.username || 'Profile' }}
           </RouterLink>
-          <button type="button" @click="mobileLogout">
-            Logout
-          </button>
+          <button type="button" @click="mobileLogout">Logout</button>
         </template>
       </div>
     </nav>

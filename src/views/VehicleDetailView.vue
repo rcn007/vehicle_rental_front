@@ -1,17 +1,12 @@
 <template>
   <section class="section">
     <div class="container">
-      <div v-if="vehicleStore.loading" class="loading">
-        Loading vehicle...
-      </div>
+      <div v-if="vehicleStore.loading" class="loading">Loading vehicle...</div>
 
       <div v-else-if="vehicleStore.vehicle" class="vehicle-detail">
         <div>
           <img
-            :src="
-              vehicleStore.vehicle.image ||
-              '/src/assets/hero.png'
-            "
+            :src="vehicleStore.vehicle.image || '/src/assets/hero.png'"
             :alt="vehicleStore.vehicle.name"
             class="detail-image"
           />
@@ -25,8 +20,10 @@
           <h1>{{ vehicleStore.vehicle.name }}</h1>
 
           <p>
-            {{ vehicleStore.vehicle.description ||
-              'Comfortable and reliable vehicle for your journey.' }}
+            {{
+              vehicleStore.vehicle.description ||
+              'Comfortable and reliable vehicle for your journey.'
+            }}
           </p>
 
           <div class="detail-specs">
@@ -49,8 +46,11 @@
           </div>
 
           <div class="price-large">
-            ${{ vehicleStore.vehicle.pricePerDay ||
-              vehicleStore.vehicle.price || 0 }}
+            ${{
+              vehicleStore.vehicle.pricePerDay ||
+              vehicleStore.vehicle.price ||
+              0
+            }}
             <small>/ day</small>
           </div>
 
@@ -69,7 +69,7 @@
 <script setup>
 import { onMounted } from 'vue'
 import { useRoute } from 'vue-router'
-import { useVehicleStore } from '../stores/vehicle'
+import { useVehicleStore } from '../stores/Vehicle'
 
 const route = useRoute()
 const vehicleStore = useVehicleStore()
