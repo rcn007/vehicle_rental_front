@@ -14,16 +14,17 @@ import RegisterView from '../views/auth/RegisterView.vue'
 import VerifyOtpView from '../views/auth/VerifyotpView.vue'
 import ForgotPasswordView from '../views/auth/ForgotPasswordView.vue'
 
-import DashboardView from '../views/admin/DashboardView.vue'
-import AdminVehiclesView from '../views/admin/VehiclesView.vue'
-import BookingsView from '../views/admin/BookingView.vue'
-import PaymentsView from '../views/admin/PaymentView.vue'
-import UsersView from '../views/admin/UsersView.vue'
-import CategoriesView from '../views/admin/CategoriesView.vue'
-import BrandsView from '../views/admin/BrandsView.vue'
-import AdminRentalHistoryView from '../views/admin/AdminRentalHistoryView.vue'
-import ReportsView from '../views/admin/ReportsView.vue'
-import PaymentMethodsView from '../views/admin/PatmentMethodsView.vue'
+
+import Dashboard from '../pages/Dashboard.vue'
+import UserDashboard from '../pages/UserDashboard.vue'
+import BookingDashboard from '../pages/BookingDashboard.vue'
+import PaymentDashboard from '../pages/PaymentDashboard.vue'
+import CategoryDashboard from '../pages/CategoryDashboard.vue'
+import BrandDashboard from '../pages/BrandDashboard.vue'
+import ReportDashboard from '../pages/ReportDashboard.vue'
+import SettingDashboard from '../pages/SettingDashboard.vue'
+import HistoryDashboard from '../pages/HistoryDashboard.vue'
+import VehicleDashboard from '../pages/VehicleDashboard.vue'
 
 const routes = [
   {
@@ -105,84 +106,86 @@ const routes = [
   {
     path: '/admin',
     component: () => import('../layouts/AdminLayout.vue'),
-    meta: {
-      requiresAuth: true,
-      requiresAdmin: true,
-    },
+
     children: [
       {
         path: '',
         redirect: '/admin/dashboard',
       },
+
       {
         path: 'dashboard',
         name: 'admin-dashboard',
-        component: DashboardView,
+        component: Dashboard,
         meta: { title: 'Dashboard' },
       },
+
       {
-        path: 'vehicles',
-        name: 'admin-vehicles',
-        component: AdminVehiclesView,
+        path: 'Vehicle',
+        name: 'admin-vehicle',
+        component: VehicleDashboard,
         meta: { title: 'Vehicle Management' },
       },
+
       {
         path: 'bookings',
         name: 'admin-bookings',
-        component: BookingsView,
+        component: BookingDashboard,
         meta: { title: 'Booking Management' },
       },
+
       {
         path: 'payments',
         name: 'admin-payments',
-        component: PaymentsView,
+        component: PaymentDashboard,
         meta: { title: 'Payment Management' },
       },
+
       {
         path: 'users',
         name: 'admin-users',
-        component: UsersView,
+        component: UserDashboard,
         meta: { title: 'User Management' },
       },
+
       {
         path: 'categories',
         name: 'admin-categories',
-        component: CategoriesView,
+        component: CategoryDashboard,
         meta: { title: 'Categories' },
       },
+
       {
         path: 'brands',
         name: 'admin-brands',
-        component: BrandsView,
+        component: BrandDashboard,
         meta: { title: 'Brands' },
       },
-      {
-        path: 'rental-history',
-        name: 'admin-rental-history',
-        component: AdminRentalHistoryView,
-        meta: { title: 'Rental History' },
-      },
+
       {
         path: 'reports',
         name: 'admin-reports',
-        component: ReportsView,
+        component: ReportDashboard,
         meta: { title: 'Reports & Analytics' },
       },
+
       {
-        path: 'payment-methods',
-        name: 'admin-payment-methods',
-        component: PaymentMethodsView,
-        meta: { title: 'Settings' },
+        path: 'history',
+        name: 'admin-history',
+        component: HistoryDashboard,
+        meta: { title: 'History' },
       },
+
       {
         path: 'settings',
         name: 'admin-settings',
-        component: PaymentMethodsView,
+        component: SettingDashboard,
         meta: { title: 'Settings' },
       },
     ],
   },
 ]
+
 
 const router = createRouter({
   history: createWebHistory(),
