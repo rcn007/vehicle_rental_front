@@ -339,6 +339,10 @@ img {
   grid-column: 1 / -1;
 }
 
+.vehicle-search {
+  margin-bottom: 28px;
+}
+
 input,
 select {
   width: 100%;
@@ -1187,43 +1191,10 @@ td strong {
   font-weight: 800;
 }
 
-.auth-divider {
-  display: flex;
-  align-items: center;
-  gap: 14px;
-  color: var(--secondary);
-  font-size: 14px;
-  font-weight: 700;
-  margin: 24px 0 18px;
-}
-
-.auth-divider::before,
-.auth-divider::after {
-  content: '';
-  flex: 1;
-  height: 1px;
-  background: var(--border);
-}
-
-.social-actions {
-  display: grid;
-  grid-template-columns: 1fr 1fr;
-  gap: 14px;
-}
-
-.social-actions svg,
 .back-link svg,
 .auth-hero-icon svg {
   stroke: currentColor;
   fill: none;
-}
-
-.brand-icon {
-  width: 30px;
-  height: 30px;
-  display: block;
-  flex: 0 0 28px;
-  object-fit: contain;
 }
 
 .auth-bottom {
@@ -3923,8 +3894,8 @@ td strong {
 .auth-login-page .auth-panel {
   position: absolute;
   top: 70px;
+  bottom: auto;
   right: clamp(28px, 7vw, 68px);
-  bottom: 70px;
   width: min(420px, calc(100% - 56px));
   height: auto;
   min-height: 0;

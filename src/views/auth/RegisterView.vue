@@ -81,21 +81,6 @@
         </button>
       </form>
 
-      <div class="auth-divider">
-        <span>or continue with</span>
-      </div>
-
-      <div class="social-actions">
-        <button type="button" class="btn btn-outline">
-          <img class="brand-icon" src="/src/assets/google-icon.svg" alt="" />
-          Google
-        </button>
-        <button type="button" class="btn btn-outline">
-          <img class="brand-icon" src="/src/assets/facebook-icon.svg" alt="" />
-          Facebook
-        </button>
-      </div>
-
       <p class="auth-bottom">
         Already have an account?
         <RouterLink to="/auth/login"> Sign In </RouterLink>

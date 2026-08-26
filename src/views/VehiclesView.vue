@@ -6,6 +6,29 @@
         <p>{{ filteredVehicles.length }} vehicles found</p>
       </div>
 
+      <div class="hero-search vehicle-search">
+        <label>
+          Vehicle Category
+          <select v-model="vehicleSearch.category" @change="applyVehicleSearch">
+            <option>All Categories</option>
+            <option>Sedan</option>
+            <option>SUV</option>
+            <option>Motorcycle</option>
+            <option>Luxury</option>
+          </select>
+        </label>
+
+        <label>
+          Pickup Date
+          <input v-model="vehicleSearch.pickupDate" type="date" />
+        </label>
+
+        <label>
+          Return Date
+          <input v-model="vehicleSearch.returnDate" type="date" />
+        </label>
+      </div>
+
       <div class="vehicles-layout">
         <SearchBar @search="handleSearch" />
 
@@ -53,11 +76,16 @@ import SearchBar from '../components/Searchbar.vue'
 
 const vehicleStore = useVehicleStore()
 const sortBy = ref('default')
+const vehicleSearch = reactive({
+  category: 'All Categories',
+  pickupDate: '',
+  returnDate: ''
+})
 
 const filters = reactive({
   search: '',
   category: 'All',
-  brand: 'All',
+  brand: 'All'
 })
 
 const filteredVehicles = computed(() => {
@@ -68,13 +96,12 @@ const filteredVehicles = computed(() => {
     const brand = String(vehicle.brand || vehicle.make || '').toLowerCase()
     const type = String(vehicle.type || vehicle.category || '').toLowerCase()
 
-    const matchesSearch = !search || name.includes(search) || brand.includes(search)
+    const matchesSearch =
+      !search || name.includes(search) || brand.includes(search)
     const matchesCategory =
-      filters.category === 'All' ||
-      type === filters.category.toLowerCase()
+      filters.category === 'All' || type === filters.category.toLowerCase()
     const matchesBrand =
-      filters.brand === 'All' ||
-      brand === filters.brand.toLowerCase()
+      filters.brand === 'All' || brand === filters.brand.toLowerCase()
 
     return matchesSearch && matchesCategory && matchesBrand
   })
@@ -93,6 +120,11 @@ function handleSearch(data) {
   filters.search = data.search || ''
   filters.category = data.category || 'All'
   filters.brand = data.brand || 'All'
+}
+
+function applyVehicleSearch() {
+  filters.category =
+    vehicleSearch.category === 'All Categories' ? 'All' : vehicleSearch.category
 }
 
 onMounted(() => {

@@ -16,19 +16,19 @@
         <div class="location-map-frame">
           <iframe
             title="DriveEase location map"
-            src="https://www.openstreetmap.org/export/embed.html?bbox=104.902%2C11.547%2C104.935%2C11.575&amp;layer=mapnik&amp;marker=11.561%2C104.918"
+            src="https://www.openstreetmap.org/export/embed.html?bbox=103.232%2C11.572%2C103.292%2C11.632&amp;layer=mapnik&amp;marker=11.6022541%2C103.2627481"
             loading="lazy"
           ></iframe>
           <div class="map-label">
             <span class="map-pin"><MapPin :size="18" /></span>
             <div>
-              <strong>DriveEase Central</strong
-              ><small>Phnom Penh, Cambodia</small>
+              <strong>DriveEase Pickup Location</strong
+              ><small>11.6022541, 103.2627481</small>
             </div>
           </div>
           <a
             class="map-expand"
-            href="https://www.openstreetmap.org/?mlat=11.561&amp;mlon=104.918#map=15/11.561/104.918"
+            href="https://www.google.com/maps/@11.6022541,103.2627481,250462m/data=!3m1!1e3?entry=ttu"
             target="_blank"
             rel="noreferrer"
             aria-label="Open map in a new tab"
@@ -50,10 +50,7 @@
               <span class="detail-icon"><MapPin :size="18" /></span>
               <div>
                 <span>Address</span
-                ><strong
-                  >No. 12, Street 214, Doun Penh<br />Phnom Penh,
-                  Cambodia</strong
-                >
+                ><strong>11.6022541, 103.2627481<br />Cambodia</strong>
               </div>
             </div>
             <div class="location-detail">
@@ -72,7 +69,7 @@
           </div>
           <a
             class="btn btn-primary btn-full directions-button"
-            href="https://www.google.com/maps/dir/?api=1&amp;destination=11.561,104.918"
+            href="https://www.google.com/maps/dir/?api=1&amp;destination=11.6022541,103.2627481"
             target="_blank"
             rel="noreferrer"
           >
