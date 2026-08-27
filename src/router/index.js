@@ -213,7 +213,7 @@ router.beforeEach((to) => {
     return {
       name: 'login',
       query: { redirect: to.fullPath }
-    }
+    } 
   }
 
   if (to.meta.requiresAdmin) {
