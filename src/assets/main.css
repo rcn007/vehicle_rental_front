@@ -1,4 +1,5 @@
 @import url('https://fonts.googleapis.com/css2?family=Outfit:wght@100..900&display=swap');
+@import 'tailwindcss';
 
 * {
   box-sizing: border-box;
@@ -315,14 +316,15 @@ img {
 }
 
 .hero-search {
-  width: min(840px, 100%);
+  width: min(750px, 100%);
   display: grid;
-  grid-template-columns: repeat(3, 1fr);
+  grid-template-columns: repeat(2, 1fr);
   gap: 16px;
   padding: 20px;
   background: #ffffff;
   border-radius: 18px;
   box-shadow: var(--shadow);
+  border: 1px solid var(--border);
 }
 
 .hero-search label,
@@ -340,6 +342,7 @@ img {
 }
 
 .vehicle-search {
+  width: 100%;
   margin-bottom: 28px;
 }
 
@@ -495,7 +498,7 @@ select:focus {
 
 .vehicle-media {
   position: relative;
-  height: 306px;
+  height: 250px;
   overflow: hidden;
 }
 
@@ -519,6 +522,15 @@ select:focus {
   background: #eef4ff;
   color: var(--accent);
   font-size: 14px;
+}
+
+.status.available::before {
+  content: '';
+  width: 9px;
+  height: 9px;
+  flex: 0 0 9px;
+  border-radius: 50%;
+  background: var(--success);
 }
 
 .vehicle-media .status {
@@ -552,7 +564,7 @@ select:focus {
 }
 
 .vehicle-content {
-  padding: 24px 26px 26px;
+  padding: 20px 22px 22px;
 }
 
 .vehicle-meta {
@@ -584,7 +596,7 @@ select:focus {
   display: flex;
   flex-wrap: wrap;
   gap: 10px;
-  margin: 22px 0;
+  margin: 18px 0;
 }
 
 .vehicle-specs span {
@@ -702,7 +714,7 @@ select:focus {
 .dashboard-page,
 .history-page {
   min-height: 70vh;
-  padding: 42px 0 90px;
+  padding: 32px 0 90px;
 }
 
 .dashboard-page {
@@ -711,8 +723,8 @@ select:focus {
 
 .vehicles-layout {
   display: grid;
-  grid-template-columns: 302px 1fr;
-  gap: 28px;
+  grid-template-columns: 250px 1fr;
+  gap: 20px;
   align-items: start;
 }
 
@@ -734,7 +746,7 @@ select:focus {
 .filter-panel {
   position: sticky;
   top: 98px;
-  padding: 28px 24px;
+  padding: 24px 14px;
 }
 
 .filter-panel h2 {

@@ -22,7 +22,6 @@
 
       <div class="flex items-center gap-3 font-medium text-sm text-[#111827] bg-white px-3 py-1.5 rounded-lg border border-[#D3DAEF] shadow-sm">
         <img src="https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=100" alt="Avatar" class="w-7 h-7 rounded-full object-cover">
-       
       </div>
     </div>
   </header>

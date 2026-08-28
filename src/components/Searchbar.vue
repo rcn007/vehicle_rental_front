@@ -52,12 +52,20 @@ import { SlidersHorizontal } from '@lucide/vue'
 const emit = defineEmits(['search'])
 
 const categories = ['All', 'Sedan', 'SUV', 'Motorcycle', 'Luxury']
-const brands = ['All', 'BMW', 'Toyota', 'Honda', 'Audi']
+const brands = [
+  'All',
+  'BMW',
+  'Toyota',
+  'Honda',
+  'Rolls-Royce',
+  'Audi',
+  'Harley-Davidson'
+]
 
 const filters = reactive({
   search: '',
   category: 'All',
-  brand: 'All',
+  brand: 'All'
 })
 
 function searchVehicles() {
