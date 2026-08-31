@@ -1,34 +1,4 @@
-@import url('https://fonts.googleapis.com/css2?family=Outfit:wght@100..900&display=swap');
-@import 'tailwindcss';
 
-* {
-  box-sizing: border-box;
-  margin: 0;
-  padding: 0;
-}
-
-:root {
-  --primary: #0f172a;
-  --primary-soft: #64748b;
-  --secondary: #64748b;
-  --accent: #0f172a;
-  --accent-hover: #1e293b;
-  --background: #f8fafc;
-  --surface: #ffffff;
-  --text: #0f172a;
-  --muted: #64748b;
-  --border: #cbd5e1;
-  --success: #10b981;
-  --danger: #dc2626;
-  --warning: #f59e0b;
-  --shadow: 0 12px 28px rgba(15, 23, 42, 0.09);
-  --radius: 8px;
-  font:
-    16px/1.45 'Outfit',
-    sans-serif;
-  color: var(--text);
-  background: var(--background);
-}
 
 body {
   min-width: 320px;
@@ -4092,3 +4062,10 @@ td strong {
 .line-chart::after {
   border-top-color: var(--success);
 }
+
+
+
+
+
+
+
