@@ -1,6 +1,16 @@
 import { defineStore } from 'pinia'
 import api from '../api/axios'
 
+const demoBookingsKey = 'frontendDemoBookings'
+
+function getDemoBookings() {
+  return JSON.parse(localStorage.getItem(demoBookingsKey) || '[]')
+}
+
+function saveDemoBookings(bookings) {
+  localStorage.setItem(demoBookingsKey, JSON.stringify(bookings))
+}
+
 export const useBookingStore = defineStore('booking', {
   state: () => ({
     bookings: [],
@@ -19,6 +29,25 @@ export const useBookingStore = defineStore('booking', {
         this.booking = response.data?.data || response.data
 
         return this.booking
+      } catch (error) {
+        if (localStorage.getItem('token') !== 'frontend-demo-token') {
+          throw error
+        }
+
+        const bookings = getDemoBookings()
+        const booking = {
+          id: Date.now(),
+          ...data,
+          status: 'Confirmed',
+        }
+
+        bookings.unshift(booking)
+        saveDemoBookings(bookings)
+
+        this.booking = booking
+        this.bookings = bookings
+
+        return booking
       } finally {
         this.loading = false
       }
@@ -31,6 +60,14 @@ export const useBookingStore = defineStore('booking', {
         const response = await api.get('/bookings')
 
         this.bookings = response.data?.data || response.data || []
+
+        return this.bookings
+      } catch (error) {
+        if (localStorage.getItem('token') !== 'frontend-demo-token') {
+          throw error
+        }
+
+        this.bookings = getDemoBookings()
 
         return this.bookings
       } finally {

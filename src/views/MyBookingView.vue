@@ -99,7 +99,10 @@
                     </span>
                   </td>
                   <td>
-                    <RouterLink to="/rental-history" class="view-link">
+                    <RouterLink
+                      to="/rental-history"
+                      class="btn btn-primary"
+                    >
                       View
                     </RouterLink>
                   </td>
@@ -477,6 +480,13 @@ onMounted(() => {
 
 .bookings-panel td:last-child {
   text-align: center;
+}
+
+.bookings-panel td:last-child .btn {
+  min-height: 34px;
+  padding: 7px 12px;
+  border-radius: 6px;
+  font-size: 13px;
 }
 
 .bookings-panel td:last-child .view-link {

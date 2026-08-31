@@ -1,6 +1,19 @@
 import { defineStore } from 'pinia'
 import api from '../api/axios'
 
+const demoCredentials = {
+  email: 'customer.demo@driveease.com',
+  password: 'DriveEase@2026',
+}
+
+const demoUser = {
+  id: 101,
+  name: 'Demo Customer',
+  username: 'demo_customer',
+  email: demoCredentials.email,
+  role: 'USER',
+}
+
 export const useAuthStore = defineStore('auth', {
   state: () => ({
     user: JSON.parse(localStorage.getItem('user') || 'null'),
@@ -19,6 +32,23 @@ export const useAuthStore = defineStore('auth', {
       this.error = null
 
       try {
+        if (
+          data.email === demoCredentials.email &&
+          data.password === demoCredentials.password
+        ) {
+          const payload = {
+            token: 'frontend-demo-token',
+            user: demoUser,
+          }
+
+          this.token = payload.token
+          this.user = payload.user
+          localStorage.setItem('token', this.token)
+          localStorage.setItem('user', JSON.stringify(this.user))
+
+          return payload
+        }
+
         const response = await api.post('/auth/login', data)
         const payload = response.data?.data || response.data
 

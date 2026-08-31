@@ -3,14 +3,14 @@
     <section class="hero-customer">
       <div class="container hero-inner">
         <div class="hero-copy">
-          <div class="availability-pill">
+          <!-- <div class="availability-pill">
             <span></span>
             500+ Vehicles Available Now
-          </div>
+          </div> -->
 
           <h1>
-            Rent Your Perfect
-            <span>Vehicle</span> Anywhere
+            Rent Your Perfect Vehicle
+            Anywhere
           </h1>
 
           <p class="hero-description">
