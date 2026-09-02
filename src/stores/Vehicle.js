@@ -1,5 +1,6 @@
 ﻿import { defineStore } from 'pinia'
 import api from '../api/axios'
+import audiA4Image from '../assets/audiA4.jpg'
 
 const sampleVehicles = [
   {
@@ -14,7 +15,7 @@ const sampleVehicles = [
     rating: '4.9',
     status: 'Available',
     image:
-      'https://images.unsplash.com/photo-1555215695-3004980ad54e?auto=format&fit=crop&w=900&q=80',
+      'https://images.unsplash.com/photo-1555215695-3004980ad54e?auto=format&fit=crop&w=900&q=80'
   },
   {
     id: 2,
@@ -28,7 +29,7 @@ const sampleVehicles = [
     rating: '4.7',
     status: 'Available',
     image:
-      'https://images.unsplash.com/photo-1533473359331-0135ef1b58bf?auto=format&fit=crop&w=900&q=80',
+      'https://images.unsplash.com/photo-1533473359331-0135ef1b58bf?auto=format&fit=crop&w=900&q=80'
   },
   {
     id: 3,
@@ -42,21 +43,21 @@ const sampleVehicles = [
     rating: '4.8',
     status: 'Available',
     image:
-      'https://images.unsplash.com/photo-1558981806-ec527fa84c39?auto=format&fit=crop&w=900&q=80',
+      'https://images.unsplash.com/photo-1558981806-ec527fa84c39?auto=format&fit=crop&w=900&q=80'
   },
   {
     id: 4,
-    name: 'Rolls Royce Ghost',
-    brand: 'Rolls Royce',
+    name: 'Lamborghini Aventador',
+    brand: 'Lamborghini',
     type: 'Luxury',
     transmission: 'Automatic',
     fuelType: 'Gasoline',
-    seats: 4,
+    seats: 2,
     pricePerDay: 350,
     rating: '4.9',
     status: 'Unavailable',
     image:
-      'https://images.unsplash.com/photo-1525609004556-c46c7d6cf023?auto=format&fit=crop&w=900&q=80',
+      'https://images.unsplash.com/photo-1525609004556-c46c7d6cf023?auto=format&fit=crop&w=900&q=80'
   },
   {
     id: 5,
@@ -69,8 +70,7 @@ const sampleVehicles = [
     pricePerDay: 95,
     rating: '4.6',
     status: 'Available',
-    image:
-      'https://images.unsplash.com/photo-1492144534655-ae79c964c9d7?auto=format&fit=crop&w=900&q=80',
+    image: audiA4Image
   },
   {
     id: 6,
@@ -84,8 +84,8 @@ const sampleVehicles = [
     rating: '4.7',
     status: 'Available',
     image:
-      'https://images.unsplash.com/photo-1549317661-bd32c8ce0db2?auto=format&fit=crop&w=900&q=80',
-  },
+      'https://static0.carbuzzimages.com/wordpress/wp-content/uploads/2025/05/2026-toyota-corolla-cross-hybrid-xse-exterior-1.jpg?q=49&fit=crop&w=825&dpr=2'
+  }
 ]
 
 export const useVehicleStore = defineStore('vehicle', {
@@ -93,7 +93,7 @@ export const useVehicleStore = defineStore('vehicle', {
     vehicles: [],
     vehicle: null,
     loading: false,
-    error: null,
+    error: null
   }),
 
   actions: {
@@ -127,6 +127,6 @@ export const useVehicleStore = defineStore('vehicle', {
       } finally {
         this.loading = false
       }
-    },
-  },
+    }
+  }
 })
