@@ -8,22 +8,24 @@ import PaymentView from '../views/PaymentView.vue'
 import MyBookingsView from '../views/MyBookingView.vue'
 import ProfileView from '../views/ProfileView.vue'
 import RentalHistoryView from '../views/RentalHistoryView.vue'
+import LocationView from '../views/LocationView.vue'
+import ContactView from '../views/ContactView.vue'
 
 import LoginView from '../views/auth/LoginView.vue'
 import RegisterView from '../views/auth/RegisterView.vue'
 import VerifyOtpView from '../views/auth/VerifyotpView.vue'
 import ForgotPasswordView from '../views/auth/ForgotPasswordView.vue'
 
-import DashboardView from '../views/admin/DashboardView.vue'
-import AdminVehiclesView from '../views/admin/VehiclesView.vue'
-import BookingsView from '../views/admin/BookingView.vue'
-import PaymentsView from '../views/admin/PaymentView.vue'
-import UsersView from '../views/admin/UsersView.vue'
-import CategoriesView from '../views/admin/CategoriesView.vue'
-import BrandsView from '../views/admin/BrandsView.vue'
-import AdminRentalHistoryView from '../views/admin/AdminRentalHistoryView.vue'
-import ReportsView from '../views/admin/ReportsView.vue'
-import PaymentMethodsView from '../views/admin/PatmentMethodsView.vue'
+import Dashboard from '../pages/Dashboard.vue'
+import UserDashboard from '../pages/UserDashboard.vue'
+import BookingDashboard from '../pages/BookingDashboard.vue'
+import PaymentDashboard from '../pages/PaymentDashboard.vue'
+import CategoryDashboard from '../pages/CategoryDashboard.vue'
+import BrandDashboard from '../pages/BrandDashboard.vue'
+import ReportDashboard from '../pages/ReportDashboard.vue'
+import SettingDashboard from '../pages/SettingDashboard.vue'
+import HistoryDashboard from '../pages/HistoryDashboard.vue'
+import VehicleDashboard from '../pages/VehicleDashboard.vue'
 
 const routes = [
   {
@@ -33,47 +35,57 @@ const routes = [
       {
         path: '',
         name: 'home',
-        component: HomeView,
+        component: HomeView
       },
       {
         path: 'vehicles',
         name: 'vehicles',
-        component: VehiclesView,
+        component: VehiclesView
       },
       {
         path: 'vehicles/:id',
         name: 'vehicle-detail',
-        component: VehicleDetailView,
+        component: VehicleDetailView
       },
       {
         path: 'booking/:vehicleId',
         name: 'booking',
         component: BookingView,
-        meta: { requiresAuth: true },
+        meta: { requiresAuth: true }
       },
       {
         path: 'payment/:bookingId',
         name: 'payment',
         component: PaymentView,
-        meta: { requiresAuth: true },
+        meta: { requiresAuth: true }
       },
       {
         path: 'my-bookings',
         name: 'my-bookings',
-        component: MyBookingsView,
+        component: MyBookingsView
       },
       {
         path: 'rental-history',
         name: 'rental-history',
-        component: RentalHistoryView,
+        component: RentalHistoryView
+      },
+      {
+        path: 'locations',
+        name: 'locations',
+        component: LocationView
+      },
+      {
+        path: 'contact',
+        name: 'contact',
+        component: ContactView
       },
       {
         path: 'profile',
         name: 'profile',
         component: ProfileView,
-        meta: { requiresAuth: true },
-      },
-    ],
+        meta: { requiresAuth: true }
+      }
+    ]
   },
 
   {
@@ -82,106 +94,107 @@ const routes = [
       {
         path: 'login',
         name: 'login',
-        component: LoginView,
+        component: LoginView
       },
       {
         path: 'register',
         name: 'register',
-        component: RegisterView,
+        component: RegisterView
       },
       {
         path: 'verify-otp',
         name: 'verify-otp',
-        component: VerifyOtpView,
+        component: VerifyOtpView
       },
       {
         path: 'forgot-password',
         name: 'forgot-password',
-        component: ForgotPasswordView,
-      },
-    ],
+        component: ForgotPasswordView
+      }
+    ]
   },
 
   {
     path: '/admin',
     component: () => import('../layouts/AdminLayout.vue'),
-    meta: {
-      requiresAuth: true,
-      requiresAdmin: true,
-    },
+
     children: [
       {
         path: '',
-        redirect: '/admin/dashboard',
+        redirect: '/admin/dashboard'
       },
+
       {
         path: 'dashboard',
         name: 'admin-dashboard',
-        component: DashboardView,
-        meta: { title: 'Dashboard' },
+        component: Dashboard,
+        meta: { title: 'Dashboard' }
       },
+
       {
         path: 'vehicles',
         name: 'admin-vehicles',
-        component: AdminVehiclesView,
-        meta: { title: 'Vehicle Management' },
+        component: VehicleDashboard,
+        meta: { title: 'Vehicle Management' }
       },
+
       {
         path: 'bookings',
         name: 'admin-bookings',
-        component: BookingsView,
-        meta: { title: 'Booking Management' },
+        component: BookingDashboard,
+        meta: { title: 'Booking Management' }
       },
+
       {
         path: 'payments',
         name: 'admin-payments',
-        component: PaymentsView,
-        meta: { title: 'Payment Management' },
+        component: PaymentDashboard,
+        meta: { title: 'Payment Management' }
       },
+
       {
         path: 'users',
         name: 'admin-users',
-        component: UsersView,
-        meta: { title: 'User Management' },
+        component: UserDashboard,
+        meta: { title: 'User Management' }
       },
+
       {
         path: 'categories',
         name: 'admin-categories',
-        component: CategoriesView,
-        meta: { title: 'Categories' },
+        component: CategoryDashboard,
+        meta: { title: 'Categories' }
       },
+
       {
         path: 'brands',
         name: 'admin-brands',
-        component: BrandsView,
-        meta: { title: 'Brands' },
+        component: BrandDashboard,
+        meta: { title: 'Brands' }
       },
-      {
-        path: 'rental-history',
-        name: 'admin-rental-history',
-        component: AdminRentalHistoryView,
-        meta: { title: 'Rental History' },
-      },
+
       {
         path: 'reports',
         name: 'admin-reports',
-        component: ReportsView,
-        meta: { title: 'Reports & Analytics' },
+        component: ReportDashboard,
+        meta: { title: 'Reports & Analytics' }
       },
+
       {
-        path: 'payment-methods',
-        name: 'admin-payment-methods',
-        component: PaymentMethodsView,
-        meta: { title: 'Settings' },
+        path: 'history',
+        name: 'admin-history',
+        component: HistoryDashboard,
+        meta: { title: 'History' }
       },
+
       {
         path: 'settings',
         name: 'admin-settings',
-        component: PaymentMethodsView,
-        meta: { title: 'Settings' },
-      },
-    ],
-  },
+        component: SettingDashboard,
+        meta: { title: 'Settings' }
+      }
+    ]
+  }
 ]
 
 const router = createRouter({
@@ -189,7 +202,7 @@ const router = createRouter({
   routes,
   scrollBehavior() {
     return { top: 0 }
-  },
+  }
 })
 
 router.beforeEach((to) => {
@@ -199,14 +212,17 @@ router.beforeEach((to) => {
   if (to.meta.requiresAuth && !token) {
     return {
       name: 'login',
-      query: { redirect: to.fullPath },
+      query: { redirect: to.fullPath }
     }
   }
 
   if (to.meta.requiresAdmin) {
-    const role = user?.role?.toUpperCase()
+    const roles = Array.isArray(user?.roles) ? user.roles : [user?.role]
+    const isAdmin = roles.some((role) =>
+      ['ADMIN', 'ROLE_ADMIN'].includes(String(role).toUpperCase())
+    )
 
-    if (role !== 'ADMIN') {
+    if (!isAdmin) {
       return { name: 'home' }
     }
   }

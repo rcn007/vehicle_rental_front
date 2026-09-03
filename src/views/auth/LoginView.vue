@@ -1,5 +1,5 @@
 <template>
-  <div class="auth-split-page">
+  <div class="auth-split-page auth-login-page">
     <section class="auth-visual">
       <div>
         <div class="auth-hero-icon">
@@ -41,7 +41,7 @@
           <input
             v-model="form.email"
             type="email"
-            placeholder="you@email.com"
+            placeholder="Enter Your Email"
             required
           />
         </div>
@@ -57,7 +57,7 @@
             <input
               v-model="form.password"
               :type="showPassword ? 'text' : 'password'"
-              placeholder="Password"
+              placeholder="Enter Your Password"
               required
             />
             <button type="button" @click="showPassword = !showPassword">
@@ -71,42 +71,14 @@
           {{ auth.error }}
         </div>
 
-        <button
-          class="btn btn-primary btn-full"
-          :disabled="auth.loading"
-        >
+        <button class="btn btn-primary btn-full" :disabled="auth.loading">
           {{ auth.loading ? 'Signing in...' : 'Sign In' }}
         </button>
       </form>
 
-      <div class="auth-divider">
-        <span>or continue with</span>
-      </div>
-
-      <div class="social-actions">
-        <button type="button" class="btn btn-outline">
-          <img
-            class="brand-icon"
-            src="/src/assets/google-icon.svg"
-            alt=""
-          />
-          Google
-        </button>
-        <button type="button" class="btn btn-outline">
-          <img
-            class="brand-icon"
-            src="/src/assets/facebook-icon.svg"
-            alt=""
-          />
-          Facebook
-        </button>
-      </div>
-
       <p class="auth-bottom">
         Don't have an account?
-        <RouterLink to="/auth/register">
-          Create one
-        </RouterLink>
+        <RouterLink to="/auth/register"> Create one </RouterLink>
       </p>
     </section>
   </div>
@@ -114,12 +86,7 @@
 
 <script setup>
 import { reactive, ref } from 'vue'
-import {
-  ArrowLeft,
-  CarFront,
-  Eye,
-  EyeOff,
-} from '@lucide/vue'
+import { ArrowLeft, CarFront, Eye, EyeOff } from '@lucide/vue'
 import { useRoute, useRouter } from 'vue-router'
 import { useAuthStore } from '../../stores/Auth'
 
@@ -129,7 +96,7 @@ const route = useRoute()
 
 const form = reactive({
   email: '',
-  password: '',
+  password: ''
 })
 
 const showPassword = ref(false)
