@@ -3,12 +3,6 @@
 @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Montserrat:wght@500;600;700;800&display=swap');
 @import 'tailwindcss';
 
-* {
-  box-sizing: border-box;
-  margin: 0;
-  padding: 0;
-}
-
 :root {
   --primary: #0f172a;
   --primary-soft: #64748b;
@@ -25,8 +19,8 @@
   --warning: #f59e0b;
   --shadow: 0 12px 28px rgba(15, 23, 42, 0.09);
   --radius: 8px;
---font-heading: "Montserrat", sans-serif;
-  --font-body: "Inter", sans-serif;
+  --font-heading: 'Montserrat', sans-serif;
+  --font-body: 'Inter', sans-serif;
 
   /* ================================
      RADIUS
@@ -43,7 +37,7 @@
   ================================= */
 
   --shadow-sm: 0 1px 3px rgba(62, 39, 35, 0.08);
-  --shadow-md: 0 4px 12px rgba(62, 39, 35, 0.10);
+  --shadow-md: 0 4px 12px rgba(62, 39, 35, 0.1);
   --shadow-lg: 0 8px 24px rgba(62, 39, 35, 0.12);
 
   /* ================================
@@ -80,7 +74,6 @@ textarea,
 table {
   font-family: var(--font-body);
 }
-
 
 body {
   min-width: 320px;
@@ -633,9 +626,13 @@ select:focus {
 }
 
 .vehicle-title-row h3 {
+  min-width: 0;
+  overflow: hidden;
   color: var(--text);
   font-size: 21px;
   line-height: 1.2;
+  text-overflow: ellipsis;
+  white-space: nowrap;
 }
 
 .rating {
@@ -778,6 +775,16 @@ select:focus {
   grid-template-columns: 250px 1fr;
   gap: 20px;
   align-items: start;
+}
+
+.mobile-search,
+.mobile-filter-actions,
+.filter-drawer-backdrop {
+  display: none;
+}
+
+.vehicles-results {
+  min-width: 0;
 }
 
 .filter-panel,
@@ -2100,6 +2107,39 @@ td strong {
     grid-template-columns: repeat(2, 1fr);
   }
 
+  .home-page .vehicle-grid,
+  .vehicles-results .vehicle-grid {
+    display: flex;
+    gap: 16px;
+    overflow-x: auto;
+    width: 100%;
+    min-width: 0;
+    padding: 0 4px 12px;
+    scroll-snap-type: x mandatory;
+    -webkit-overflow-scrolling: touch;
+    touch-action: pan-x;
+    scrollbar-width: thin;
+    scrollbar-color: #94a3b8 transparent;
+  }
+
+  .home-page .vehicle-grid::-webkit-scrollbar,
+  .vehicles-results .vehicle-grid::-webkit-scrollbar {
+    display: block;
+    height: 8px;
+  }
+
+  .home-page .vehicle-grid::-webkit-scrollbar-thumb,
+  .vehicles-results .vehicle-grid::-webkit-scrollbar-thumb {
+    background: #94a3b8;
+    border-radius: 999px;
+  }
+
+  .home-page .vehicle-grid .vehicle-card,
+  .vehicles-results .vehicle-grid .vehicle-card {
+    flex: 0 0 min(88vw, 360px);
+    scroll-snap-align: start;
+  }
+
   .vehicles-layout,
   .vehicle-detail {
     grid-template-columns: 1fr;
@@ -2260,6 +2300,164 @@ td strong {
   .history-details,
   .stats-grid {
     grid-template-columns: 1fr;
+  }
+
+  .vehicle-grid {
+    display: flex;
+    gap: 16px;
+    overflow-x: auto;
+    padding: 0 4px 12px;
+    scroll-snap-type: x mandatory;
+    scrollbar-width: none;
+  }
+
+  .vehicle-grid::-webkit-scrollbar {
+    display: none;
+  }
+
+  .vehicle-grid .vehicle-card {
+    flex: 0 0 min(78vw, 300px);
+    scroll-snap-align: start;
+  }
+
+  .home-page .vehicle-grid,
+  .vehicles-results .vehicle-grid {
+    display: flex;
+    gap: 16px;
+    overflow-x: auto;
+    padding: 0 4px 12px;
+    scroll-snap-type: x mandatory;
+    scrollbar-width: none;
+  }
+
+  .home-page .vehicle-grid::-webkit-scrollbar,
+  .vehicles-results .vehicle-grid::-webkit-scrollbar {
+    display: none;
+  }
+
+  .home-page .vehicle-grid .vehicle-card,
+  .vehicles-results .vehicle-grid .vehicle-card {
+    flex: 0 0 min(88vw, 360px);
+    height: auto;
+    min-height: 0;
+    display: flex;
+    flex-direction: column;
+    scroll-snap-align: start;
+  }
+
+  .home-page .vehicle-grid .vehicle-media,
+  .vehicles-results .vehicle-grid .vehicle-media {
+    height: clamp(180px, 52vw, 205px);
+  }
+
+  .home-page .vehicle-grid .vehicle-content,
+  .vehicles-results .vehicle-grid .vehicle-content {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    padding: 20px;
+  }
+
+  .home-page .vehicle-grid .vehicle-actions,
+  .vehicles-results .vehicle-grid .vehicle-actions {
+    margin-top: 24px;
+    grid-template-columns: 1fr 1fr;
+    gap: 16px;
+  }
+
+  .home-page .vehicle-grid,
+  .vehicles-results .vehicle-grid {
+    -webkit-overflow-scrolling: touch;
+    scrollbar-width: thin;
+    scrollbar-color: #94a3b8 transparent;
+  }
+
+  .home-page .vehicle-grid::-webkit-scrollbar,
+  .vehicles-results .vehicle-grid::-webkit-scrollbar {
+    display: block;
+    height: 8px;
+  }
+
+  .home-page .vehicle-grid::-webkit-scrollbar-thumb,
+  .vehicles-results .vehicle-grid::-webkit-scrollbar-thumb {
+    background: #94a3b8;
+    border-radius: 999px;
+  }
+
+  .home-page .vehicle-grid .vehicle-specs {
+    gap: 8px;
+    margin: 14px 0;
+  }
+
+  .home-page .vehicle-grid .vehicle-specs span {
+    padding: 7px 10px;
+  }
+
+  .home-page .category-grid {
+    display: flex;
+    gap: 16px;
+    overflow-x: auto;
+    padding: 0 4px 12px;
+    scroll-snap-type: x mandatory;
+    scrollbar-width: none;
+  }
+
+  .home-page .category-grid::-webkit-scrollbar {
+    display: none;
+  }
+
+  .home-page .category-grid .category-card {
+    flex: 0 0 min(78vw, 300px);
+    scroll-snap-align: start;
+  }
+
+  .home-page .benefits-section .benefit-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 10px;
+  }
+
+  .home-page .benefits-section .benefit-grid article {
+    min-height: 116px;
+    justify-content: center;
+    gap: 8px;
+    padding: 12px 8px;
+    border-radius: 10px;
+    box-shadow: 0 2px 8px rgba(15, 23, 42, 0.05);
+  }
+
+  .home-page .benefits-section .benefit-grid svg {
+    width: 26px;
+    height: 26px;
+    margin: 0;
+  }
+
+  .home-page .benefits-section .benefit-grid h3 {
+    margin: 0;
+    font-size: 14px;
+    line-height: 1.25;
+  }
+
+  .home-page .benefits-section .benefit-grid p {
+    display: none;
+  }
+
+  .home-page .categories-section .section-header {
+    flex-direction: column;
+    align-items: stretch;
+  }
+
+  .home-page .categories-section .view-link {
+    flex: 0 0 auto;
+    margin-left: auto;
+    margin-top: 8px;
+    margin-bottom: 0;
+    justify-content: flex-end;
+  }
+
+  .home-page .section-header .view-link {
+    margin-left: auto;
+    margin-top: 8px;
+    justify-content: flex-end;
   }
 
   .section-header,
@@ -3538,6 +3736,26 @@ td strong {
     flex-basis: 36px;
   }
 
+  .logo,
+  .logo:hover,
+  .logo:focus,
+  .logo:active,
+  .logo.router-link-active,
+  .logo.router-link-exact-active {
+    color: var(--text);
+    background: transparent;
+  }
+
+  .logo-mark,
+  .logo:hover .logo-mark,
+  .logo:focus .logo-mark,
+  .logo:active .logo-mark,
+  .logo.router-link-active .logo-mark,
+  .logo.router-link-exact-active .logo-mark {
+    color: #ffffff;
+    background: var(--accent);
+    transform: none;
+  }
   .nav-content {
     width: min(100% - 28px, 1540px);
     gap: 12px;
@@ -3556,9 +3774,11 @@ td strong {
     place-items: center;
     color: #52627f;
     background: transparent;
-    border: 0;
+    border: 1px solid transparent;
+    box-sizing: border-box;
     border-radius: 8px;
     margin-left: auto;
+    transition: border-color 0.5s ease;
   }
 
   .mobile-menu-button:focus {
@@ -3566,68 +3786,190 @@ td strong {
   }
 
   .mobile-menu-button.open {
-    border: 2px solid #3f3f46;
-    background: #ffffff;
-    box-shadow: 0 4px 12px rgba(15, 23, 42, 0.08);
+    position: fixed;
+    top: 18px;
+    right: 18px;
+    z-index: 42;
+    color: #8a9298;
+    background: transparent;
+    border-color: transparent;
+    box-shadow: none;
   }
 
   .mobile-menu-button svg {
     stroke-width: 2;
   }
 
+  .mobile-menu-button:hover {
+    border-color: #16b978;
+  }
+
+  .mobile-menu-button.open:hover {
+    background: transparent;
+    border-color: #d5dbe0;
+  }
+
   .mobile-nav {
-    display: none;
-    width: min(100% - 28px, 380px);
-    margin: 10px auto 12px;
-    padding: 10px;
-    background: #ffffff;
-    border: 1px solid #eef2f7;
-    border-radius: 14px;
-    box-shadow: 0 16px 32px rgba(15, 23, 42, 0.08);
+    display: grid;
+    position: fixed;
+    inset: 0 0 0 auto;
+    z-index: 40;
+    width: min(92vw, 350px);
+    margin: 0;
+    padding: 18px 20px 28px;
+    background: #202428;
+    border-left: 1px solid #30363b;
+    border-radius: 0;
+    box-shadow: -18px 0 40px rgba(0, 0, 0, 0.34);
+    align-content: start;
+    gap: 4px;
+    opacity: 0;
+    pointer-events: none;
+    transform: translateX(100%);
+    visibility: hidden;
+    transition:
+      transform 0.35s ease,
+      opacity 0.35s ease,
+      visibility 0.35s ease;
   }
 
   .mobile-nav.open {
+    opacity: 1;
+    pointer-events: auto;
+    transform: translateX(0);
+    visibility: visible;
+  }
+
+  .mobile-nav.open::before {
+    content: '';
+    position: fixed;
+    inset: 0;
+    z-index: -1;
+    background: rgba(13, 18, 22, 0.64);
+  }
+
+  .mobile-nav-brand {
+    min-height: 48px;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    margin: 0 0 22px;
+    padding: 0;
+    color: #f4f5f5;
+    background: transparent;
+    font-size: 23px;
+    font-weight: 800;
+  }
+
+  .mobile-nav-brand-mark {
+    width: 32px;
+    height: 32px;
     display: grid;
-    gap: 8px;
+    place-items: center;
+    color: #143126;
+    background: #16b978;
+    border-radius: 5px;
+  }
+
+  .mobile-nav-brand svg {
+    stroke-width: 2.5;
   }
 
   .mobile-nav a {
-    min-height: 44px;
+    min-height: 56px;
     display: flex;
     align-items: center;
-    color: #60708f;
-    border-radius: 8px;
-    padding: 0 14px;
+    color: #f3f4f4;
+    border-radius: 0;
+    padding: 0;
+    font-size: clamp(18px, 5.2vw, 23px);
+    line-height: 1.2;
     font-weight: 700;
+    transition:
+      color 0.5s ease,
+      background-color 0.5s ease,
+      padding-left 0.5s ease;
+  }
+
+  .mobile-nav > a:not(.mobile-nav-brand):hover {
+    color: #16b978;
+    padding-left: 4px;
   }
 
   .mobile-nav a.router-link-exact-active {
-    color: var(--accent);
-    background: #eff6ff;
+    color: #16b978;
+    background: transparent;
+    padding: 0;
+  }
+
+  .mobile-nav .mobile-nav-brand.router-link-exact-active {
+    color: #f4f5f5;
+    background: transparent;
   }
 
   .mobile-auth-links {
-    min-height: 44px;
+    min-height: 56px;
     display: flex;
     align-items: center;
-    gap: 4px;
-    color: var(--accent);
-    padding: 0 14px;
+    gap: 8px;
+    color: #f1f3f4;
+    padding: 10px 0 0;
+    font-size: clamp(18px, 5.2vw, 21px);
     font-weight: 800;
   }
 
   .mobile-auth-links a {
     min-height: auto;
-    color: var(--accent);
+    color: #f1f3f4;
     background: transparent;
     padding: 0;
   }
 
   .mobile-auth-links button {
-    color: var(--accent);
+    color: #f1f3f4;
     background: transparent;
     border: 0;
+    padding: 0;
+    font-size: 18px;
     font-weight: 800;
+  }
+
+  .mobile-login-link {
+    min-height: 38px !important;
+    display: inline-flex !important;
+    align-items: center;
+    gap: 8px;
+    padding: 0 12px !important;
+    color: #ffffff !important;
+    background: #5c6267 !important;
+    border-radius: 999px !important;
+    transition:
+      color 0.5s ease,
+      background-color 0.5s ease,
+      transform 0.5s ease;
+  }
+
+  .mobile-login-link:hover {
+    color: #ffffff !important;
+    background: #16b978 !important;
+    transform: translateY(-2px);
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .mobile-nav {
+      transition: none;
+    }
+  }
+
+  @media (max-width: 390px) {
+    .mobile-nav {
+      width: min(82vw, 320px);
+      padding-inline: 16px;
+    }
+
+    .mobile-nav-brand {
+      font-size: 19px;
+    }
   }
 
   .nav-actions {
@@ -3664,11 +4006,11 @@ td strong {
   }
 
   .category-card {
-    height: 220px;
+    height: clamp(220px, 60vw, 264px);
   }
 
   .vehicle-media {
-    height: 230px;
+    height: clamp(145px, 44vw, 180px);
   }
 
   .vehicle-content,
@@ -3830,6 +4172,38 @@ td strong {
   .auth-stats {
     flex-direction: column;
     gap: 12px;
+  }
+}
+
+@media (max-width: 900px) {
+  .history-page .history-summary {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: 10px;
+    margin-bottom: 28px;
+  }
+
+  .history-page .history-summary article {
+    min-width: 0;
+    min-height: 116px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    padding: 12px 6px;
+    border-radius: 10px;
+    box-shadow: 0 2px 8px rgba(15, 23, 42, 0.05);
+  }
+
+  .history-page .history-summary strong {
+    margin-bottom: 4px;
+    font-size: 22px;
+    line-height: 1.1;
+    overflow-wrap: anywhere;
+  }
+
+  .history-page .history-summary span {
+    font-size: 12px;
+    line-height: 1.25;
   }
 }
 
@@ -3999,9 +4373,25 @@ td strong {
 
   .auth-register-page .auth-stats,
   .auth-login-page .auth-stats {
+    flex-direction: row;
+    align-items: flex-start;
     justify-content: center;
-    gap: 24px;
+    gap: 12px;
     margin-top: 28px;
+    width: 100%;
+  }
+
+  .auth-register-page .auth-stats span,
+  .auth-login-page .auth-stats span {
+    flex: 1 1 0;
+    min-width: 0;
+    text-align: center;
+    padding-left: 0;
+  }
+
+  .auth-register-page .auth-stats strong,
+  .auth-login-page .auth-stats strong {
+    font-size: 24px;
   }
 
   .auth-register-page .auth-panel,
@@ -4013,6 +4403,307 @@ td strong {
     padding: 36px 18px 34px;
     border-radius: 0;
     background: #ffffff;
+  }
+}
+
+/* Vehicle listing responsive layout */
+@media (min-width: 768px) and (max-width: 1024px) {
+  .vehicles-layout {
+    grid-template-columns: minmax(190px, 24%) minmax(0, 1fr);
+    gap: 16px;
+  }
+
+  .vehicles-results .vehicle-grid {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 18px;
+    overflow: visible;
+    padding: 0;
+    scroll-snap-type: none;
+  }
+
+  .vehicles-results .vehicle-grid .vehicle-card {
+    min-width: 0;
+    flex: initial;
+    scroll-snap-align: none;
+  }
+
+  .vehicles-results .vehicle-grid .vehicle-media {
+    height: clamp(180px, 24vw, 230px);
+  }
+}
+
+@media (max-width: 767px) {
+  .vehicles-page {
+    padding: 20px 0 56px;
+  }
+
+  .vehicles-page .container {
+    width: min(100% - 24px, 640px);
+  }
+
+  .page-header {
+    margin-bottom: 18px;
+  }
+
+  .page-header h1 {
+    font-size: 30px;
+  }
+
+  .mobile-search {
+    display: block;
+    margin-bottom: 14px;
+  }
+
+  .mobile-search-panel {
+    display: block;
+    padding: 14px;
+    background: #ffffff;
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    box-shadow: var(--shadow);
+  }
+
+  .mobile-search-panel .filter-field {
+    margin: 0;
+  }
+
+  .vehicles-layout {
+    display: block;
+  }
+
+  .vehicles-layout > .filter-panel,
+  .vehicles-results .vehicle-search,
+  .desktop-sort {
+    display: none;
+  }
+
+  .results-toolbar {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: 12px;
+    min-height: 0;
+    padding: 12px;
+    margin-bottom: 18px;
+  }
+
+  .mobile-filter-actions {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 10px;
+  }
+
+  .mobile-filter-actions button,
+  .mobile-filter-actions label,
+  .mobile-filter-actions select {
+    min-height: 46px;
+  }
+
+  .mobile-filter-actions button,
+  .mobile-filter-actions label {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 6px;
+    padding: 10px 12px;
+    color: var(--primary);
+    background: #ffffff;
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    font-weight: 700;
+  }
+
+  .mobile-filter-actions label {
+    padding: 0 4px 0 12px;
+  }
+
+  .mobile-filter-actions select {
+    min-height: 44px;
+    padding: 8px 4px;
+    border: 0;
+    background: transparent;
+    font-weight: 700;
+  }
+
+  .vehicle-count {
+    font-size: 15px;
+  }
+
+  .vehicles-results .vehicle-grid {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: 16px;
+    overflow: visible;
+    padding: 0;
+    scroll-snap-type: none;
+  }
+
+  .vehicles-results .vehicle-grid .vehicle-card {
+    width: 100%;
+    min-width: 0;
+    flex: initial;
+    scroll-snap-align: none;
+  }
+
+  .vehicles-results .vehicle-grid .vehicle-media {
+    height: auto;
+    aspect-ratio: 16 / 10;
+  }
+
+  .vehicles-results .vehicle-grid .vehicle-content {
+    padding: 18px;
+  }
+
+  .filter-drawer-backdrop {
+    position: fixed;
+    inset: 0;
+    z-index: 40;
+    display: flex;
+    align-items: flex-end;
+    background: rgba(15, 23, 42, 0.46);
+  }
+
+  .filter-drawer {
+    width: 100%;
+    max-height: min(88vh, 680px);
+    overflow-y: auto;
+    padding: 20px 18px max(18px, env(safe-area-inset-bottom));
+    background: #ffffff;
+    border-radius: 18px 18px 0 0;
+    box-shadow: 0 -12px 30px rgba(15, 23, 42, 0.16);
+  }
+
+  .filter-drawer-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 22px;
+  }
+
+  .filter-drawer-header h2 {
+    margin: 0;
+    color: var(--text);
+    font-size: 24px;
+  }
+
+  .filter-drawer-header button {
+    width: 42px;
+    height: 42px;
+    color: var(--muted);
+    background: #f8fafc;
+    border: 1px solid var(--border);
+    border-radius: 50%;
+    font-size: 24px;
+    line-height: 1;
+  }
+
+  .filter-drawer .filter-group {
+    margin-bottom: 22px;
+  }
+
+  .filter-drawer .filter-group label {
+    min-height: 36px;
+  }
+
+  .filter-drawer .price-filter label {
+    align-items: flex-start;
+    flex-direction: column;
+    gap: 6px;
+  }
+
+  .filter-drawer .price-filter input {
+    min-height: 46px;
+  }
+
+  .filter-drawer-actions {
+    display: grid;
+    grid-template-columns: 1fr 1.4fr;
+    gap: 10px;
+    padding-top: 4px;
+  }
+
+  .filter-drawer-actions .btn {
+    min-height: 48px;
+  }
+}
+
+@media (max-width: 650px) {
+  .footer {
+    padding-top: 30px;
+  }
+
+  .footer-grid {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: 12px;
+    padding-bottom: 28px;
+  }
+
+  .footer-grid > div:first-child {
+    display: block;
+    grid-column: 1 / -1;
+    padding-bottom: 8px;
+  }
+
+  .footer h2 {
+    margin-bottom: 16px;
+    font-size: 22px;
+  }
+
+  .footer p {
+    max-width: 340px;
+    font-size: 14px;
+    line-height: 1.6;
+  }
+
+  .footer h3 {
+    margin-bottom: 14px;
+    font-size: 14px;
+    line-height: 1.2;
+  }
+
+  .footer a {
+    margin-top: 10px;
+    font-size: 12px;
+    line-height: 1.35;
+    overflow-wrap: anywhere;
+  }
+
+  .footer-bottom {
+    padding: 16px 12px;
+    font-size: 11px;
+  }
+
+  .home-page .stats-band {
+    padding: 26px 0;
+  }
+
+  .home-page .stats-row {
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+    gap: 0;
+  }
+
+  .home-page .stats-row div {
+    min-width: 0;
+    padding: 0 6px;
+    border-right: 1px solid rgba(255, 255, 255, 0.12);
+    border-bottom: 0;
+  }
+
+  .home-page .stats-row div:last-child {
+    border-right: 0;
+  }
+
+  .home-page .stats-row strong {
+    margin-bottom: 6px;
+    font-size: 17px;
+    line-height: 1.1;
+    white-space: nowrap;
+  }
+
+  .home-page .stats-row span {
+    display: block;
+    font-size: 10px;
+    line-height: 1.25;
   }
 }
 
@@ -4047,7 +4738,6 @@ td strong {
 }
 
 .nav-links a.router-link-exact-active,
-.mobile-nav a.router-link-exact-active,
 .admin-badge,
 .status,
 .active-rental-media .status {

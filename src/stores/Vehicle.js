@@ -57,7 +57,7 @@ const sampleVehicles = [
     rating: '4.9',
     status: 'Unavailable',
     image:
-      'https://images.unsplash.com/photo-1525609004556-c46c7d6cf023?auto=format&fit=crop&w=900&q=80'
+      'https://i.pinimg.com/1200x/11/43/1a/11431ab3e966a1a37530da7eaa5090fa.jpg'
   },
   {
     id: 5,

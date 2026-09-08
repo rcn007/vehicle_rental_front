@@ -6,6 +6,10 @@
         <p>{{ filteredVehicles.length }} vehicles found</p>
       </div>
 
+      <div class="mobile-search">
+        <SearchBar mobile @search="handleSearch" />
+      </div>
+
       <div class="vehicles-layout">
         <SearchBar @search="handleSearch" />
 
@@ -23,9 +27,24 @@
           </div>
 
           <div class="results-toolbar">
-            <span>{{ filteredVehicles.length }} vehicles</span>
+            <div class="mobile-filter-actions">
+              <button type="button" @click="openFilterDrawer">Filter</button>
 
-            <label>
+              <label>
+                Sort
+                <select v-model="sortBy">
+                  <option value="default">Default</option>
+                  <option value="priceLow">Price low to high</option>
+                  <option value="priceHigh">Price high to low</option>
+                </select>
+              </label>
+            </div>
+
+            <span class="vehicle-count"
+              >{{ filteredVehicles.length }} vehicles</span
+            >
+
+            <label class="desktop-sort">
               Sort:
               <select v-model="sortBy">
                 <option value="default">Default</option>
@@ -53,6 +72,54 @@
           </div>
         </div>
       </div>
+
+      <div
+        v-if="filterDrawerOpen"
+        class="filter-drawer-backdrop"
+        @click.self="filterDrawerOpen = false"
+      >
+        <aside class="filter-drawer" aria-label="Vehicle filters">
+          <div class="filter-drawer-header">
+            <h2>Filters</h2>
+            <button
+              type="button"
+              aria-label="Close filters"
+              @click="filterDrawerOpen = false"
+            >
+              &times;
+            </button>
+          </div>
+
+          <div class="filter-group">
+            <h3>Category</h3>
+            <label v-for="category in categories" :key="category">
+              <input
+                v-model="draftFilters.category"
+                type="radio"
+                :value="category"
+              />
+              {{ category }}
+            </label>
+          </div>
+
+          <div class="filter-group">
+            <h3>Brand</h3>
+            <label v-for="brand in brands" :key="brand">
+              <input v-model="draftFilters.brand" type="radio" :value="brand" />
+              {{ brand }}
+            </label>
+          </div>
+
+          <div class="filter-drawer-actions">
+            <button type="button" class="btn btn-outline" @click="resetFilters">
+              Reset
+            </button>
+            <button type="button" class="btn btn-primary" @click="applyFilters">
+              Apply Filters
+            </button>
+          </div>
+        </aside>
+      </div>
     </div>
   </section>
 </template>
@@ -67,6 +134,18 @@ import SearchBar from '../components/Searchbar.vue'
 const vehicleStore = useVehicleStore()
 const bookingStore = useBookingStore()
 const sortBy = ref('default')
+const filterDrawerOpen = ref(false)
+
+const categories = ['All', 'Sedan', 'SUV', 'Motorcycle', 'Luxury']
+const brands = [
+  'All',
+  'BMW',
+  'Toyota',
+  'Honda',
+  'Rolls-Royce',
+  'Audi',
+  'Harley-Davidson'
+]
 
 const filters = reactive({
   search: '',
@@ -74,6 +153,11 @@ const filters = reactive({
   brand: 'All',
   pickupDate: '',
   returnDate: ''
+})
+
+const draftFilters = reactive({
+  category: 'All',
+  brand: 'All'
 })
 
 const filteredVehicles = computed(() => {
@@ -139,6 +223,31 @@ function handleSearch(data) {
   filters.brand = data.brand || 'All'
   filters.pickupDate = data.pickupDate || filters.pickupDate
   filters.returnDate = data.returnDate || filters.returnDate
+}
+
+function openFilterDrawer() {
+  Object.assign(draftFilters, {
+    category: filters.category,
+    brand: filters.brand
+  })
+  filterDrawerOpen.value = true
+}
+
+function applyFilters() {
+  filters.category = draftFilters.category
+  filters.brand = draftFilters.brand
+  filterDrawerOpen.value = false
+}
+
+function resetFilters() {
+  Object.assign(draftFilters, {
+    category: 'All',
+    brand: 'All'
+  })
+  Object.assign(filters, {
+    category: 'All',
+    brand: 'All'
+  })
 }
 
 onMounted(() => {

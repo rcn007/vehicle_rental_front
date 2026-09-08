@@ -1,7 +1,7 @@
 <template>
   <header class="navbar">
     <div class="container nav-content">
-      <RouterLink to="/" class="logo">
+      <RouterLink to="/" class="logo" @click="closeMenu">
         <span class="logo-mark">
           <CarFront :size="18" />
         </span>
@@ -56,6 +56,13 @@
     </div>
 
     <nav class="mobile-nav" :class="{ open: menuOpen }">
+      <RouterLink to="/" class="mobile-nav-brand" @click="closeMenu">
+        <span class="mobile-nav-brand-mark">
+          <CarFront :size="18" />
+        </span>
+        <span>DriveEase</span>
+      </RouterLink>
+
       <RouterLink to="/" @click="closeMenu"> Home </RouterLink>
       <RouterLink to="/vehicles" @click="closeMenu"> Vehicles </RouterLink>
       <RouterLink to="/my-bookings" @click="closeMenu">
@@ -69,7 +76,14 @@
 
       <div class="mobile-auth-links">
         <template v-if="!auth.isAuthenticated">
-          <RouterLink to="/auth/login" @click="closeMenu"> Sign In </RouterLink>
+          <RouterLink
+            to="/auth/login"
+            class="mobile-login-link"
+            @click="closeMenu"
+          >
+            <UserRound :size="17" />
+            Sign In
+          </RouterLink>
           <span>/</span>
           <RouterLink to="/auth/register" @click="closeMenu">
             Register
@@ -89,7 +103,7 @@
 
 <script setup>
 import { ref } from 'vue'
-import { CarFront, Menu, X } from '@lucide/vue'
+import { CarFront, Menu, UserRound, X } from '@lucide/vue'
 import { useRouter } from 'vue-router'
 import { useAuthStore } from '../stores/Auth'
 
