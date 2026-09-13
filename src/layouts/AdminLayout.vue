@@ -9,6 +9,7 @@
 
       <!-- Navbar -->
       <DashboardNavbar />
+        <NotificationPopup />
 
       <!-- Page Content -->
       <main class="p-4 sm:p-6">
@@ -25,4 +26,5 @@
 <script setup>
 import DashboardSidebar from '../components/dashboard/DashboardSidebar.vue'
 import DashboardNavbar from '../components/dashboard/DashboardNavbar.vue'
+import NotificationPopup from '../components/dashboard/NotificationPopup.vue';
 </script>

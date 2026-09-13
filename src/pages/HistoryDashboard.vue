@@ -1,364 +1,905 @@
 <template>
-  <main class="p-6  min-h-[calc(100vh-64px)] relative overflow-x-hidden">
-    
-    <!-- Breadcrumb & Header -->
-    <div class="mb-6">
-     
-      <h1 class="text-4xl font-bold tracking-tight text-[#111827]">Rental History</h1>
-      <p class="text-[#43474E] text-xl mt-1">View and manage completed vehicle rental history</p>
+  <main class="min-h-[calc(100vh-64px)] bg-slate-50 p-4 sm:p-6 lg:p-8">
+
+    <!-- =========================================================
+         PAGE HEADER
+    ========================================================== -->
+    <div class="max-w-[1600px] mx-auto mb-7">
+      <div class="flex flex-col gap-1">
+
+        <h1 class="text-3xl sm:text-3xl font-bold tracking-tight text-slate-900">
+          Rental History
+        </h1>
+
+        <p class="text-xl text-slate-900">
+          View completed rental transactions and rental performance.
+        </p>
+      </div>
     </div>
 
-    <!-- 3 KPI Summary Cards -->
-    <div class="grid grid-cols-1 sm:grid-cols-3 gap-4 mb-6 ">
-      
-      <!-- Total Rentals -->
-      <div class="p-5 bg-white border border-[#D3DAEF] rounded-xl shadow-sm flex items-center justify-between ">
-        <div>
-          <div class="text-[#43474E] text-xl font-medium mb-1 ">TOTAL RENTALS</div>
-          <div class="text-3xl font-bold text-[#111827]">1,248</div>
-          <div class="text-xs text-[#7A8190] mt-1">All completed rentals</div>
-        </div>
-        <div class="w-12 h-12 rounded-xl bg-[#F1F3FF] border border-[#D3DAEF] flex items-center justify-center text-[#111827]">
-          <i class="fa-solid fa-car text-lg"></i>
-        </div>
-      </div>
 
-      <!-- Total Revenue -->
-      <div class="p-5 bg-white border border-[#D3DAEF] rounded-xl shadow-sm flex items-center justify-between">
-        <div>
-          <div class="text-[#43474E] text-xl font-medium mb-1">TOTAL REVENUE</div>
-          <div class="text-3xl font-bold text-[#111827]">$86,450</div>
-          <div class="text-xs text-[#7A8190] mt-1">Revenue from completed</div>
-        </div>
-        <div class="w-12 h-12 rounded-xl bg-[#F1F3FF] border border-[#D3DAEF] flex items-center justify-center text-[#111827]">
-          <i class="fa-solid fa-wallet text-lg"></i>
-        </div>
-      </div>
-
-      <!-- Average Duration -->
-      <div class="p-5 bg-white border border-[#D3DAEF] rounded-xl shadow-sm flex items-center justify-between">
-        <div>
-          <div class="text-[#43474E] text-xl font-medium mb-1">AVERAGE DURATION</div>
-          <div class="text-3xl font-bold text-[#111827]">3.4 Days</div>
-          <div class="text-xs text-[#7A8190] mt-1">Average rental length</div>
-        </div>
-        <div class="w-12 h-12 rounded-xl bg-[#F1F3FF] border border-[#D3DAEF] flex items-center justify-center text-[#111827]">
-          <i class="fa-solid fa-chart-line text-lg"></i>
-        </div>
-      </div>
-
-    </div>
-
-    <!-- Main Content Container -->
-    <div class="bg-white border border-[#D3DAEF] rounded-xl shadow-sm overflow-hidden">
-      
-      <!-- Section Header & Filter Toolbar -->
-      <div class="p-5 border-b border-[#D3DAEF]">
-        <h2 class="text-lg font-bold text-[#111827]">Rental History</h2>
-        <p class="text-xs text-[#7A8190] mb-4">Completed and previous rental transactions</p>
-
-        <div class="flex flex-col md:flex-row items-stretch md:items-center gap-3">
-          
-          <!-- Search Input -->
-          <div class="relative flex-1">
-            <input 
-              type="text" 
-              v-model="searchQuery" 
-              placeholder="Search ID, customer, vehicle..." 
-              class="w-full h-10 pl-9 pr-4 bg-[#F1F3FF] border border-[#D3DAEF] rounded-lg text-sm text-[#111827] focus:outline-none focus:border-[#2563EB]"
-            >
-            <i class="fa-solid fa-magnifying-glass absolute left-3 top-1/2 -translate-y-1/2 text-[#7A8190] text-xs"></i>
-          </div>
-
-          <!-- Date Range Filter -->
-          <div class="relative">
-            <select v-model="selectedDateRange" class="h-10 px-3 pr-8 bg-[#F1F3FF] border border-[#D3DAEF] rounded-lg text-sm text-[#111827] focus:outline-none">
-              <option value="">Date Range</option>
-              <option value="last-7">Last 7 Days</option>
-              <option value="last-30">Last 30 Days</option>
-              <option value="aug-2026">August 2026</option>
-            </select>
-          </div>
-
-          <!-- Vehicle Filter -->
-          <div class="relative">
-            <select v-model="selectedVehicle" class="h-10 px-3 pr-8 bg-[#F1F3FF] border border-[#D3DAEF] rounded-lg text-sm text-[#111827] focus:outline-none">
-              <option value="">All Vehicles</option>
-              <option value="Toyota Camry">Toyota Camry</option>
-              <option value="Honda CR-V">Honda CR-V</option>
-              <option value="Toyota Fortuner">Toyota Fortuner</option>
-            </select>
-          </div>
-
-        </div>
-      </div>
-
-      <!-- Table View -->
-      <div class="overflow-x-auto">
-        <table class="w-full text-left border-collapse">
-          <thead>
-            <tr class="bg-[#F8FAFC] text-[#7A8190] text-xs font-bold uppercase tracking-wider border-b border-[#D3DAEF]">
-              <th class="p-3.5 pl-6">BOOKING ID</th>
-              <th class="p-3.5">CUSTOMER</th>
-              <th class="p-3.5">VEHICLE</th>
-              <th class="p-3.5 pr-6">DATES</th>
-            </tr>
-          </thead>
-          <tbody class="divide-y divide-[#E1E6F5]">
-            <tr 
-              v-for="rental in filteredRentals" 
-              :key="rental.id"
-              @click="openDetails(rental)"
-              class="hover:bg-[#F8FAFC] transition-colors cursor-pointer"
-            >
-              <td class="p-4 pl-6 font-bold text-[#2563EB] text-sm">{{ rental.id }}</td>
-              <td class="p-4">
-                <div class="flex items-center gap-3">
-                  <div class="w-8 h-8 rounded-full bg-[#E1E8FD] text-[#2563EB] font-bold flex items-center justify-center text-xs">
-                    {{ rental.customerInitials }}
-                  </div>
-                  <span class="font-semibold text-[#111827] text-sm">{{ rental.customerName }}</span>
-                </div>
-              </td>
-              <td class="p-4">
-                <div class="flex items-center gap-2">
-                  <div class="w-7 h-7 rounded bg-[#F1F3FF] border border-[#D3DAEF] flex items-center justify-center text-[#111827]">
-                    <i class="fa-solid fa-car text-[10px]"></i>
-                  </div>
-                  <span class="text-sm text-[#111827] font-medium">{{ rental.vehicleName }}</span>
-                </div>
-              </td>
-              <td class="p-4 pr-6 text-xs text-[#43474E]">
-                <div class="font-medium text-[#111827]">{{ rental.dateRange }}</div>
-                <div class="text-[#7A8190] mt-0.5">{{ rental.duration }}</div>
-              </td>
-            </tr>
-          </tbody>
-        </table>
-      </div>
-
-      <!-- Pagination Footer -->
-      <div class="p-4 px-6 bg-[#F8FAFC] border-t border-[#D3DAEF] text-xs text-[#7A8190]">
-        Showing 1-{{ filteredRentals.length }} of 1,248 rentals
-      </div>
-
-    </div>
-
-    <!-- Backdrop Overlay for Side Drawer -->
-    <div 
-      v-if="selectedRental" 
-      @click="selectedRental = null"
-      class="fixed inset-0 bg-black/30 backdrop-blur-xs z-40 transition-opacity"
-    ></div>
-
-    <!-- Slide-Over Rental Details Drawer -->
-    <div 
-      class="fixed top-0 right-0 bottom-0 w-full sm:w-[480px] bg-white border-l border-[#D3DAEF] shadow-2xl z-50 transform transition-transform duration-300 overflow-y-auto flex flex-col justify-between"
-      :class="selectedRental ? 'translate-x-0' : 'translate-x-full'"
+    <!-- =========================================================
+         LOADING STATE
+    ========================================================== -->
+    <div
+      v-if="loading"
+      class="max-w-[1600px] mx-auto bg-white border border-slate-200 rounded-2xl"
     >
-      <div v-if="selectedRental" class="p-6">
-        
-        <!-- Drawer Header -->
-        <div class="flex items-center justify-between pb-4 border-b border-[#D3DAEF]">
-          <h2 class="text-lg font-bold text-[#111827]">Rental Details</h2>
-          <button @click="selectedRental = null" class="w-8 h-8 rounded-lg hover:bg-[#F1F3FF] flex items-center justify-center text-[#7A8190] hover:text-[#111827]">
-            <i class="fa-solid fa-xmark"></i>
-          </button>
+      <div class="flex flex-col items-center justify-center py-24">
+        <div class="w-10 h-10 rounded-full bg-slate-100 flex items-center justify-center mb-4">
+          <i class="fa-solid fa-circle-notch fa-spin text-slate-600"></i>
         </div>
 
-        <!-- Booking ID & Status Card -->
-        <div class="mt-5 p-4 bg-[#F8FAFC] border border-[#D3DAEF] rounded-xl">
-          <div class="flex items-center justify-between mb-2">
-            <span class="font-bold text-[#111827] text-base">{{ selectedRental.id }}</span>
-            <span class="inline-flex items-center px-2.5 py-0.5 rounded text-xs font-semibold bg-[#DCFCE7] text-[#15803D]">
-              {{ selectedRental.status }}
-            </span>
-          </div>
-          <div class="text-xs text-[#7A8190] mb-4">{{ selectedRental.dateRange }} ({{ selectedRental.duration }})</div>
-          
-          <div class="flex items-center gap-2">
-            <button @click="handleAction('invoice')" class="flex-1 py-2 bg-white border border-[#D3DAEF] rounded-lg text-xs font-bold text-[#111827] hover:bg-[#E1E8FD] transition-colors shadow-sm">Invoice</button>
-            <button @click="handleAction('contract')" class="flex-1 py-2 bg-white border border-[#D3DAEF] rounded-lg text-xs font-bold text-[#111827] hover:bg-[#E1E8FD] transition-colors shadow-sm">Contract</button>
-          </div>
-        </div>
+        <p class="text-sm font-semibold text-slate-700">
+          Loading rental history
+        </p>
 
-        <!-- Customer Details -->
-        <div class="mt-5">
-          <div class="text-[11px] font-bold uppercase tracking-wider text-[#7A8190] mb-2">CUSTOMER</div>
-          <div class="flex items-center gap-3 p-3 bg-[#F1F3FF] border border-[#D3DAEF] rounded-xl">
-            <div class="w-9 h-9 rounded-full bg-[#2563EB] text-white font-bold flex items-center justify-center text-xs">
-              {{ selectedRental.customerInitials }}
-            </div>
-            <div>
-              <div class="font-bold text-[#111827] text-sm">{{ selectedRental.customerName }}</div>
-              <div class="text-xs text-[#7A8190]">{{ selectedRental.customerEmail }}</div>
-            </div>
-          </div>
-        </div>
-
-        <!-- Vehicle Details -->
-        <div class="mt-5">
-          <div class="text-[11px] font-bold uppercase tracking-wider text-[#7A8190] mb-2">VEHICLE</div>
-          <div class="flex items-center gap-3 p-3 bg-[#F1F3FF] border border-[#D3DAEF] rounded-xl">
-            <div class="w-12 h-10 rounded bg-white border border-[#D3DAEF] flex items-center justify-center text-[#111827]">
-              <i class="fa-solid fa-car text-sm"></i>
-            </div>
-            <div>
-              <div class="font-bold text-[#111827] text-sm">{{ selectedRental.vehicleName }}</div>
-              <div class="text-xs text-[#7A8190]">Plate: {{ selectedRental.plateNumber }}</div>
-            </div>
-          </div>
-        </div>
-
-        <!-- Payment Breakdown -->
-        <div class="mt-5">
-          <div class="text-[11px] font-bold uppercase tracking-wider text-[#7A8190] mb-2">PAYMENT</div>
-          <div class="p-4 bg-[#F8FAFC] border border-[#D3DAEF] rounded-xl space-y-2 text-xs">
-            <div class="flex justify-between pb-2 border-b border-[#D3DAEF]">
-              <span class="text-[#7A8190]">Status</span>
-              <span class="font-semibold text-[#15803D]">{{ selectedRental.paymentStatus }}</span>
-            </div>
-            <div class="flex justify-between">
-              <span class="text-[#7A8190]">Base Rate ({{ selectedRental.duration }})</span>
-              <span class="font-medium text-[#111827]">{{ selectedRental.baseRate }}</span>
-            </div>
-            <div class="flex justify-between pt-2 border-t border-[#D3DAEF] font-bold text-sm">
-              <span class="text-[#111827]">Total</span>
-              <span class="text-[#111827]">{{ selectedRental.totalAmount }}</span>
-            </div>
-          </div>
-        </div>
-
-        <!-- Rental Timeline -->
-        <div class="mt-5">
-          <div class="text-[11px] font-bold uppercase tracking-wider text-[#7A8190] mb-3">RENTAL TIMELINE</div>
-          <div class="space-y-4 pl-2 border-l-2 border-[#D3DAEF] ml-2">
-            
-            <div class="relative pl-4">
-              <div class="absolute -left-[21px] top-1 w-3 h-3 rounded-full bg-[#2563EB] border-2 border-white"></div>
-              <div class="text-xs font-bold text-[#111827]">Created</div>
-              <div class="text-[10px] text-[#7A8190]">Aug 01, 2026 at 10:23 AM</div>
-            </div>
-
-            <div class="relative pl-4">
-              <div class="absolute -left-[21px] top-1 w-3 h-3 rounded-full bg-[#2563EB] border-2 border-white"></div>
-              <div class="text-xs font-bold text-[#111827]">Confirmed</div>
-              <div class="text-[10px] text-[#7A8190]">Aug 01, 2026 at 11:05 AM</div>
-            </div>
-
-            <div class="relative pl-4">
-              <div class="absolute -left-[21px] top-1 w-3.5 h-3.5 rounded-full bg-[#16A34A] border-2 border-white flex items-center justify-center">
-                <i class="fa-solid fa-check text-[6px] text-white"></i>
-              </div>
-              <div class="text-xs font-bold text-[#111827]">Picked Up & Completed</div>
-              <div class="text-[10px] text-[#7A8190]">Aug 05, 2026 at 08:30 AM</div>
-            </div>
-
-          </div>
-        </div>
-
+        <p class="text-xs text-slate-400 mt-1">
+          Please wait while we retrieve the records.
+        </p>
       </div>
-
-      <!-- Drawer Footer Actions -->
-      <div v-if="selectedRental" class="p-4 px-6 bg-[#F8FAFC] border-t border-[#D3DAEF] flex items-center gap-3">
-        <button @click="handleAction('print')" class="flex-1 py-2.5 bg-white border border-[#D3DAEF] rounded-lg text-xs font-bold text-[#111827] hover:bg-[#E1E8FD] transition-colors shadow-sm">Print Receipt</button>
-        <button @click="handleAction('full-record')" class="flex-1 py-2.5 bg-[#111827] text-white rounded-lg text-xs font-bold hover:bg-black transition-colors shadow-sm">Full Record</button>
-      </div>
-
     </div>
+
+
+    <!-- =========================================================
+         ERROR STATE
+    ========================================================== -->
+    <div
+      v-else-if="error"
+      class="max-w-[1600px] mx-auto bg-white border border-red-200 rounded-2xl"
+    >
+      <div class="flex flex-col items-center justify-center py-20 px-6 text-center">
+
+        <div class="w-12 h-12 rounded-full bg-red-50 flex items-center justify-center mb-4">
+          <i class="fa-solid fa-triangle-exclamation text-red-500"></i>
+        </div>
+
+        <h3 class="text-base font-bold text-slate-900">
+          Unable to load rental history
+        </h3>
+
+        <p class="text-sm text-slate-500 mt-1 max-w-md">
+          {{ error }}
+        </p>
+
+        <button
+          @click="fetchHistoryData"
+          class="mt-5 inline-flex items-center gap-2 px-4 py-2.5 bg-slate-900 text-white text-sm font-semibold rounded-lg hover:bg-slate-800 transition cursor-pointer"
+        >
+          <i class="fa-solid fa-rotate-right text-xs"></i>
+          Retry
+        </button>
+
+      </div>
+    </div>
+
+
+    <!-- =========================================================
+         MAIN CONTENT
+    ========================================================== -->
+    <template v-else>
+
+      <div class="max-w-[1600px] mx-auto">
+
+
+        <!-- =====================================================
+             KPI CARDS
+        ====================================================== -->
+        <div class="grid grid-cols-1 sm:grid-cols-3 gap-4 mb-6">
+
+          <!-- Total Rentals -->
+          <div
+            class="bg-white border border-slate-200 rounded-2xl p-5 hover:border-slate-300 transition"
+          >
+            <div class="flex items-start justify-between">
+
+              <div>
+                 <span class="text-[#0f172a] text-[15px] font-bold uppercase tracking-wider"
+            style="font-family: var(--font-heading);">
+                  Total Rentals
+                </span>
+
+                <h2 class="text-2xl font-bold text-slate-900 mt-2">
+                  {{ kpis.totalRentals.toLocaleString() }}
+                </h2>
+
+                <p class="text-xs text-slate-400 mt-1">
+                  Completed rentals
+                </p>
+              </div>
+
+              <div
+                class="w-10 h-10 rounded-xl bg-blue-50 flex items-center justify-center"
+              >
+                <i class="fa-solid fa-car text-blue-600"></i>
+              </div>
+
+            </div>
+          </div>
+
+
+          <!-- Revenue -->
+          <div
+            class="bg-white border border-slate-200 rounded-2xl p-5 hover:border-slate-300 transition"
+          >
+            <div class="flex items-start justify-between">
+
+              <div>
+                <span class="text-[#0f172a] text-[15px] font-bold uppercase tracking-wider"
+            style="font-family: var(--font-heading);">
+                  Total Revenue
+                </span>
+
+                <h2 class="text-2xl font-bold text-slate-900 mt-2">
+                  ${{ Number(kpis.totalRevenue).toLocaleString() }}
+                </h2>
+
+                <p class="text-xs text-slate-400 mt-1">
+                  From completed rentals
+                </p>
+              </div>
+
+              <div
+                class="w-10 h-10 rounded-xl bg-emerald-50 flex items-center justify-center"
+              >
+                <i class="fa-solid fa-dollar-sign text-emerald-600"></i>
+              </div>
+
+            </div>
+          </div>
+
+
+          <!-- Average Duration -->
+          <div
+            class="bg-white border border-slate-200 rounded-2xl p-5 hover:border-slate-300 transition"
+          >
+            <div class="flex items-start justify-between">
+
+              <div>
+                <span class="text-[#0f172a] text-[15px] font-bold uppercase tracking-wider"
+            style="font-family: var(--font-heading);">
+                  Average Duration
+                </span>
+
+                <h2 class="text-2xl font-bold text-slate-900 mt-2">
+                  {{ kpis.avgDuration }}
+                  <span class="text-base font-semibold text-slate-500">
+                    days
+                  </span>
+                </h2>
+
+                <p class="text-xs text-slate-400 mt-1">
+                  Average rental length
+                </p>
+              </div>
+
+              <div
+                class="w-10 h-10 rounded-xl bg-violet-50 flex items-center justify-center"
+              >
+                <i class="fa-solid fa-clock text-violet-600"></i>
+              </div>
+
+            </div>
+          </div>
+
+        </div>
+
+
+        <!-- =====================================================
+             RENTAL HISTORY PANEL
+        ====================================================== -->
+        <section
+          class="bg-white border border-slate-200 rounded-2xl overflow-hidden"
+        >
+
+          <!-- ===================================================
+               PANEL HEADER & FILTERS
+          ==================================================== -->
+          <div class="px-5 sm:px-6 pt-5 pb-4">
+
+            <div class="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-4">
+
+              <div>
+                <h2 class="text-base font-bold text-slate-900">
+                  Completed Rentals
+                </h2>
+
+                <p class="text-xs text-slate-500 mt-1">
+                  Historical records of completed vehicle rentals.
+                </p>
+              </div>
+
+              <div
+                class="inline-flex items-center gap-2 px-3 py-1.5 rounded-full bg-emerald-50 text-emerald-700 text-xs font-semibold w-fit"
+              >
+                <span class="w-1.5 h-1.5 rounded-full bg-emerald-500"></span>
+                {{ filteredRentals.length }} records
+              </div>
+
+            </div>
+
+
+            <!-- Filter Toolbar -->
+            <div class="mt-5 flex flex-col lg:flex-row gap-3">
+
+              <!-- Search -->
+              <div class="relative flex-1">
+                  <input
+                  v-model="searchQuery"
+                  type="text"
+                  placeholder="Search booking ID, customer or vehicle..."
+                  class="w-full h-10 pl-9 pr-4 bg-slate-50 border border-slate-200 rounded-lg text-sm text-slate-900 placeholder:text-slate-400 outline-none focus:bg-white focus:border-slate-400 focus:ring-2 focus:ring-slate-100 transition"
+                />
+              </div>
+
+              <!-- Date Filter -->
+              <div class="relative">
+                <select
+                  v-model="selectedDateRange"
+                  class="w-full lg:w-40 h-10 px-3 pr-8 bg-slate-50 border border-slate-200 rounded-lg text-sm text-slate-700 outline-none focus:bg-white focus:border-slate-400 cursor-pointer"
+                >
+                  <option value="">All Dates</option>
+                  <option value="last-7">Last 7 Days</option>
+                  <option value="last-30">Last 30 Days</option>
+                  <option value="aug-2026">August 2026</option>
+                </select>
+              </div>
+
+              <!-- Dynamic Vehicle Filter (Populated from getVehicles) -->
+              <div class="relative">
+                <select
+                  v-model="selectedVehicle"
+                  class="w-full lg:w-48 h-10 px-3 pr-8 bg-slate-50 border border-slate-200 rounded-lg text-sm text-slate-700 outline-none focus:bg-white focus:border-slate-400 cursor-pointer"
+                >
+                  <option value="">All Vehicles</option>
+                  <option
+                    v-for="vehicle in vehicleOptions"
+                    :key="vehicle"
+                    :value="vehicle"
+                  >
+                    {{ vehicle }}
+                  </option>
+                </select>
+              </div>
+
+            </div>
+
+          </div>
+
+
+          <!-- ===================================================
+               TABLE
+          ==================================================== -->
+          <div class="overflow-x-auto border-t border-slate-100">
+
+            <table class="w-full min-w-[850px]">
+
+              <!-- Table Head -->
+              <thead>
+                <tr class="bg-slate-50/70 border-b border-slate-200">
+                  <th class="text-left px-6 py-3 text-[11px] font-bold uppercase tracking-wider text-slate-500">
+                    Booking
+                  </th>
+                  <th class="text-left px-4 py-3 text-[11px] font-bold uppercase tracking-wider text-slate-500">
+                    Customer
+                  </th>
+                  <th class="text-left px-4 py-3 text-[11px] font-bold uppercase tracking-wider text-slate-500">
+                    Vehicle
+                  </th>
+                  <th class="text-left px-4 py-3 text-[11px] font-bold uppercase tracking-wider text-slate-500">
+                    Rental Period
+                  </th>
+                  <th class="text-left px-4 py-3 text-[11px] font-bold uppercase tracking-wider text-slate-500">
+                    Duration
+                  </th>
+                  <th class="text-right px-6 py-3 text-[11px] font-bold uppercase tracking-wider text-slate-500">
+                    Amount
+                  </th>
+                </tr>
+              </thead>
+
+
+              <!-- Table Body -->
+              <tbody class="divide-y divide-slate-100">
+
+                <!-- Empty State -->
+                <tr v-if="filteredRentals.length === 0">
+                  <td colspan="6" class="px-6 py-16 text-center">
+                    <div class="flex flex-col items-center">
+                      <div class="w-12 h-12 rounded-full bg-slate-100 flex items-center justify-center mb-3">
+                        <i class="fa-solid fa-folder-open text-slate-400"></i>
+                      </div>
+                      <p class="text-sm font-semibold text-slate-700">No rental records found</p>
+                      <p class="text-xs text-slate-400 mt-1">Try changing your search or filters.</p>
+                    </div>
+                  </td>
+                </tr>
+
+                <!-- Rental Rows -->
+                <tr
+                  v-for="rental in filteredRentals"
+                  :key="rental.id"
+                  @click="openDetails(rental)"
+                  class="group hover:bg-slate-50/80 cursor-pointer transition"
+                >
+
+                  <!-- Booking ID -->
+                  <td class="px-6 py-4">
+                    <div class="flex items-center gap-3">
+                      <div class="w-9 h-9 rounded-lg bg-slate-100 flex items-center justify-center group-hover:bg-blue-50 transition">
+                        <i class="fa-solid fa-receipt text-xs text-slate-500 group-hover:text-blue-600"></i>
+                      </div>
+                      <div>
+                        <div class="text-sm font-bold text-slate-900 group-hover:text-blue-600 transition">
+                          #BK-{{ rental.id }}
+                        </div>
+                        <div class="text-[11px] text-slate-400 mt-0.5">
+                          {{ rental.status }}
+                        </div>
+                      </div>
+                    </div>
+                  </td>
+
+                  <!-- Customer -->
+                  <td class="px-4 py-4">
+                    <div class="flex items-center gap-3">
+                      <div class="w-8 h-8 rounded-full bg-slate-900 text-white flex items-center justify-center text-[10px] font-bold">
+                        {{ rental.customerInitials }}
+                      </div>
+                      <div class="min-w-0">
+                        <div class="text-sm font-semibold text-slate-800 truncate">
+                          {{ rental.customerName }}
+                        </div>
+                        <div class="text-[11px] text-slate-400 truncate max-w-[180px]">
+                          {{ rental.customerEmail }}
+                        </div>
+                      </div>
+                    </div>
+                  </td>
+
+                  <!-- Vehicle -->
+                  <td class="px-4 py-4">
+                    <div class="flex items-center gap-3">
+                      <div class="w-9 h-9 rounded-lg bg-slate-100 flex items-center justify-center">
+                        <i class="fa-solid fa-car text-xs text-slate-500"></i>
+                      </div>
+                      <div>
+                        <div class="text-sm font-semibold text-slate-800">
+                          {{ rental.vehicleName }}
+                        </div>
+                        <div class="text-[11px] text-slate-400">
+                          {{ rental.plateNumber }}
+                        </div>
+                      </div>
+                    </div>
+                  </td>
+
+                  <!-- Period -->
+                  <td class="px-4 py-4">
+                    <div class="text-sm font-medium text-slate-800">
+                      {{ rental.dateRange }}
+                    </div>
+                    <div class="text-[11px] text-slate-400 mt-0.5">
+                      Rental period
+                    </div>
+                  </td>
+
+                  <!-- Duration -->
+                  <td class="px-4 py-4">
+                    <span class="inline-flex items-center px-2.5 py-1 rounded-md bg-slate-100 text-slate-700 text-xs font-semibold">
+                      {{ rental.durationDays }} days
+                    </span>
+                  </td>
+
+                  <!-- Amount -->
+                  <td class="px-6 py-4 text-right">
+                    <div class="text-sm font-bold text-slate-900">
+                      ${{ Number(rental.totalAmount).toLocaleString() }}
+                    </div>
+                    <div class="text-[11px] text-emerald-600 font-medium mt-0.5">
+                      {{ rental.paymentStatus }}
+                    </div>
+                  </td>
+
+                </tr>
+
+              </tbody>
+
+            </table>
+
+          </div>
+
+
+          <!-- ===================================================
+               TABLE FOOTER
+          ==================================================== -->
+          <div class="px-6 py-3.5 border-t border-slate-100 bg-slate-50/50 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2">
+            <p class="text-xs text-slate-500">
+              Showing <span class="font-semibold text-slate-700">{{ filteredRentals.length }}</span>
+              of <span class="font-semibold text-slate-700">{{ rawHistoryData.length }}</span>
+              rental records
+            </p>
+            <div class="text-[11px] text-slate-400">
+              Click a record to view details
+            </div>
+          </div>
+
+        </section>
+
+      </div>
+
+
+      <!-- =======================================================
+           BACKDROP
+      ======================================================== -->
+      <div
+        v-if="selectedRental"
+        @click="selectedRental = null"
+        class="fixed inset-0 bg-slate-950/30 backdrop-blur-[2px] z-40"
+      ></div>
+
+
+      <!-- =======================================================
+           DETAILS DRAWER
+      ======================================================== -->
+      <aside
+        class="fixed top-0 right-0 bottom-0 w-full sm:w-[460px] bg-white z-50 shadow-2xl border-l border-slate-200 flex flex-col transition-transform duration-300"
+        :class="selectedRental ? 'translate-x-0' : 'translate-x-full'"
+      >
+        <template v-if="selectedRental">
+
+          <!-- Drawer Header -->
+          <div class="px-6 py-5 border-b border-slate-200 flex items-center justify-between">
+            <div>
+              <p class="text-[11px] uppercase tracking-wider font-bold text-slate-400">
+                Rental Record
+              </p>
+              <h2 class="text-lg font-bold text-slate-900 mt-0.5">
+                #BK-{{ selectedRental.id }}
+              </h2>
+            </div>
+            <button
+              @click="selectedRental = null"
+              class="w-9 h-9 rounded-lg bg-slate-100 text-slate-500 hover:bg-slate-200 hover:text-slate-900 flex items-center justify-center transition cursor-pointer"
+            >
+              <i class="fa-solid fa-xmark"></i>
+            </button>
+          </div>
+
+          <!-- Drawer Content -->
+          <div class="flex-1 overflow-y-auto px-6 py-6">
+
+            <!-- Status -->
+            <div class="flex items-center justify-between p-4 bg-emerald-50 border border-emerald-100 rounded-xl">
+              <div class="flex items-center gap-3">
+                <div class="w-9 h-9 rounded-lg bg-white flex items-center justify-center">
+                  <i class="fa-solid fa-check text-emerald-600"></i>
+                </div>
+                <div>
+                  <p class="text-xs text-emerald-700 font-medium">Rental Status</p>
+                  <p class="text-sm font-bold text-emerald-800 mt-0.5">{{ selectedRental.status }}</p>
+                </div>
+              </div>
+              <div class="text-right">
+                <p class="text-[11px] text-emerald-600">Duration</p>
+                <p class="text-sm font-bold text-emerald-800">{{ selectedRental.durationDays }} days</p>
+              </div>
+            </div>
+
+            <!-- Customer Details -->
+            <div class="mt-7">
+              <h3 class="text-xs font-bold uppercase tracking-wider text-slate-400 mb-3">Customer</h3>
+              <div class="flex items-center gap-3">
+                <div class="w-11 h-11 rounded-full bg-slate-900 text-white flex items-center justify-center text-xs font-bold">
+                  {{ selectedRental.customerInitials }}
+                </div>
+                <div>
+                  <p class="text-sm font-bold text-slate-900">{{ selectedRental.customerName }}</p>
+                  <p class="text-xs text-slate-500 mt-0.5">{{ selectedRental.customerEmail }}</p>
+                </div>
+              </div>
+            </div>
+
+            <!-- Vehicle Details -->
+            <div class="mt-7">
+              <h3 class="text-xs font-bold uppercase tracking-wider text-slate-400 mb-3">Vehicle</h3>
+              <div class="flex items-center gap-3 p-4 border border-slate-200 rounded-xl">
+                <div class="w-12 h-12 rounded-lg bg-slate-100 flex items-center justify-center">
+                  <i class="fa-solid fa-car text-slate-600"></i>
+                </div>
+                <div>
+                  <p class="text-sm font-bold text-slate-900">{{ selectedRental.vehicleName }}</p>
+                  <p class="text-xs text-slate-500 mt-1">
+                    Plate: <span class="font-medium text-slate-700">{{ selectedRental.plateNumber }}</span>
+                  </p>
+                </div>
+              </div>
+            </div>
+
+            <!-- Rental Period -->
+            <div class="mt-7">
+              <h3 class="text-xs font-bold uppercase tracking-wider text-slate-400 mb-3">Rental Period</h3>
+              <div class="grid grid-cols-2 gap-3">
+                <div class="p-3.5 border border-slate-200 rounded-xl">
+                  <p class="text-[11px] text-slate-400">Start Date</p>
+                  <p class="text-sm font-semibold text-slate-800 mt-1">{{ formatDate(selectedRental.startDate) }}</p>
+                </div>
+                <div class="p-3.5 border border-slate-200 rounded-xl">
+                  <p class="text-[11px] text-slate-400">End Date</p>
+                  <p class="text-sm font-semibold text-slate-800 mt-1">{{ formatDate(selectedRental.endDate) }}</p>
+                </div>
+              </div>
+            </div>
+
+            <!-- Payment -->
+            <div class="mt-7">
+              <h3 class="text-xs font-bold uppercase tracking-wider text-slate-400 mb-3">Payment</h3>
+              <div class="border border-slate-200 rounded-xl overflow-hidden">
+                <div class="px-4 py-3 bg-slate-50 flex items-center justify-between">
+                  <span class="text-xs text-slate-500">Rental total</span>
+                  <span class="text-lg font-bold text-slate-900">${{ Number(selectedRental.totalAmount).toLocaleString() }}</span>
+                </div>
+                <div class="px-4 py-3 flex items-center justify-between border-t border-slate-100">
+                  <span class="text-xs text-slate-500">Payment status</span>
+                  <span class="inline-flex items-center gap-1.5 text-xs font-semibold text-emerald-600">
+                    <span class="w-1.5 h-1.5 rounded-full bg-emerald-500"></span>
+                    {{ selectedRental.paymentStatus }}
+                  </span>
+                </div>
+              </div>
+            </div>
+
+            <!-- Timeline -->
+            <div class="mt-7">
+              <h3 class="text-xs font-bold uppercase tracking-wider text-slate-400 mb-4">Timeline</h3>
+              <div class="relative pl-6">
+                <div class="absolute left-[5px] top-2 bottom-2 w-px bg-slate-200"></div>
+                <div class="relative mb-6">
+                  <div class="absolute -left-[25px] top-0.5 w-3 h-3 rounded-full bg-blue-500 ring-4 ring-blue-50"></div>
+                  <p class="text-sm font-semibold text-slate-800">Booking Created</p>
+                  <p class="text-xs text-slate-400 mt-1">{{ formatDate(selectedRental.createdAt) }}</p>
+                </div>
+                <div class="relative">
+                  <div class="absolute -left-[25px] top-0.5 w-3 h-3 rounded-full bg-emerald-500 ring-4 ring-emerald-50"></div>
+                  <p class="text-sm font-semibold text-slate-800">Rental Status</p>
+                  <p class="text-xs text-slate-400 mt-1">{{ formatDate(selectedRental.endDate) }}</p>
+                </div>
+              </div>
+            </div>
+
+          </div>
+
+          <!-- Drawer Footer -->
+          <div class="p-4 border-t border-slate-200 bg-white flex gap-3">
+            <button
+              @click="handleAction('print')"
+              class="flex-1 h-10 border border-slate-200 rounded-lg text-sm font-semibold text-slate-700 hover:bg-slate-50 transition cursor-pointer"
+            >
+              <i class="fa-solid fa-print mr-1.5 text-xs"></i> Print
+            </button>
+            <button
+              @click="handleAction('invoice')"
+              class="flex-1 h-10 bg-slate-900 text-white rounded-lg text-sm font-semibold hover:bg-slate-800 transition cursor-pointer"
+            >
+              <i class="fa-solid fa-file-invoice mr-1.5 text-xs"></i> Invoice
+            </button>
+          </div>
+
+        </template>
+      </aside>
+
+    </template>
 
   </main>
 </template>
 
 <script setup>
-import { ref, computed } from 'vue'
+import { ref, computed, onMounted } from 'vue'
+import { getRentalHistory, getBookings, getVehicles } from '../api/history'
 
-// Reactive Filters and State
+// Page State
+const loading = ref(true)
+const error = ref(null)
+
+// Raw API Data Stores
+const rentalStatistics = ref(null)
+const rawHistoryData = ref([])
+const rawVehiclesData = ref([])
+
+// Filters and Selections
 const searchQuery = ref('')
 const selectedDateRange = ref('')
 const selectedVehicle = ref('')
 const selectedRental = ref(null)
 
-// Mock Dataset matching reference screen
-const rentals = ref([
-  {
-    id: '#BK-1024',
-    customerName: 'John Smith',
-    customerInitials: 'JS',
-    customerEmail: 'john.smith@example.com',
-    vehicleName: 'Toyota Camry',
-    plateNumber: '3B-5678',
-    dateRange: 'Aug 10 - Aug 13',
-    duration: '3 days',
-    status: 'Completed',
-    paymentStatus: 'Paid via ABA',
-    baseRate: '$240.00',
-    totalAmount: '$240.00'
-  },
-  {
-    id: '#BK-1023',
-    customerName: 'Sokha Chan',
-    customerInitials: 'SC',
-    customerEmail: 'sokha.chan@example.com',
-    vehicleName: 'Honda CR-V',
-    plateNumber: '2C-9876',
-    dateRange: 'Aug 08 - Aug 12',
-    duration: '4 days',
-    status: 'Completed',
-    paymentStatus: 'Paid via Card',
-    baseRate: '$380.00',
-    totalAmount: '$380.00'
-  },
-  {
-    id: '#BK-1022',
-    customerName: 'Dara Kim',
-    customerInitials: 'DK',
-    customerEmail: 'dara.kim@example.com',
-    vehicleName: 'Toyota Fortuner',
-    plateNumber: '2A-1234',
-    dateRange: 'Aug 05 - Aug 08',
-    duration: '3 days',
-    status: 'Completed',
-    paymentStatus: 'Paid via ABA',
-    baseRate: '$240.00',
-    totalAmount: '$240.00'
-  }
-])
+// Helper: Response Data Unwrapper
+const unwrapData = (response) => {
+  if (!response) return null
 
-// Filter Computed Logic
+  if (Array.isArray(response)) {
+    return response
+  }
+
+  if (response.data !== undefined) {
+    return response.data
+  }
+
+  if (Array.isArray(response.content)) {
+    return response.content
+  }
+
+  return response
+}
+
+// Helper: Extract Initials from Name
+const getInitials = (name) => {
+  if (!name) return 'CU'
+  const parts = String(name).trim().split(/\s+/)
+  if (parts.length >= 2) {
+    return (parts[0][0] + parts[1][0]).toUpperCase()
+  }
+  return name.substring(0, 2).toUpperCase()
+}
+
+// Helper: Format Date
+const formatDate = (dateStr) => {
+  if (!dateStr) return 'N/A'
+  const d = new Date(dateStr)
+  if (isNaN(d.getTime())) {
+    return dateStr
+  }
+  return d.toLocaleDateString('en-US', {
+    month: 'short',
+    day: '2-digit',
+    year: 'numeric'
+  })
+}
+
+// Main Fetcher: Fetches History, Bookings, and Vehicles in Parallel
+const fetchHistoryData = async () => {
+  try {
+    loading.value = true
+    error.value = null
+
+    // Fetch history, bookings, and vehicle registry in 1 parallel request
+    const [historyRes, bookingRes, vehicleRes] = await Promise.all([
+      getRentalHistory(),
+      getBookings(),
+      getVehicles()
+    ])
+
+    // 1. Process Dashboard Statistics
+    const statisticsData = unwrapData(historyRes)
+    rentalStatistics.value = statisticsData || {
+      total: 0,
+      completed: 0,
+      revenue: 0,
+      averageRating: 0,
+      totalDaysRented: 0
+    }
+
+    // 2. Process All Vehicles (from /vehicle/getAll)
+    const vehicleList = unwrapData(vehicleRes)
+    rawVehiclesData.value = Array.isArray(vehicleList)
+      ? vehicleList
+      : vehicleList?.content || []
+
+    // 3. Process History Table Records
+    if (Array.isArray(statisticsData?.history) && statisticsData.history.length > 0) {
+      rawHistoryData.value = statisticsData.history
+    } else {
+      // Fallback: Use getBookings() response if statistics history array is empty
+      const bookingData = unwrapData(bookingRes)
+      const bookings = Array.isArray(bookingData)
+        ? bookingData
+        : bookingData?.content || []
+
+      const completedOnly = bookings.filter(
+        booking => String(booking.status || '').toUpperCase() === 'COMPLETED'
+      )
+
+      // Fallback to all bookings if no completed ones exist yet
+      rawHistoryData.value = completedOnly.length > 0 ? completedOnly : bookings
+    }
+
+  } catch (err) {
+    console.error('Failed to load rental history:', err)
+    error.value =
+      err.response?.data?.message ||
+      err.response?.data?.msg ||
+      'Failed to retrieve rental history records.'
+  } finally {
+    loading.value = false
+  }
+}
+
+// Normalizer: Standardizes backend properties for consistent Vue rendering
+const normalizedRentals = computed(() => {
+  if (!Array.isArray(rawHistoryData.value)) {
+    return []
+  }
+
+  return rawHistoryData.value.map(item => {
+    const id = item.bookingId || item.id || 'N/A'
+
+    const customerName =
+      item.customerName ||
+      item.user?.name ||
+      item.userName ||
+      item.customer?.name ||
+      'Customer'
+
+    const customerEmail =
+      item.customerEmail ||
+      item.user?.email ||
+      item.customer?.email ||
+      'customer@example.com'
+
+    const vehicleName =
+      item.vehicleName ||
+      item.vehicle?.model ||
+      item.vehicle?.name ||
+      `${item.vehicle?.brand?.brandName || ''} ${item.vehicle?.model || ''}`.trim() ||
+      'Standard Vehicle'
+
+    const plateNumber =
+      item.plateNumber ||
+      item.vehicle?.licensePlate ||
+      item.vehicle?.plateNumber ||
+      'N/A'
+
+    const startDateValue =
+      item.startDate ||
+      item.pickupDate ||
+      item.createdAt
+
+    const endDateValue =
+      item.endDate ||
+      item.returnDate
+
+    const startDate = startDateValue ? new Date(startDateValue) : null
+    const endDate = endDateValue ? new Date(endDateValue) : null
+
+    let durationDays = Number(
+      item.totalDays ||
+      item.durationDays ||
+      0
+    )
+
+    if (
+      durationDays <= 0 &&
+      startDate &&
+      endDate &&
+      !isNaN(startDate.getTime()) &&
+      !isNaN(endDate.getTime())
+    ) {
+      const diffTime = Math.abs(endDate - startDate)
+      durationDays = Math.max(
+        Math.ceil(diffTime / (1000 * 60 * 60 * 24)),
+        1
+      )
+    }
+
+    const dateRange =
+      startDate && endDate && !isNaN(startDate.getTime()) && !isNaN(endDate.getTime())
+        ? `${startDate.toLocaleDateString('en-US', {
+            month: 'short',
+            day: '2-digit'
+          })} - ${endDate.toLocaleDateString('en-US', {
+            month: 'short',
+            day: '2-digit'
+          })}`
+        : 'N/A'
+
+    const totalAmount = Number(
+      item.totalPrice ||
+      item.totalAmount ||
+      item.amount ||
+      0
+    )
+
+    return {
+      id,
+      customerName,
+      customerEmail,
+      customerInitials: getInitials(customerName),
+      vehicleName,
+      plateNumber,
+      startDate: startDateValue,
+      endDate: endDateValue,
+      createdAt: item.createdAt || startDateValue,
+      dateRange,
+      durationDays,
+      status: item.status || 'COMPLETED',
+      paymentStatus:
+        item.paymentStatus ||
+        item.payment?.status ||
+        'Paid',
+      totalAmount
+    }
+  })
+})
+
+// KPI Aggregation Computations
+const kpis = computed(() => {
+  const statistics = rentalStatistics.value
+
+  if (!statistics) {
+    return {
+      totalRentals: 0,
+      totalRevenue: 0,
+      avgDuration: '0.0'
+    }
+  }
+
+  const completed = Number(statistics.completed || 0)
+  const revenue = Number(statistics.revenue || 0)
+  const totalDays = Number(statistics.totalDaysRented || 0)
+
+  const avgDuration =
+    completed > 0
+      ? (totalDays / completed).toFixed(1)
+      : '0.0'
+
+  return {
+    totalRentals: completed || normalizedRentals.value.length,
+    totalRevenue: revenue,
+    avgDuration
+  }
+})
+
+// Dynamic Vehicle Dropdown Filter Options (Primary: getVehicles API, Fallback: History List)
+const vehicleOptions = computed(() => {
+  if (rawVehiclesData.value.length > 0) {
+    const namesFromApi = rawVehiclesData.value
+      .map(v => v.name || v.model || `${v.brand?.brandName || ''} ${v.model || ''}`.trim())
+      .filter(Boolean)
+
+    return [...new Set(namesFromApi)]
+  }
+
+  const namesFromHistory = normalizedRentals.value
+    .map(rental => rental.vehicleName)
+    .filter(Boolean)
+
+  return [...new Set(namesFromHistory)]
+})
+
+// Filter Handler for Search and Vehicle Selection
 const filteredRentals = computed(() => {
-  return rentals.value.filter(rental => {
-    const matchesSearch = 
-      rental.id.toLowerCase().includes(searchQuery.value.toLowerCase()) ||
-      rental.customerName.toLowerCase().includes(searchQuery.value.toLowerCase()) ||
-      rental.vehicleName.toLowerCase().includes(searchQuery.value.toLowerCase())
-    
-    const matchesVehicle = selectedVehicle.value ? rental.vehicleName === selectedVehicle.value : true
-    
+  return normalizedRentals.value.filter(rental => {
+    const q = searchQuery.value.toLowerCase().trim()
+
+    const matchesSearch =
+      !q ||
+      String(rental.id).toLowerCase().includes(q) ||
+      rental.customerName.toLowerCase().includes(q) ||
+      rental.vehicleName.toLowerCase().includes(q)
+
+    const matchesVehicle =
+      !selectedVehicle.value ||
+      rental.vehicleName === selectedVehicle.value
+
     return matchesSearch && matchesVehicle
   })
 })
 
-// Drawer Selection Event
 const openDetails = (rental) => {
   selectedRental.value = rental
 }
 
-// Action Trigger Handlers
 const handleAction = (actionType) => {
+  if (!selectedRental.value) return
+
   switch (actionType) {
     case 'invoice':
-      alert(`Downloading invoice for ${selectedRental.value.id}...`)
-      break
-    case 'contract':
-      alert(`Opening rental contract for ${selectedRental.value.id}...`)
+      alert(`Downloading invoice for #BK-${selectedRental.value.id}...`)
       break
     case 'print':
       window.print()
       break
-    case 'full-record':
-      alert(`Navigating to full archive record for ${selectedRental.value.id}...`)
-      break
   }
 }
+
+onMounted(fetchHistoryData)
 </script>

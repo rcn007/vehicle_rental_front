@@ -92,4 +92,113 @@
 </template>
 
 <script setup>
+import { ref, onMounted } from 'vue'
+import {
+  getNotificationSettings,
+  updateNotificationSettings
+} from '../../api/notification'
+
+const notificationSettings = ref({
+  newBooking: true,
+  paymentReceived: true,
+  bookingCancellation: true,
+  newUserRegistration: true,
+  lowAvailabilityAlert: true,
+  dailySummaryReport: true
+})
+
+const loadingNotifications = ref(false)
+const savingNotifications = ref(false)
+
+const fetchNotificationSettings = async () => {
+  loadingNotifications.value = true
+
+  try {
+    const data = await getNotificationSettings()
+
+    if (data) {
+      notificationSettings.value = {
+        newBooking: data.newBooking,
+        paymentReceived: data.paymentReceived,
+        bookingCancellation: data.bookingCancellation,
+        newUserRegistration: data.newUserRegistration,
+        lowAvailabilityAlert: data.lowAvailabilityAlert,
+        dailySummaryReport: data.dailySummaryReport
+      }
+    }
+
+    console.log(
+      'Notification settings:',
+      notificationSettings.value
+    )
+  } catch (error) {
+    console.error(
+      'Failed to fetch notification settings:',
+      error
+    )
+
+    console.error(
+      'Status:',
+      error.response?.status
+    )
+
+    console.error(
+      'Response:',
+      error.response?.data
+    )
+  } finally {
+    loadingNotifications.value = false
+  }
+}
+
+const saveNotificationSettings = async () => {
+  if (savingNotifications.value) {
+    return
+  }
+
+  savingNotifications.value = true
+
+  try {
+    const data = await updateNotificationSettings(
+      notificationSettings.value
+    )
+
+    if (data) {
+      notificationSettings.value = {
+        newBooking: data.newBooking,
+        paymentReceived: data.paymentReceived,
+        bookingCancellation: data.bookingCancellation,
+        newUserRegistration: data.newUserRegistration,
+        lowAvailabilityAlert: data.lowAvailabilityAlert,
+        dailySummaryReport: data.dailySummaryReport
+      }
+    }
+
+    console.log(
+      'Notification settings updated:',
+      data
+    )
+  } catch (error) {
+    console.error(
+      'Failed to update notification settings:',
+      error
+    )
+
+    console.error(
+      'Status:',
+      error.response?.status
+    )
+
+    console.error(
+      'Response:',
+      error.response?.data
+    )
+  } finally {
+    savingNotifications.value = false
+  }
+}
+
+onMounted(() => {
+  fetchNotificationSettings()
+})
 </script>

@@ -26,6 +26,22 @@ import ReportDashboard from '../pages/ReportDashboard.vue'
 import SettingDashboard from '../pages/SettingDashboard.vue'
 import HistoryDashboard from '../pages/HistoryDashboard.vue'
 import VehicleDashboard from '../pages/VehicleDashboard.vue'
+import CreateBooking from '../components/booking/Create.vue'
+import Update from '../components/booking/Update.vue'
+import Detail from '../components/booking/Detail.vue'
+import CreateVehicle from '../components/vehicles/CreateVehicle.vue'
+import UpdateVehicle from '../components/vehicles/UpdateVehicle.vue'
+import DetailVehicle from '../components/vehicles/DetailVehicle.vue'
+import CreateCategory from '../components/category/CreateCategory.vue'
+import UpdateCategory from '../components/category/UpdateCategory.vue'
+import DetailCategory from '../components/category/DetailCategory.vue'
+import CreateBrand from '../components/brands/CreateBrand.vue'
+import UpdateBrands from '../components/brands/UpdateBrands.vue'
+import DetailBrand from '../components/brands/DetailBrand.vue'
+import CreateUser from '../components/user/CreateUser.vue'
+import UpdateUser from '../components/user/UpdateUser.vue'
+import DetailUser from '../components/user/DetailUser.vue'
+import Profile from '../pages/Profile.vue'
 
 const routes = [
   {
@@ -192,7 +208,107 @@ const routes = [
         name: 'admin-settings',
         component: SettingDashboard,
         meta: { title: 'Settings' }
-      }
+      },
+
+      {
+        path: 'profile_user',
+        name: 'Profile',
+        component: Profile
+      },
+            {
+        path: 'bookings/create',
+        name: 'CreateBooking',
+        component: CreateBooking
+      },
+
+      {
+        path:'bookings/update/:id',
+        name: 'UpdateBooking',
+        component: Update
+      },
+
+      {
+        path:'bookings/:id',
+        name: 'DetailBooking',
+        component: Detail
+      },
+
+      {
+        path: 'vehicles/create',
+        name: 'CreateVehicle',
+        component: CreateVehicle
+      },
+
+      {
+        path:'vehicles/update/:id',
+        name: 'UpdateVehicle',
+        component: UpdateVehicle
+      },
+
+      {
+        path:'vehicles/:id',
+        name: 'DetailVehicle',
+        component: DetailVehicle
+      },
+
+      {
+        path: 'categories/create',
+        name: 'CreateCategory',
+        component: CreateCategory
+      },
+
+      {
+        path:'categories/update/:id',
+        name: 'UpdateCategory',
+        component: UpdateCategory
+      },
+
+      {
+        path:'categories/:id',
+        name: 'DetailCategory',
+        component: DetailCategory
+      },
+
+      {
+        path: 'brands/create',
+        name: 'CreateBrand',
+        component: CreateBrand
+      },
+
+      {
+        path:'brands/update/:id',
+        name: 'UpdateBrand',
+        component: UpdateBrands
+      },
+
+      {
+        path:'brands/:id',
+        name: 'DetailBrand',
+        component: DetailBrand
+      },
+
+            {
+        path: 'users/post',
+        name: 'CreateUser',
+        component: CreateUser
+      },
+
+      {
+        path:'users/update/:id',
+        name: 'UpdateUser',
+        component: UpdateUser
+      },
+
+      {
+        path:'users/:id',
+        name: 'DetailUser',  
+        component: DetailUser
+      },
+
+
+
+
+
     ]
   }
 ]
