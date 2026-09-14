@@ -42,8 +42,24 @@ import CreateUser from '../components/user/CreateUser.vue'
 import UpdateUser from '../components/user/UpdateUser.vue'
 import DetailUser from '../components/user/DetailUser.vue'
 import Profile from '../pages/Profile.vue'
+import ResetPassword from '../views/auth/ResetPassword.vue'
 
 const routes = [
+  // -------------------------------------------------------------
+  // Global Aliases & Redirects
+  // -------------------------------------------------------------
+  {
+    path: '/login',
+    redirect: '/auth/login'
+  },
+  {
+    path: '/register',
+    redirect: '/auth/register'
+  },
+
+  // -------------------------------------------------------------
+  // Main Customer Layout Routes
+  // -------------------------------------------------------------
   {
     path: '/',
     component: () => import('../layouts/MainLayout.vue'),
@@ -104,6 +120,9 @@ const routes = [
     ]
   },
 
+  // -------------------------------------------------------------
+  // Authentication Routes
+  // -------------------------------------------------------------
   {
     path: '/auth',
     children: [
@@ -126,190 +145,181 @@ const routes = [
         path: 'forgot-password',
         name: 'forgot-password',
         component: ForgotPasswordView
+      },
+      {
+        path: 'reset-password',
+        name: 'reset-password',
+        component: ResetPassword
       }
     ]
   },
 
+  // Google Callback handler endpoint matching backend Spring Security redirect
+  {
+    path: '/api/auth/google/callback',
+    name: 'google-callback',
+    component: LoginView
+  },
+
+  // -------------------------------------------------------------
+  // Admin Portal Routes
+  // -------------------------------------------------------------
   {
     path: '/admin',
     component: () => import('../layouts/AdminLayout.vue'),
-
+    meta: { requiresAdmin: true },
     children: [
       {
         path: '',
         redirect: '/admin/dashboard'
       },
-
       {
         path: 'dashboard',
         name: 'admin-dashboard',
         component: Dashboard,
         meta: { title: 'Dashboard' }
       },
-
       {
         path: 'vehicles',
         name: 'admin-vehicles',
         component: VehicleDashboard,
         meta: { title: 'Vehicle Management' }
       },
-
       {
         path: 'bookings',
         name: 'admin-bookings',
         component: BookingDashboard,
         meta: { title: 'Booking Management' }
       },
-
       {
         path: 'payments',
         name: 'admin-payments',
         component: PaymentDashboard,
         meta: { title: 'Payment Management' }
       },
-
       {
         path: 'users',
         name: 'admin-users',
         component: UserDashboard,
         meta: { title: 'User Management' }
       },
-
       {
         path: 'categories',
         name: 'admin-categories',
         component: CategoryDashboard,
         meta: { title: 'Categories' }
       },
-
       {
         path: 'brands',
         name: 'admin-brands',
         component: BrandDashboard,
         meta: { title: 'Brands' }
       },
-
       {
         path: 'reports',
         name: 'admin-reports',
         component: ReportDashboard,
         meta: { title: 'Reports & Analytics' }
       },
-
       {
         path: 'history',
         name: 'admin-history',
         component: HistoryDashboard,
         meta: { title: 'History' }
       },
-
       {
         path: 'settings',
         name: 'admin-settings',
         component: SettingDashboard,
         meta: { title: 'Settings' }
       },
-
       {
         path: 'profile_user',
         name: 'Profile',
         component: Profile
       },
-            {
+      {
         path: 'bookings/create',
         name: 'CreateBooking',
         component: CreateBooking
       },
-
       {
-        path:'bookings/update/:id',
+        path: 'bookings/update/:id',
         name: 'UpdateBooking',
         component: Update
       },
-
       {
-        path:'bookings/:id',
+        path: 'bookings/:id',
         name: 'DetailBooking',
         component: Detail
       },
-
       {
         path: 'vehicles/create',
         name: 'CreateVehicle',
         component: CreateVehicle
       },
-
       {
-        path:'vehicles/update/:id',
+        path: 'vehicles/update/:id',
         name: 'UpdateVehicle',
         component: UpdateVehicle
       },
-
       {
-        path:'vehicles/:id',
+        path: 'vehicles/:id',
         name: 'DetailVehicle',
         component: DetailVehicle
       },
-
       {
         path: 'categories/create',
         name: 'CreateCategory',
         component: CreateCategory
       },
-
       {
-        path:'categories/update/:id',
+        path: 'categories/update/:id',
         name: 'UpdateCategory',
         component: UpdateCategory
       },
-
       {
-        path:'categories/:id',
+        path: 'categories/:id',
         name: 'DetailCategory',
         component: DetailCategory
       },
-
       {
         path: 'brands/create',
         name: 'CreateBrand',
         component: CreateBrand
       },
-
       {
-        path:'brands/update/:id',
+        path: 'brands/update/:id',
         name: 'UpdateBrand',
         component: UpdateBrands
       },
-
       {
-        path:'brands/:id',
+        path: 'brands/:id',
         name: 'DetailBrand',
         component: DetailBrand
       },
-
-            {
+      {
         path: 'users/post',
         name: 'CreateUser',
         component: CreateUser
       },
-
       {
-        path:'users/update/:id',
+        path: 'users/update/:id',
         name: 'UpdateUser',
         component: UpdateUser
       },
-
       {
-        path:'users/:id',
-        name: 'DetailUser',  
+        path: 'users/:id',
+        name: 'DetailUser',
         component: DetailUser
-      },
-
-
-
-
-
+      }
     ]
+  },
+
+  // 404 Fallback
+  {
+    path: '/:pathMatch(.*)*',
+    redirect: '/auth/login'
   }
 ]
 
