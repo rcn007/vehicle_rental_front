@@ -1,25 +1,23 @@
 <template>
-  <div class="p-4 md:p-8 max-w-full mx-auto space-y-6">
+  <div class="p-4 sm:p-6 lg:p-8 max-w-6xl mx-auto space-y-6">
     
-    <!-- Page Header -->
+    <!-- Header -->
     <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
       <div>
-        <h1 class="text-2xl font-bold text-[#111827]">Account Settings</h1>
-        <p class="text-sm text-[#7A8190] mt-0.5">Manage your user profile details and platform information.</p>
+        <h1 class="text-2xl sm:text-3xl font-bold text-slate-900 tracking-tight">Account Settings</h1>
+        <p class="text-sm text-slate-500 mt-1">Manage your public profile, contact details, and account preferences.</p>
       </div>
 
       <!-- Account Status Badge -->
-      <div v-if="!loading" class="flex items-center gap-2 bg-white px-3 py-1.5 rounded-lg border border-[#D3DAEF] w-fit">
-        <span class="text-xs font-medium text-[#7A8190]">Account Status:</span>
-        <span 
-          :class="[
-            'text-xs font-semibold px-2 py-0.5 rounded-full flex items-center gap-1.5',
-            form.isActive ? 'bg-emerald-50 text-emerald-700 border border-emerald-200' : 'bg-amber-50 text-amber-700 border border-amber-200'
-          ]"
-        >
-          <span :class="['w-1.5 h-1.5 rounded-full', form.isActive ? 'bg-emerald-500' : 'bg-amber-500']"></span>
-          {{ form.isActive ? 'Active' : 'Inactive' }}
-        </span>
+      <div v-if="!loading" class="flex items-center gap-2.5 bg-white px-3.5 py-2 rounded-xl border border-slate-200 shadow-sm w-fit">
+        <span class="text-xs font-semibold uppercase tracking-wider text-slate-500">Status</span>
+        <label class="relative inline-flex items-center cursor-pointer">
+          <input type="checkbox" v-model="form.isActive" class="sr-only peer">
+          <div class="w-9 h-5 bg-slate-200 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-slate-300 after:border after:rounded-full after:h-4 after:w-4 after:transition-all peer-checked:bg-emerald-500"></div>
+          <span class="ml-2 text-xs font-medium" :class="form.isActive ? 'text-emerald-700' : 'text-slate-500'">
+            {{ form.isActive ? 'Active' : 'Inactive' }}
+          </span>
+        </label>
       </div>
     </div>
 
@@ -28,158 +26,212 @@
       <div 
         v-if="toast.show" 
         :class="[
-          'p-4 rounded-xl border flex items-center justify-between shadow-sm',
-          toast.type === 'success' ? 'bg-emerald-50 border-emerald-200 text-emerald-800' : 'bg-red-50 border-red-200 text-red-800'
+          'p-4 rounded-xl border flex items-center justify-between shadow-sm transition-all',
+          toast.type === 'success' ? 'bg-emerald-50 border-emerald-200 text-emerald-900' : 'bg-red-50 border-red-200 text-red-900'
         ]"
       >
         <div class="flex items-center gap-3 text-sm font-medium">
-          <i :class="toast.type === 'success' ? 'fa-solid fa-circle-check text-emerald-600' : 'fa-solid fa-circle-exclamation text-red-600'"></i>
+          <i :class="toast.type === 'success' ? 'fa-solid fa-circle-check text-emerald-600 text-lg' : 'fa-solid fa-circle-exclamation text-red-600 text-lg'"></i>
           <span>{{ toast.message }}</span>
         </div>
-        <button @click="toast.show = false" class="text-xs opacity-70 hover:opacity-100">
-          <i class="fa-solid fa-xmark text-base"></i>
+        <button type="button" @click="toast.show = false" class="text-slate-400 hover:text-slate-600">
+          <i class="fa-solid fa-xmark text-lg"></i>
         </button>
       </div>
     </transition>
 
-    <!-- Main Card -->
-    <div class="bg-white rounded-2xl border border-[#D3DAEF] shadow-sm overflow-hidden">
+    <!-- Main Card Container -->
+    <div class="bg-white rounded-2xl border border-slate-200/80 shadow-sm overflow-hidden">
       
       <!-- Loading State -->
-      <div v-if="loading" class="flex flex-col items-center justify-center py-20 text-[#7A8190]">
-        <i class="fa-solid fa-spinner animate-spin text-3xl text-[#2563EB] mb-3"></i>
-        <span class="text-sm font-medium">Fetching profile details...</span>
+      <div v-if="loading" class="flex flex-col items-center justify-center py-24 text-slate-400">
+        <i class="fa-solid fa-circle-notch animate-spin text-4xl text-blue-600 mb-3"></i>
+        <span class="text-sm font-medium">Loading profile details...</span>
       </div>
 
       <!-- Main Form -->
-      <form v-else @submit.prevent="handleUpdate" class="divide-y divide-[#D3DAEF]">
+      <form v-else @submit.prevent="handleUpdate">
         
-        <!-- Header Banner Section with Clickable Profile Avatar -->
-        <div class="p-6 md:p-8 bg-[#F1F3FF]/50 flex flex-col sm:flex-row items-center sm:items-start gap-6">
-          
-          <!-- Hidden Native File Input -->
-          <input 
-            type="file" 
-            ref="fileInputRef" 
-            @change="handleFileChange" 
-            accept="image/*" 
-            class="hidden" 
-          />
-
-          <!-- Clickable Avatar Preview Container -->
-          <div 
-            @click="triggerFileInput"
-            class="relative group shrink-0 cursor-pointer"
-            title="Click to select new image"
-          >
-            <img 
-              :src="previewImage || form.profileImage || defaultAvatar" 
-              @error="(e) => e.target.src = defaultAvatar"
-              alt="Profile Avatar" 
-              class="w-24 h-24 rounded-full object-cover border-2 border-white shadow-md ring-4 ring-[#2563EB]/10 transition-transform group-hover:scale-105"
-            />
+        <!-- Hero Header Card Banner -->
+        <div class="relative bg-gradient-to-r from-blue-600 via-indigo-600 to-violet-600 h-32 sm:h-40">
+          <div class="absolute -bottom-12 left-6 sm:left-8 flex items-end gap-5">
             
-            <!-- Hover Overlay Indicator -->
-            <div class="absolute inset-0 bg-black/40 rounded-full flex flex-col items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity">
-              <i class="fa-solid fa-camera text-white text-xl"></i>
-              <span class="text-[10px] text-white font-medium mt-1">Change</span>
-            </div>
-          </div>
+            <!-- Hidden File Input -->
+            <input 
+              type="file" 
+              ref="fileInputRef" 
+              @change="handleFileChange" 
+              accept="image/*" 
+              class="hidden" 
+            />
 
-          <!-- User Quick Info -->
-          <div class="flex-1 space-y-3 w-full text-center sm:text-left">
-            <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-2">
-              <div>
-                <h2 class="text-lg font-bold text-[#111827]">{{ form.name || 'N/A' }}</h2>
-                <p class="text-xs text-[#7A8190]">{{ form.email || 'N/A' }}</p>
+            <!-- Interactive Profile Avatar -->
+            <div 
+              @click="triggerFileInput"
+              class="relative group shrink-0 cursor-pointer rounded-full"
+              title="Click to update avatar"
+            >
+              <img 
+                :src="previewImage || form.profileImage || defaultAvatar" 
+                @error="(e) => e.target.src = defaultAvatar"
+                alt="Profile Avatar" 
+                class="w-24 h-24 sm:w-28 sm:h-28 rounded-full object-cover border-4 border-white shadow-lg transition-transform duration-200 group-hover:scale-[1.02]"
+              />
+              
+              <!-- Hover Camera Overlay -->
+              <div class="absolute inset-0 bg-slate-900/50 rounded-full flex flex-col items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity">
+                <i class="fa-solid fa-camera text-white text-lg"></i>
+                <span class="text-[10px] text-white font-semibold mt-0.5">Change</span>
               </div>
-
-              <!-- Read-only Role Badge & Joined Date -->
-              <div class="flex items-center gap-2 justify-center sm:justify-start text-xs text-[#7A8190]">
-                <span class="px-2.5 py-1 bg-[#2563EB]/10 text-[#2563EB] font-semibold rounded-md border border-[#2563EB]/20">
-                  {{ form.role || 'ROLE_USER' }}
-                </span>
-                <span v-if="form.createAt">• Joined {{ formatDate(form.createAt) }}</span>
-              </div>
-            </div>
-
-            <!-- Upload Info Banner -->
-            <div class="flex items-center justify-center sm:justify-start gap-2 text-xs text-[#7A8190]">
-              <i class="fa-solid fa-circle-info text-[#2563EB]"></i>
-              <span>Click on the profile picture above to choose an image file from your computer.</span>
             </div>
           </div>
         </div>
 
-        <!-- Personal Details Section -->
-        <div class="p-6 md:p-8 space-y-6">
-          <h3 class="text-base font-semibold text-[#111827] flex items-center gap-2">
-            <i class="fa-regular fa-user text-[#2563EB]"></i> Personal Details
-          </h3>
+        <!-- User Quick Info Header Bar -->
+        <div class="pt-14 px-6 sm:px-8 pb-6 bg-slate-50/50 border-b border-slate-200/80 flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+          <div>
+            <h2 class="text-xl font-bold text-slate-900">{{ form.name || 'Unnamed User' }}</h2>
+            <p class="text-xs text-slate-500 font-mono mt-0.5">{{ form.email || 'No email provided' }}</p>
+          </div>
 
-          <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-            <!-- Full Name -->
-            <div class="space-y-1.5">
-              <label class="block text-sm font-medium text-[#111827]">Full Name</label>
-              <div class="relative">
+          <div class="flex items-center gap-2">
+            <span class="px-3 py-1 bg-blue-50 text-blue-700 border border-blue-200 text-xs font-semibold rounded-lg uppercase tracking-wider">
+              {{ form.role || 'ROLE_USER' }}
+            </span>
+            <span v-if="form.createAt" class="text-xs text-slate-500">
+              • Joined {{ formatDate(form.createAt) }}
+            </span>
+          </div>
+        </div>
+
+        <!-- Form Body Sections -->
+        <div class="p-6 sm:p-8 space-y-8">
+          
+          <!-- Section 1: Personal Details -->
+          <div class="space-y-4">
+            <div class="border-b border-slate-100 pb-2">
+              <h3 class="text-base font-semibold text-slate-900 flex items-center gap-2">
+                <i class="fa-regular fa-id-card text-blue-600"></i> Personal Information
+              </h3>
+              <p class="text-xs text-slate-500">Update your basic profile identifiers.</p>
+            </div>
+
+            <div class="grid grid-cols-1 sm:grid-cols-2 gap-5">
+              
+              <!-- Full Name -->
+              <div class="space-y-1.5">
+                <label class="block text-xs font-semibold uppercase tracking-wider text-slate-600">Full Name</label>
+                <div class="relative">
+                   <input 
+                    v-model="form.name" 
+                    type="text" 
+                    required 
+                    placeholder="John Doe"
+                    class="w-full h-11 pl-10 pr-4 bg-slate-50/50 border border-slate-200 rounded-xl text-sm text-slate-900 focus:bg-white focus:border-blue-600 focus:ring-4 focus:ring-blue-600/10 transition-all outline-none"
+                  />
+                </div>
+              </div>
+
+              <!-- Email Address -->
+              <div class="space-y-1.5">
+                <label class="block text-xs font-semibold uppercase tracking-wider text-slate-600">Email Address</label>
+                <div class="relative">
+                     <input 
+                    v-model="form.email" 
+                    type="email" 
+                    required 
+                    placeholder="john@example.com"
+                    class="w-full h-11 pl-10 pr-4 bg-slate-50/50 border border-slate-200 rounded-xl text-sm text-slate-900 focus:bg-white focus:border-blue-600 focus:ring-4 focus:ring-blue-600/10 transition-all outline-none"
+                  />
+                </div>
+              </div>
+
+              <!-- Gender -->
+              <div class="space-y-1.5">
+                <label class="block text-xs font-semibold uppercase tracking-wider text-slate-600">Gender</label>
+                <div class="relative">
+                  <select 
+                    v-model="form.gender" 
+                    class="w-full h-11 pl-10 pr-10 bg-slate-50/50 border border-slate-200 rounded-xl text-sm text-slate-900 focus:bg-white focus:border-blue-600 focus:ring-4 focus:ring-blue-600/10 transition-all outline-none appearance-none cursor-pointer"
+                  >
+                    <option value="" disabled>Select Gender</option>
+                    <option value="MALE">Male</option>
+                    <option value="FEMALE">Female</option>
+                    <option value="OTHER">Other</option>
+                  </select>
+                  <i class="fa-solid fa-chevron-down absolute right-3.5 top-1/2 -translate-y-1/2 text-slate-400 text-xs pointer-events-none"></i>
+                </div>
+              </div>
+
+              <!-- Phone Number -->
+              <div class="space-y-1.5">
+                <label class="block text-xs font-semibold uppercase tracking-wider text-slate-600">Phone Number</label>
+                <div class="relative">
+                   <input 
+                    v-model="form.tell" 
+                    type="tel" 
+                    placeholder="+855 12 345 678"
+                    class="w-full h-11 pl-10 pr-4 bg-slate-50/50 border border-slate-200 rounded-xl text-sm text-slate-900 focus:bg-white focus:border-blue-600 focus:ring-4 focus:ring-blue-600/10 transition-all outline-none"
+                  />
+                </div>
+              </div>
+
+            </div>
+          </div>
+
+          <!-- Section 2: Integrations & Extras -->
+          <div class="space-y-4">
+            <div class="border-b border-slate-100 pb-2">
+              <h3 class="text-base font-semibold text-slate-900 flex items-center gap-2">
+                <i class="fa-brands fa-telegram text-blue-500"></i> Integrations 
+              </h3>
+              <p class="text-xs text-slate-500">Configure third-party notification channels.</p>
+            </div>
+
+            <div class="grid grid-cols-1 sm:grid-cols-2 gap-5">
+              
+              <!-- Telegram Chat ID -->
+              <div class="space-y-1.5">
+                <label class="block text-xs font-semibold uppercase tracking-wider text-slate-600">Telegram Chat ID</label>
+                <div class="relative">
                   <input 
-                  v-model="form.name" 
-                  type="text" 
-                  required 
-                  placeholder="John Doe"
-                  class="w-full h-10 pl-10 pr-4 bg-white border border-[#D3DAEF] rounded-lg text-sm text-[#111827] placeholder:text-[#7A8190] focus:outline-none focus:border-[#2563EB] focus:ring-4 focus:ring-[#2563EB]/10 transition-all"
-                />
+                    v-model="form.telegramChatId" 
+                    type="text" 
+                    placeholder="e.g. 123456789"
+                    class="w-full h-11 pl-10 pr-4 bg-slate-50/50 border border-slate-200 rounded-xl text-sm text-slate-900 focus:bg-white focus:border-blue-600 focus:ring-4 focus:ring-blue-600/10 transition-all outline-none"
+                  />
+                </div>
+                <p class="text-[11px] text-slate-400">Used for system notification alerts via Telegram bot.</p>
               </div>
-            </div>
 
-            <!-- Email Address -->
-            <div class="space-y-1.5">
-              <label class="block text-sm font-medium text-[#111827]">Email Address</label>
-              <div class="relative">
-                 <input 
-                  v-model="form.email" 
-                  type="email" 
-                  required 
-                  placeholder="john@example.com"
-                  class="w-full h-10 pl-10 pr-4 bg-white border border-[#D3DAEF] rounded-lg text-sm text-[#111827] placeholder:text-[#7A8190] focus:outline-none focus:border-[#2563EB] focus:ring-4 focus:ring-[#2563EB]/10 transition-all"
-                />
-              </div>
-            </div>
+             
 
-            <!-- Gender Enum Selection -->
-            <div class="space-y-1.5">
-              <label class="block text-sm font-medium text-[#111827]">Gender</label>
-              <div class="relative">
-                   <select 
-                  v-model="form.gender" 
-                  class="w-full h-10 pl-10 pr-4 bg-white border border-[#D3DAEF] rounded-lg text-sm text-[#111827] focus:outline-none focus:border-[#2563EB] focus:ring-4 focus:ring-[#2563EB]/10 transition-all appearance-none cursor-pointer"
-                >
-                  <option value="" disabled>Select Gender</option>
-                  <option value="MALE">Male</option>
-                  <option value="FEMALE">Female</option>
-                  <option value="OTHER">Other</option>
-                </select>
-                <i class="fa-solid fa-chevron-down absolute right-3.5 top-1/2 -translate-y-1/2 text-[#7A8190] text-xs pointer-events-none"></i>
-              </div>
-            </div>
-
-            <!-- Phone Number (tell) -->
-            <div class="space-y-1.5">
-              <label class="block text-sm font-medium text-[#111827]">Phone Number</label>
-              <div class="relative">
-                <input 
-                  v-model="form.tell" 
-                  type="tel" 
-                  placeholder="+855 12 345 678"
-                  class="w-full h-10 pl-10 pr-4 bg-white border border-[#D3DAEF] rounded-lg text-sm text-[#111827] placeholder:text-[#7A8190] focus:outline-none focus:border-[#2563EB] focus:ring-4 focus:ring-[#2563EB]/10 transition-all"
-                />
-              </div>
             </div>
           </div>
+
         </div>
 
-        <!-- Integration Details Section -->
-       
+        <!-- Sticky Form Action Footer -->
+        <div class="px-6 sm:px-8 py-4 bg-slate-50 border-t border-slate-200/80 flex items-center justify-end gap-3">
+          <button 
+            type="button" 
+            @click="resetForm" 
+            :disabled="saving"
+            class="px-5 py-2.5 rounded-xl border border-slate-300 bg-white text-slate-700 text-sm font-semibold hover:bg-slate-100 transition-colors disabled:opacity-50"
+          >
+            Cancel
+          </button>
+          
+          <button 
+            type="submit" 
+            :disabled="saving"
+            class="inline-flex items-center gap-2 px-6 py-2.5 rounded-xl bg-blue-600 text-white text-sm font-semibold hover:bg-blue-700 active:bg-blue-800 transition-colors shadow-sm disabled:opacity-50"
+          >
+            <i v-if="saving" class="fa-solid fa-spinner animate-spin"></i>
+            <i v-else class="fa-solid fa-floppy-disk"></i>
+            <span>{{ saving ? 'Saving Changes...' : 'Save Profile Changes' }}</span>
+          </button>
+        </div>
 
       </form>
     </div>

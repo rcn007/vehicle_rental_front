@@ -82,7 +82,8 @@
         <!-- Total Revenue -->
         <div class="p-5 bg-white border border-slate-200/80 rounded-2xl shadow-sm relative overflow-hidden">
           <div class="flex items-center justify-between mb-3">
-            <span class="text-xs font-bold text-slate-400 uppercase tracking-wider">Total Revenue</span>
+              <span class="text-[#0f172a] text-[15px] font-bold uppercase tracking-wider"
+            style="font-family: var(--font-heading);">Total Revenue</span>
             <div class="w-8 h-8 rounded-lg bg-emerald-50 text-emerald-600 flex items-center justify-center text-xs">
               <i class="fa-solid fa-dollar-sign"></i>
             </div>
@@ -101,7 +102,8 @@
         <!-- Bookings -->
         <div class="p-5 bg-white border border-slate-200/80 rounded-2xl shadow-sm relative overflow-hidden">
           <div class="flex items-center justify-between mb-3">
-            <span class="text-xs font-bold text-slate-400 uppercase tracking-wider">Total Bookings</span>
+              <span class="text-[#0f172a] text-[15px] font-bold uppercase tracking-wider"
+            style="font-family: var(--font-heading);">Total Bookings</span>
             <div class="w-8 h-8 rounded-lg bg-indigo-50 text-indigo-600 flex items-center justify-center text-xs">
               <i class="fa-regular fa-calendar-check"></i>
             </div>
@@ -120,7 +122,8 @@
         <!-- Completion Rate -->
         <div class="p-5 bg-white border border-slate-200/80 rounded-2xl shadow-sm relative overflow-hidden">
           <div class="flex items-center justify-between mb-3">
-            <span class="text-xs font-bold text-slate-400 uppercase tracking-wider">Completed Trips</span>
+              <span class="text-[#0f172a] text-[15px] font-bold uppercase tracking-wider"
+            style="font-family: var(--font-heading);">Completed Trips</span>
             <div class="w-8 h-8 rounded-lg bg-blue-50 text-blue-600 flex items-center justify-center text-xs">
               <i class="fa-solid fa-circle-check"></i>
             </div>
@@ -139,7 +142,8 @@
         <!-- Cancellations -->
         <div class="p-5 bg-white border border-slate-200/80 rounded-2xl shadow-sm relative overflow-hidden">
           <div class="flex items-center justify-between mb-3">
-            <span class="text-xs font-bold text-slate-400 uppercase tracking-wider">Cancelled</span>
+              <span class="text-[#0f172a] text-[15px] font-bold uppercase tracking-wider"
+            style="font-family: var(--font-heading);">Cancelled</span>
             <div class="w-8 h-8 rounded-lg bg-rose-50 text-rose-600 flex items-center justify-center text-xs">
               <i class="fa-solid fa-circle-xmark"></i>
             </div>
@@ -705,6 +709,26 @@ const revenueTrend = computed(() => {
     bookings: data.count,
   }));
 });
+const getShortMonthLabel = (month) => {
+  if (!month) return "";
+
+  const monthMap = {
+    January: "Jan",
+    February: "Feb",
+    March: "Mar",
+    April: "Apr",
+    May: "May",
+    June: "Jun",
+    July: "Jul",
+    August: "Aug",
+    September: "Sep",
+    October: "Oct",
+    November: "Nov",
+    December: "Dec",
+  };
+
+  return monthMap[String(month).trim()] || String(month).slice(0, 3);
+};
 
 const dynamicRevenueTrend = computed(() => {
   const data = revenueTrend.value;
@@ -724,7 +748,10 @@ const dynamicRevenueTrend = computed(() => {
       x,
       y,
       val: item.revenue,
-      label: item.label,
+label:
+  trendGranularity.value === "monthly"
+    ? getShortMonthLabel(item.label)
+    : item.label,
       bookings: item.bookings,
     };
   });

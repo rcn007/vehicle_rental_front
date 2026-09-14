@@ -12,7 +12,7 @@
         <NotificationPopup />
 
       <!-- Page Content -->
-      <main class="p-4 sm:p-6">
+      <main >
         <div class="mx-auto max-w-[1440px]">
           <RouterView />
         </div>

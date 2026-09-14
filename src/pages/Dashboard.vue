@@ -12,18 +12,11 @@
         >
           Dashboard Overview
         </h1>
-        <p class="text-xl text-[#0f172a] mt-1" ">
+        <p class="text-xl text-[#0f172a] mt-1" " style="color: var(--text);">
           Welcome back! Here is your fleet's current status.
         </p>
       </div>
-      <button 
-        @click="$emit('export')"
-        class="px-3.5 py-2 text-xs font-semibold text-white transition-opacity hover:opacity-90 flex items-center gap-2 cursor-pointer"
-        style="background-color: var(--primary); border-radius: var(--radius-md); box-shadow: var(--shadow-sm);"
-      >
-        <i class="fa-solid fa-download text-xs"></i>
-        <span>Export Report</span>
-      </button>
+
     </div>
 
     <!-- Loading State -->
@@ -48,8 +41,8 @@
         >
           <div class="flex items-center justify-between">
             <span 
-              class="text-[15px] font-bold tracking-wider uppercase text-[#0f172a]" 
-              style="font-family: var(--font-heading); "
+              class="text-[15px] font-bold tracking-wider uppercase " 
+              style="font-family: var(--font-heading); color: var(--text);"
             >
               Total Users
             </span>
@@ -101,8 +94,8 @@
         >
           <div class="flex items-center justify-between">
             <span 
-              class="text-[15px] font-bold tracking-wider uppercase text-[#0f172a]"
-              style="font-family: var(--font-heading); "
+              class="text-[15px] font-bold tracking-wider uppercase "
+              style="font-family: var(--font-heading);color: var(--text); "
             >
               Total Vehicles
             </span>
@@ -133,8 +126,8 @@
         >
           <div class="flex items-center justify-between">
             <span 
-              class="text-[15px] font-bold tracking-wider uppercase text-[#0f172a]"
-              style="font-family: var(--font-heading); "
+              class="text-[15px] font-bold tracking-wider uppercase "
+              style="font-family: var(--font-heading); color: var(--text);"
             >
               Active Bookings
             </span>
@@ -165,8 +158,8 @@
         >
           <div class="flex items-center justify-between">
             <span 
-              class="text-[15px] font-bold tracking-wider uppercase text-[#0f172a]"
-              style="font-family: var(--font-heading);"
+              class="text-[15px] font-bold tracking-wider uppercase "
+              style="font-family: var(--font-heading);color: var(--text);"
             >
               Monthly Revenue
             </span>
@@ -209,7 +202,7 @@
           <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-3 mb-6">
             <h2 
               class="text-base font-bold text-[#0f172a]"
-              style="font-family: var(--font-heading); "
+              style="font-family: var(--font-heading);color: var(--text); "
             >
               Revenue Overview
             </h2>

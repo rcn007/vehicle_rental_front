@@ -2,7 +2,7 @@
   <Transition name="notification">
     <div
       v-if="notification"
-      class="w-full bg-white border-b border-[#D3DAEF] shadow-md"
+      class="w-full bg-[--background] border-b border-[#D3DAEF] shadow-md"
     >
       <div class="px-6 py-4 flex items-start justify-between">
 
@@ -10,7 +10,7 @@
 
           <!-- Icon -->
           <div
-            class="w-10 h-10 rounded-full bg-[#EFF6FF] flex items-center justify-center flex-shrink-0"
+            class="w-10 h-10 rounded-full bg-[--background] flex items-center justify-center flex-shrink-0"
           >
             <i
               class="fa-regular fa-bell text-[#2563EB]"
@@ -20,7 +20,7 @@
           <!-- Content -->
           <div>
             <div
-              class="text-sm font-bold text-[#111827]"
+              class="text-sm font-bold text-[--text]"
             >
               {{ notification.title }}
             </div>
@@ -43,7 +43,7 @@
         <!-- Close -->
         <button
           @click="closeNotification"
-          class="text-[#7A8190] hover:text-[#111827]"
+          class="text-[#7A8190] hover:text-[--text]"
         >
           <i class="fa-solid fa-xmark"></i>
         </button>

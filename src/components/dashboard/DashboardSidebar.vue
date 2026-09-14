@@ -14,9 +14,9 @@
       </div>
 
       <span
-        class="text-base font-extrabold tracking-tight uppercase text-white"
+        class="text-base font-extrabold tracking-tight  text-white"
       >
-        RentTv
+        ChoulTv
       </span>
     </div>
 

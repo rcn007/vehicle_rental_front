@@ -1,25 +1,25 @@
 <template>
-  <main class="p-6 md:p-8 min-h-[calc(100vh-64px)] bg-gray-50/50">
+  <main class="p-6 md:p-8 min-h-[calc(100vh-64px)] bg-[var(--background)] text-[var(--text)]">
     
     <!-- Page Header & Top Search/Action Bar -->
     <div class="flex flex-col md:flex-row md:items-center justify-between mb-8 gap-4">
       <div>
-        <h1 class="text-3xl font-bold tracking-tight text-gray-900">Brands</h1>
-        <p class="text-xl text-gray-900 mt-1">Manage manufacturer profiles and brand distribution</p>
+        <h1 class="text-3xl font-bold tracking-tight text-[var(--text)]">Brands</h1>
+        <p class="text-xl text-[var(--muted)] mt-1">Manage manufacturer profiles and brand distribution</p>
       </div>
       
       <div class="flex items-center gap-3 w-full md:w-auto">
         <div class="relative flex-1 md:w-64">
-           <input 
+          <input 
             type="text" 
             v-model="searchQuery"
             placeholder="Search brand or category..." 
-            class="w-full h-9 pl-9 pr-4 bg-white border border-gray-200 rounded-lg text-xs font-medium text-gray-900 placeholder:text-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-600 transition-all shadow-xs"
+            class="w-full h-9 pl-9 pr-4 bg-[var(--surface)] border border-[var(--border)] rounded-lg text-xs font-medium text-[var(--text)] placeholder:text-[var(--muted)] focus:outline-none focus:ring-2 focus:ring-[var(--accent)]/20 focus:border-[var(--accent)] transition-all shadow-[var(--shadow-sm)]"
           >
         </div>
         <button 
           @click="navigateToAdd" 
-          class="inline-flex items-center justify-center gap-2 h-12 px-4 rounded-[11px] text-xs font-semibold text-white bg-gray-900 hover:bg-gray-800 transition-all shadow-xs shrink-0 active:scale-95 cursor-pointer"
+          class="inline-flex items-center justify-center gap-2 h-12 px-4 rounded-[11px] text-xs font-semibold text-[var(--background)] bg-[var(--accent)] hover:bg-[var(--accent-hover)] transition-all shadow-[var(--shadow-sm)] shrink-0 active:scale-95 cursor-pointer"
         >
           <i class="fa-solid fa-plus text-[10px]"></i> 
           <span>Add Brand</span>
@@ -31,42 +31,39 @@
     <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 mb-8">
       
       <!-- Card 1: Total Brands -->
-      <div class="p-5 bg-white border border-gray-200/80 rounded-xl shadow-xs hover:border-gray-300 transition-all flex items-center justify-between">
+      <div class="p-5 bg-[var(--surface)] border border-[var(--border)] rounded-xl shadow-[var(--shadow-sm)] hover:border-[var(--muted)] transition-all flex items-center justify-between">
         <div>
-           <span class="text-[#0f172a] text-[15px] font-bold uppercase tracking-wider"
-            style="font-family: var(--font-heading);">Total Brands</span>
-          <div class="mt-2 text-2xl font-extrabold text-gray-900">{{ brands.length }}</div>
-          <p class="text-[11px] text-gray-400 mt-0.5 font-medium">Registered manufacturers</p>
+          <span class="text-[var(--text)] text-[15px] font-bold uppercase tracking-wider">Total Brands</span>
+          <div class="mt-2 text-2xl font-extrabold text-[var(--text)]">{{ brands.length }}</div>
+          <p class="text-[11px] text-[var(--muted)] mt-0.5 font-medium">Registered manufacturers</p>
         </div>
-        <div class="w-10 h-10 rounded-lg bg-blue-50 text-blue-600 flex items-center justify-center text-sm">
+        <div class="w-10 h-10 rounded-lg bg-[var(--background)] text-[var(--accent)] flex items-center justify-center text-sm border border-[var(--border)]">
           <i class="fa-solid fa-shield-halved"></i>
         </div>
       </div>
 
       <!-- Card 2: Active Brands -->
-      <div class="p-5 bg-white border border-gray-200/80 rounded-xl shadow-xs hover:border-gray-300 transition-all flex items-center justify-between">
+      <div class="p-5 bg-[var(--surface)] border border-[var(--border)] rounded-xl shadow-[var(--shadow-sm)] hover:border-[var(--muted)] transition-all flex items-center justify-between">
         <div>
-           <span class="text-[#0f172a] text-[15px] font-bold uppercase tracking-wider"
-            style="font-family: var(--font-heading);">Active Brands</span>
-          <div class="mt-2 text-2xl font-extrabold text-gray-900">{{ activeBrandsCount }}</div>
-          <p class="text-[11px] text-emerald-600 font-bold mt-0.5 inline-flex items-center gap-1">
+          <span class="text-[var(--text)] text-[15px] font-bold uppercase tracking-wider">Active Brands</span>
+          <div class="mt-2 text-2xl font-extrabold text-[var(--text)]">{{ activeBrandsCount }}</div>
+          <p class="text-[11px] text-[var(--accent)] font-bold mt-0.5 inline-flex items-center gap-1">
             <i class="fa-solid fa-circle-check text-[10px]"></i> {{ activeRatio }}% Operational ratio
           </p>
         </div>
-        <div class="w-10 h-10 rounded-lg bg-emerald-50 text-emerald-600 flex items-center justify-center text-sm">
+        <div class="w-10 h-10 rounded-lg bg-[var(--background)] text-[var(--accent)] flex items-center justify-center text-sm border border-[var(--border)]">
           <i class="fa-solid fa-circle-check"></i>
         </div>
       </div>
 
       <!-- Card 3: Top Brand -->
-      <div class="p-5 bg-white border border-gray-200/80 rounded-xl shadow-xs hover:border-gray-300 transition-all flex items-center justify-between sm:col-span-2 lg:col-span-1">
+      <div class="p-5 bg-[var(--surface)] border border-[var(--border)] rounded-xl shadow-[var(--shadow-sm)] hover:border-[var(--muted)] transition-all flex items-center justify-between sm:col-span-2 lg:col-span-1">
         <div>
-           <span class="text-[#0f172a] text-[15px] font-bold uppercase tracking-wider"
-            style="font-family: var(--font-heading);">Largest Share</span>
-          <div class="mt-2 text-2xl font-extrabold text-gray-900">{{ topBrand.name }}</div>
-          <p class="text-[11px] text-gray-400 mt-0.5 font-medium">{{ topBrand.count }} Fleet Vehicles ({{ topBrand.percentage }}%)</p>
+          <span class="text-[var(--text)] text-[15px] font-bold uppercase tracking-wider">Largest Share</span>
+          <div class="mt-2 text-2xl font-extrabold text-[var(--text)]">{{ topBrand.name }}</div>
+          <p class="text-[11px] text-[var(--muted)] mt-0.5 font-medium">{{ topBrand.count }} Fleet Vehicles ({{ topBrand.percentage }}%)</p>
         </div>
-        <div class="w-10 h-10 rounded-lg bg-indigo-50 text-indigo-600 flex items-center justify-center text-sm">
+        <div class="w-10 h-10 rounded-lg bg-[var(--background)] text-[var(--accent)] flex items-center justify-center text-sm border border-[var(--border)]">
           <i class="fa-solid fa-car"></i>
         </div>
       </div>
@@ -76,12 +73,12 @@
     <!-- Filter Control Bar -->
     <div class="flex items-center justify-between mb-6">
       <div class="flex items-center gap-2">
-        <h2 class="font-bold text-sm text-gray-900">All Brand Cards</h2>
-        <span class="px-2 py-0.5 rounded-full text-[10px] font-bold bg-gray-100 text-gray-600">{{ filteredBrands.length }} Brands</span>
+        <h2 class="font-bold text-sm text-[var(--text)]">All Brand Cards</h2>
+        <span class="px-2 py-0.5 rounded-full text-[10px] font-bold bg-[var(--background)] text-[var(--muted)] border border-[var(--border)]">{{ filteredBrands.length }} Brands</span>
       </div>
 
       <div class="flex items-center gap-2">
-        <select v-model="selectedStatus" class="h-8 px-3 bg-white border border-gray-200 rounded-lg text-xs font-semibold text-gray-700 focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-600 transition-all cursor-pointer shadow-xs">
+        <select v-model="selectedStatus" class="h-8 px-3 bg-[var(--surface)] border border-[var(--border)] rounded-lg text-xs font-semibold text-[var(--text)] focus:outline-none focus:ring-2 focus:ring-[var(--accent)]/20 focus:border-[var(--accent)] transition-all cursor-pointer shadow-[var(--shadow-sm)]">
           <option value="All">All Statuses</option>
           <option value="Active">Active</option>
           <option value="Inactive">Inactive</option>
@@ -91,27 +88,27 @@
 
     <!-- Loading State -->
     <div v-if="loading" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5">
-      <div v-for="n in 6" :key="n" class="bg-white border border-gray-200/80 rounded-xl p-5 shadow-xs animate-pulse space-y-4">
+      <div v-for="n in 6" :key="n" class="bg-[var(--surface)] border border-[var(--border)] rounded-xl p-5 shadow-[var(--shadow-sm)] animate-pulse space-y-4">
         <div class="flex items-center gap-3">
-          <div class="w-10 h-10 rounded-lg bg-gray-200"></div>
-          <div class="h-4 bg-gray-200 rounded w-1/2"></div>
+          <div class="w-10 h-10 rounded-lg bg-[var(--border)]"></div>
+          <div class="h-4 bg-[var(--border)] rounded w-1/2"></div>
         </div>
-        <div class="h-10 bg-gray-200 rounded"></div>
+        <div class="h-10 bg-[var(--border)] rounded"></div>
       </div>
     </div>
 
     <!-- Error State -->
-    <div v-else-if="error" class="p-8 bg-white border border-gray-200/80 rounded-xl text-center my-6">
-      <i class="fa-solid fa-triangle-exclamation text-rose-500 text-2xl mb-2"></i>
-      <p class="text-gray-900 font-semibold mb-1">Failed to load brand data</p>
-      <p class="text-gray-500 text-xs mb-4">{{ error }}</p>
-      <button @click="fetchBrands" class="px-4 py-2 bg-blue-600 text-white text-xs font-semibold rounded-lg hover:bg-blue-700 cursor-pointer">Retry</button>
+    <div v-else-if="error" class="p-8 bg-[var(--surface)] border border-[var(--border)] rounded-xl text-center my-6">
+      <i class="fa-solid fa-triangle-exclamation text-[var(--danger)] text-2xl mb-2"></i>
+      <p class="text-[var(--text)] font-semibold mb-1">Failed to load brand data</p>
+      <p class="text-[var(--muted)] text-xs mb-4">{{ error }}</p>
+      <button @click="fetchBrands" class="px-4 py-2 bg-[var(--accent)] text-[var(--background)] text-xs font-semibold rounded-lg hover:bg-[var(--accent-hover)] cursor-pointer">Retry</button>
     </div>
 
     <!-- Empty State -->
-    <div v-else-if="paginatedBrands.length === 0" class="p-12 bg-white border border-gray-200/80 rounded-xl text-center my-6">
-      <i class="fa-solid fa-shield-halved text-gray-300 text-3xl mb-2"></i>
-      <p class="text-gray-700 font-semibold text-sm">No brands found matching criteria</p>
+    <div v-else-if="paginatedBrands.length === 0" class="p-12 bg-[var(--surface)] border border-[var(--border)] rounded-xl text-center my-6">
+      <i class="fa-solid fa-shield-halved text-[var(--muted)] text-3xl mb-2"></i>
+      <p class="text-[var(--text)] font-semibold text-sm">No brands found matching criteria</p>
     </div>
 
     <!-- Brand Cards Grid -->
@@ -120,13 +117,13 @@
       <div 
         v-for="brand in paginatedBrands" 
         :key="brand.id"
-        class="bg-white border border-gray-200/80 rounded-xl shadow-xs p-5 hover:border-gray-300 transition-all flex flex-col justify-between group"
+        class="bg-[var(--surface)] border border-[var(--border)] rounded-xl shadow-[var(--shadow-sm)] p-5 hover:border-[var(--muted)] transition-all flex flex-col justify-between group"
       >
         <div>
           <div class="flex items-start justify-between mb-4">
             <div class="flex items-center gap-3">
               <!-- Brand Logo Container -->
-              <div class="w-10 h-10 rounded-lg bg-gray-50 border border-gray-200 flex items-center justify-center text-gray-900 shrink-0 font-bold text-sm group-hover:border-blue-500/30 transition-colors overflow-hidden">
+              <div class="w-10 h-10 rounded-lg bg-[var(--background)] border border-[var(--border)] flex items-center justify-center text-[var(--text)] shrink-0 font-bold text-sm group-hover:border-[var(--accent)]/50 transition-colors overflow-hidden">
                 <img 
                   v-if="getBrandLogo(brand)" 
                   :src="getBrandLogo(brand)" 
@@ -134,10 +131,10 @@
                   @error="handleImageError"
                   class="w-full h-full object-contain p-1"
                 />
-                <i v-else class="fa-solid fa-car text-gray-700"></i>
+                <i v-else class="fa-solid fa-car text-[var(--muted)]"></i>
               </div>
               <div>
-                <h3 class="font-bold text-gray-900 text-sm">{{ getBrandName(brand) }}</h3>
+                <h3 class="font-bold text-[var(--text)] text-sm">{{ getBrandName(brand) }}</h3>
                 <span :class="getStatusBadgeClass(brand.status)" class="mt-1">
                   <span class="w-1.5 h-1.5 rounded-full" :class="getStatusDotClass(brand.status)"></span>
                   {{ getStatusText(brand.status) }}
@@ -145,28 +142,28 @@
               </div>
             </div>
             
-            <!-- Delete Action Dropdown/Button -->
+            <!-- Delete Action Button -->
             <button 
               @click="handleDelete(brand)" 
               :disabled="deletingId === brand.id"
-              class="w-7 h-7 rounded-lg hover:bg-rose-50 text-gray-400 hover:text-rose-600 transition-colors inline-flex items-center justify-center cursor-pointer disabled:opacity-50"
+              class="w-7 h-7 rounded-lg hover:bg-[var(--danger)]/10 text-[var(--muted)] hover:text-[var(--danger)] transition-colors inline-flex items-center justify-center cursor-pointer disabled:opacity-50"
               title="Delete Brand"
             >
-              <i v-if="deletingId === brand.id" class="fa-solid fa-circle-notch fa-spin text-xs"></i>
+              <i v-if="deletingId === brand.id" class="fa-solid fa-circle-notch fa-spin text-xs text-[var(--danger)]"></i>
               <i v-else class="fa-regular fa-trash-can text-xs"></i>
             </button>
           </div>
 
-          <div class="grid grid-cols-2 gap-3 py-3 border-y border-gray-100 my-3 text-xs">
+          <div class="grid grid-cols-2 gap-3 py-3 border-y border-[var(--border)] my-3 text-xs">
             <div>
-              <span class="text-[11px] text-gray-400 font-medium">Fleet Size</span>
-              <div class="text-base font-extrabold text-gray-900 mt-0.5">
-                {{ getFleetCount(brand) }} <span class="text-[10px] font-normal text-gray-400">units</span>
+              <span class="text-[11px] text-[var(--muted)] font-medium">Fleet Size</span>
+              <div class="text-base font-extrabold text-[var(--text)] mt-0.5">
+                {{ getFleetCount(brand) }} <span class="text-[10px] font-normal text-[var(--muted)]">units</span>
               </div>
             </div>
             <div>
-              <span class="text-[11px] text-gray-400 font-medium">Categories</span>
-              <div class="text-xs font-bold text-gray-700 mt-1 truncate" :title="getCategoriesList(brand)">
+              <span class="text-[11px] text-[var(--muted)] font-medium">Categories</span>
+              <div class="text-xs font-bold text-[var(--muted)] mt-1 truncate" :title="getCategoriesList(brand)">
                 {{ getCategoriesList(brand) }}
               </div>
             </div>
@@ -176,16 +173,16 @@
         <div class="flex items-center justify-end gap-2 pt-1">
           <button 
             @click="navigateToDetail(brand.id)"
-            class="h-8 px-3 rounded-lg text-xs font-semibold text-gray-700 bg-gray-50 border border-gray-200 hover:bg-gray-100 transition-all inline-flex items-center gap-1.5 cursor-pointer"
+            class="h-8 px-3 rounded-lg text-xs font-semibold text-[var(--text)] bg-[var(--background)] border border-[var(--border)] hover:bg-[var(--border)] transition-all inline-flex items-center gap-1.5 cursor-pointer"
           >
-            <i class="fa-regular fa-eye text-[11px] text-gray-400"></i>
+            <i class="fa-regular fa-eye text-[11px] text-[var(--muted)]"></i>
             <span>View</span>
           </button>
           <button 
             @click="navigateToEdit(brand.id)"
-            class="h-8 px-3 rounded-lg text-xs font-semibold text-gray-700 bg-gray-50 border border-gray-200 hover:bg-gray-100 transition-all inline-flex items-center gap-1.5 cursor-pointer"
+            class="h-8 px-3 rounded-lg text-xs font-semibold text-[var(--text)] bg-[var(--background)] border border-[var(--border)] hover:bg-[var(--border)] transition-all inline-flex items-center gap-1.5 cursor-pointer"
           >
-            <i class="fa-solid fa-pen text-[11px] text-gray-400"></i>
+            <i class="fa-solid fa-pen text-[11px] text-[var(--muted)]"></i>
             <span>Edit</span>
           </button>
         </div>
@@ -193,13 +190,13 @@
 
     </div>
 
-    <!-- Pagination Footer (10 per page) -->
-    <div v-if="!loading && filteredBrands.length > 0" class="flex flex-col sm:flex-row items-center justify-between p-4 bg-white border border-gray-200/80 rounded-xl shadow-xs text-xs text-gray-500 gap-3">
+    <!-- Pagination Footer -->
+    <div v-if="!loading && filteredBrands.length > 0" class="flex flex-col sm:flex-row items-center justify-between p-4 bg-[var(--surface)] border border-[var(--border)] rounded-xl shadow-[var(--shadow-sm)] text-xs text-[var(--muted)] gap-3">
       <div>
         Showing 
-        <span class="font-bold text-gray-900">{{ startItemIndex }}–{{ endItemIndex }}</span> 
+        <span class="font-bold text-[var(--text)]">{{ startItemIndex }}–{{ endItemIndex }}</span> 
         of 
-        <span class="font-bold text-gray-900">{{ filteredBrands.length }}</span> 
+        <span class="font-bold text-[var(--text)]">{{ filteredBrands.length }}</span> 
         brands
       </div>
 
@@ -207,7 +204,7 @@
         <button 
           @click="currentPage--" 
           :disabled="currentPage === 1" 
-          class="w-7 h-7 rounded-md border border-gray-200 flex items-center justify-center text-gray-500 hover:bg-gray-100 transition-colors cursor-pointer disabled:opacity-40 disabled:cursor-not-allowed"
+          class="w-7 h-7 rounded-md border border-[var(--border)] flex items-center justify-center text-[var(--muted)] hover:bg-[var(--background)] hover:text-[var(--text)] transition-colors cursor-pointer disabled:opacity-40 disabled:cursor-not-allowed"
         >
           <i class="fa-solid fa-chevron-left text-[10px]"></i>
         </button>
@@ -219,8 +216,8 @@
           :class="[
             'w-7 h-7 rounded-md font-bold flex items-center justify-center text-xs transition-colors cursor-pointer',
             currentPage === page 
-              ? 'bg-blue-600 text-white shadow-xs' 
-              : 'border border-gray-200 text-gray-700 hover:bg-gray-100'
+              ? 'bg-[var(--accent)] text-[var(--background)] shadow-[var(--shadow-sm)]' 
+              : 'border border-[var(--border)] text-[var(--text)] hover:bg-[var(--background)]'
           ]"
         >
           {{ page }}
@@ -229,7 +226,7 @@
         <button 
           @click="currentPage++" 
           :disabled="currentPage === totalPages || totalPages === 0" 
-          class="w-7 h-7 rounded-md border border-gray-200 flex items-center justify-center text-gray-500 hover:bg-gray-100 transition-colors cursor-pointer disabled:opacity-40 disabled:cursor-not-allowed"
+          class="w-7 h-7 rounded-md border border-[var(--border)] flex items-center justify-center text-[var(--muted)] hover:bg-[var(--text)] transition-colors cursor-pointer disabled:opacity-40 disabled:cursor-not-allowed"
         >
           <i class="fa-solid fa-chevron-right text-[10px]"></i>
         </button>

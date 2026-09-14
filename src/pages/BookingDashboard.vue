@@ -1,13 +1,16 @@
 <template>
-  <main class="p-6 md:p-8 min-h-[calc(100vh-64px)] bg-gray-50/50 ">
+  <main class="p-6 md:p-8 min-h-[calc(100vh-64px)]  " 
+  style="background-color: var(--background); font-family: var(--font-body); color: var(--text);">
 
     <!-- Page Header -->
     <div class="flex flex-col sm:flex-row sm:items-center justify-between mb-8 gap-4">
       <div>
-        <h1 class="text-3xl font-bold tracking-tight text-[#0f172a]">
+        <h1 class="text-3xl font-bold tracking-tight text-[#0f172a]" 
+        style="color: var(--text);">
           Bookings
         </h1>
-        <p class="text-xl mt-1 text-[#0f172a]">
+        <p class="text-xl mt-1 text-[#0f172a]" 
+        style="color: var(--text);">
           Manage and monitor all vehicle rental bookings
         </p>
       </div>
@@ -20,7 +23,8 @@
           class="inline-flex items-center justify-center gap-2 h-10 px-4 rounded-[11px] text-sm font-semibold text-white bg-[#0f172a] hover:text-gray-100 transition-all shadow-sm shadow-blue-500/10 active:scale-95 cursor-pointer"
         >
           <i class="fa-solid fa-plus text-xs text-white"></i>
-          <span class="text-white  hover:text-gray-100 ">New Booking</span>
+          <span class="text-white  hover:text-gray-100 "
+          style="color: var(--text);">New Booking</span>
         </router-link>
       </div>
     </div>
@@ -31,11 +35,12 @@
     <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-4 mb-8">
       <!-- Total -->
       <div
-        class="p-5 bg-white border border-gray-200/80  rounded-xl shadow-xs hover:shadow-md hover:border-gray-300 transition-all flex flex-col justify-between group"
+        class="p-5 border border-gray-200/80  rounded-xl shadow-xs hover:shadow-md hover:border-gray-300 transition-all flex flex-col justify-between group"
+        style="color: var(--text);"
       >
         <div class="flex items-center justify-between tracking-wider uppercase " >
           <span class="text-[#0f172a] text-[15px] font-bold uppercase tracking-wider "
-           style="font-family: var(--font-heading);"
+           style="font-family: var(--font-heading);color: var(--text);"
           >
             Total
           </span>
@@ -47,7 +52,8 @@
         </div>
 
         <div class="mt-4">
-          <div class="text-2xl font-extrabold text-gray-900">
+          <div class="text-2xl font-extrabold text-gray-900"
+          style="color: var(--text);">
             {{ totalBookings }}
           </div>
 
@@ -69,11 +75,11 @@
 
       <!-- Pending -->
       <div
-        class="p-5 bg-white border border-gray-200/80 rounded-xl shadow-xs hover:shadow-md hover:border-gray-300 transition-all flex flex-col justify-between group"
+        class="p-5  border border-gray-200/80 rounded-xl shadow-xs hover:shadow-md hover:border-gray-300 transition-all flex flex-col justify-between group"
       >
         <div class="flex items-center justify-between">
           <span class="text-[#0f172a] text-[15px] font-bold uppercase tracking-wider"
-            style="font-family: var(--font-heading);">
+            style="font-family: var(--font-heading);color: var(--text);">
             
             Pending
           </span>
@@ -85,7 +91,8 @@
         </div>
 
         <div class="mt-4">
-          <div class="text-2xl font-extrabold text-gray-900">
+          <div class="text-2xl font-extrabold text-gray-900"
+          style="color: var(--text);">
             {{ pendingBookings }}
           </div>
           <div class="mt-1 text-[11px] text-gray-400 font-medium">
@@ -96,11 +103,11 @@
 
       <!-- Confirmed -->
       <div
-        class="p-5 bg-white border border-gray-200/80 rounded-xl shadow-xs hover:shadow-md hover:border-gray-300 transition-all flex flex-col justify-between group"
+        class="p-5  border border-gray-200/80 rounded-xl shadow-xs hover:shadow-md hover:border-gray-300 transition-all flex flex-col justify-between group"
       >
         <div class="flex items-center justify-between">
           <span class="text-[#0f172a] text-[15px] font-bold uppercase tracking-wider"
-            style="font-family: var(--font-heading);">
+            style="font-family: var(--font-heading);color: var(--text);">
             Confirmed
           </span>
           <div
@@ -111,7 +118,8 @@
         </div>
 
         <div class="mt-4">
-          <div class="text-2xl font-extrabold text-gray-900">
+          <div class="text-2xl font-extrabold text-gray-900"
+          style="color: var(--text);">
             {{ confirmedBookings }}
           </div>
           <div class="mt-1 text-[11px] text-gray-400 font-medium">
@@ -122,11 +130,11 @@
 
       <!-- Completed -->
       <div
-        class="p-5 bg-white border border-gray-200/80 rounded-xl shadow-xs hover:shadow-md hover:border-gray-300 transition-all flex flex-col justify-between group"
+        class="p-5 border border-gray-200/80 rounded-xl shadow-xs hover:shadow-md hover:border-gray-300 transition-all flex flex-col justify-between group"
       >
         <div class="flex items-center justify-between">
           <span class="text-[#0f172a] text-[15px] font-bold uppercase tracking-wider"
-            style="font-family: var(--font-heading);">
+            style="font-family: var(--font-heading);color: var(--text);">
             Completed
           </span>
           <div
@@ -137,7 +145,8 @@
         </div>
 
         <div class="mt-4">
-          <div class="text-2xl font-extrabold text-gray-900">
+          <div class="text-2xl font-extrabold text-gray-900"
+          style="color: var(--text);">
             {{ completedBookings }}
           </div>
           <div class="mt-1 text-[11px] text-gray-400 font-medium">
@@ -148,11 +157,11 @@
 
       <!-- Cancelled -->
       <div
-        class="p-5 bg-white border border-gray-200/80 rounded-xl shadow-xs hover:shadow-md hover:border-gray-300 transition-all flex flex-col justify-between group"
+        class="p-5  border border-gray-200/80 rounded-xl shadow-xs hover:shadow-md hover:border-gray-300 transition-all flex flex-col justify-between group"
       >
         <div class="flex items-center justify-between">
           <span class="text-[#0f172a] text-[15px] font-bold uppercase tracking-wider"
-            style="font-family: var(--font-heading);">
+            style="font-family: var(--font-heading);color: var(--text);">
             Cancelled
           </span>
           <div
@@ -163,7 +172,8 @@
         </div>
 
         <div class="mt-4">
-          <div class="text-2xl font-extrabold text-gray-900">
+          <div class="text-2xl font-extrabold text-gray-900"
+          style="color: var(--text);">
             {{ cancelledBookings }}
           </div>
           <div class="mt-1 text-[11px] text-gray-400 font-medium">
@@ -177,8 +187,8 @@
          FILTER BAR
     ========================================================== -->
     <div
-      class="p-4 bg-white border border-gray-200/80 rounded-t-xl shadow-xs flex flex-col md:flex-row items-center justify-between gap-4"
-    >
+      class="p-4  border border-gray-200/80 rounded-t-xl shadow-xs flex flex-col md:flex-row items-center justify-between gap-4"
+    style="color: var(--text);">
       <!-- Search -->
       <div class="relative w-full md:w-80">
         <input
@@ -186,8 +196,8 @@
           v-model="searchQuery"
           @input="currentPage = 1"
           placeholder="Search booking ID or customer..."
-          class="w-full h-9 pl-9 pr-4 bg-gray-50 border border-gray-200 rounded-lg text-xs font-medium text-gray-900 placeholder:text-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-600 transition-all"
-        />
+          class="w-full h-9 pl-9 pr-4 border border-gray-200 rounded-lg text-xs font-medium  placeholder:text-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-600 transition-all"
+        style="color: var(--text);font-family: var(--font-heading);"/>
       </div>
 
       <!-- Filters -->
@@ -195,8 +205,8 @@
         <select
           v-model="selectedStatus"
           @change="currentPage = 1"
-          class="h-9 px-3 bg-gray-50 border border-gray-200 rounded-lg text-xs font-semibold text-[#0f172a] focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-600 transition-all cursor-pointer"
-        >
+          class="h-9 px-3  border border(--border) rounded-lg text-xs font-semibold t focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-600 transition-all cursor-pointer"
+        style="color: var(--text);font-family: var(--font-heading);">
           <option value="All Statuses">All Statuses</option>
           <option value="PENDING">Pending</option>
           <option value="CONFIRMED">Confirmed</option>
@@ -211,15 +221,16 @@
          BOOKINGS TABLE
     ========================================================== -->
     <div
-      class="bg-white border-x border-b border-gray-200/80 rounded-b-xl shadow-xs overflow-hidden"
+      class=" border-x border-b border-gray-200/80 rounded-b-xl shadow-xs overflow-hidden"
     >
-      <div class="overflow-x-auto">
+      <div class="overflow-x-auto" 
+      style="color: var(--text);">
         <table class="w-full text-left border-collapse">
           <!-- Header -->
           <thead>
             <tr
-              class="bg-gray-50/50 border-b border-gray-200/80 text-[11px] font-bold text-[#0f172a] uppercase tracking-wider"
-            >
+              class="border-b  border-(--border) text-[11px] font-bold text-(--text) uppercase tracking-wider"
+           >
               <th class="py-3.5 px-4 ">Booking ID</th>
               <th class="py-3.5 px-4">Customer</th>
               <th class="py-3.5 px-4">Vehicle</th>

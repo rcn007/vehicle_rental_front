@@ -1,18 +1,17 @@
 <template>
-  <main class="p-6 md:p-8 min-h-[calc(100vh-64px)] bg-gray-50/50">
+  <main class="p-6 md:p-8 min-h-[calc(100vh-64px)] bg-[var(--background)] text-[var(--text)]">
     
     <!-- Page Header & Main Actions -->
     <div class="flex flex-col md:flex-row md:items-center justify-between mb-8 gap-4">
       <div>
-        <h1 class="text-3xl font-bold tracking-tight text-gray-900">Users</h1>
-        <p class="text-xl text-gray-900 mt-1">Manage administrators, operational staff, and registered customers</p>
+        <h1 class="text-3xl font-bold tracking-tight text-[var(--text)]">Users</h1>
+        <p class="text-xl text-[var(--muted)] mt-1">Manage administrators, operational staff, and registered customers</p>
       </div>
       
       <div class="flex items-center gap-3 shrink-0">
-       
         <button 
           @click="navigateToAdd" 
-          class="inline-flex items-center justify-center gap-2 h-12 px-4 rounded-[11px] text-xs font-semibold text-white bg-gray-900 hover:bg-gray-800 transition-all shadow-xs cursor-pointer active:scale-95"
+          class="inline-flex items-center justify-center gap-2 h-12 px-4 rounded-[11px] text-xs font-semibold text-[var(--background)] bg-[var(--accent)] hover:bg-[var(--accent-hover)] transition-all shadow-[var(--shadow-sm)] cursor-pointer active:scale-95"
         >
           <i class="fa-solid fa-plus text-[10px]"></i>
           <span>Add User</span>
@@ -24,103 +23,98 @@
     <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-4 mb-8">
       
       <!-- KPI 1: Total Users -->
-      <div class="p-4 bg-white border border-gray-200/80 rounded-xl shadow-xs hover:border-gray-300 transition-all flex flex-col justify-between">
+      <div class="p-4 bg-[var(--surface)] border border-[var(--border)] rounded-xl shadow-[var(--shadow-sm)] hover:border-[var(--muted)] transition-all flex flex-col justify-between">
         <div class="flex items-center justify-between">
-          <span class="text-[#0f172a] text-[15px] font-bold uppercase tracking-wider"
-            style="font-family: var(--font-heading);">Total Users</span>
-          <div class="w-7 h-7 rounded-lg bg-blue-50 text-blue-600 flex items-center justify-center text-xs">
+          <span class="text-[var(--text)] text-[15px] font-bold uppercase tracking-wider">Total Users</span>
+          <div class="w-7 h-7 rounded-lg bg-[var(--background)] text-[var(--accent)] flex items-center justify-center text-xs border border-[var(--border)]">
             <i class="fa-solid fa-users"></i>
           </div>
         </div>
         <div class="mt-3">
-          <div class="text-2xl font-extrabold text-gray-900">{{ stats.total }}</div>
-          <p class="text-[10px] text-gray-400 mt-0.5 font-medium">All user types</p>
+          <div class="text-2xl font-extrabold text-[var(--text)]">{{ stats.total }}</div>
+          <p class="text-[10px] text-[var(--muted)] mt-0.5 font-medium">All user types</p>
         </div>
       </div>
 
       <!-- KPI 2: Active Users -->
-      <div class="p-4 bg-white border border-gray-200/80 rounded-xl shadow-xs hover:border-gray-300 transition-all flex flex-col justify-between">
+      <div class="p-4 bg-[var(--surface)] border border-[var(--border)] rounded-xl shadow-[var(--shadow-sm)] hover:border-[var(--muted)] transition-all flex flex-col justify-between">
         <div class="flex items-center justify-between">
-           <span class="text-[#0f172a] text-[15px] font-bold uppercase tracking-wider"
-            style="font-family: var(--font-heading);">Active</span>
-          <div class="w-7 h-7 rounded-lg bg-emerald-50 text-emerald-600 flex items-center justify-center text-xs">
+          <span class="text-[var(--text)] text-[15px] font-bold uppercase tracking-wider">Active</span>
+          <div class="w-7 h-7 rounded-lg bg-[var(--background)] text-[var(--accent)] flex items-center justify-center text-xs border border-[var(--border)]">
             <i class="fa-solid fa-circle-check"></i>
           </div>
         </div>
         <div class="mt-3">
-          <div class="text-2xl font-extrabold text-gray-900">{{ stats.active }}</div>
-          <p class="text-[10px] text-emerald-600 font-bold mt-0.5">{{ stats.activeRate }}% active rate</p>
+          <div class="text-2xl font-extrabold text-[var(--text)]">{{ stats.active }}</div>
+          <p class="text-[10px] text-[var(--accent)] font-bold mt-0.5">{{ stats.activeRate }}% active rate</p>
         </div>
       </div>
 
       <!-- KPI 3: Customers -->
-      <div class="p-4 bg-white border border-gray-200/80 rounded-xl shadow-xs hover:border-gray-300 transition-all flex flex-col justify-between">
+      <div class="p-4 bg-[var(--surface)] border border-[var(--border)] rounded-xl shadow-[var(--shadow-sm)] hover:border-[var(--muted)] transition-all flex flex-col justify-between">
         <div class="flex items-center justify-between">
-           <span class="text-[#0f172a] text-[15px] font-bold uppercase tracking-wider"
-            style="font-family: var(--font-heading);">Customers</span>
-          <div class="w-7 h-7 rounded-lg bg-indigo-50 text-indigo-600 flex items-center justify-center text-xs">
+          <span class="text-[var(--text)] text-[15px] font-bold uppercase tracking-wider">Customers</span>
+          <div class="w-7 h-7 rounded-lg bg-[var(--background)] text-[var(--accent)] flex items-center justify-center text-xs border border-[var(--border)]">
             <i class="fa-solid fa-user-tag"></i>
           </div>
         </div>
         <div class="mt-3">
-          <div class="text-2xl font-extrabold text-gray-900">{{ stats.customers }}</div>
-          <p class="text-[10px] text-gray-400 mt-0.5 font-medium">End consumers</p>
+          <div class="text-2xl font-extrabold text-[var(--text)]">{{ stats.customers }}</div>
+          <p class="text-[10px] text-[var(--muted)] mt-0.5 font-medium">End consumers</p>
         </div>
       </div>
 
       <!-- KPI 4: Administrators -->
-      <div class="p-4 bg-white border border-gray-200/80 rounded-xl shadow-xs hover:border-gray-300 transition-all flex flex-col justify-between">
+      <div class="p-4 bg-[var(--surface)] border border-[var(--border)] rounded-xl shadow-[var(--shadow-sm)] hover:border-[var(--muted)] transition-all flex flex-col justify-between">
         <div class="flex items-center justify-between">
-           <span class="text-[#0f172a] text-[15px] font-bold uppercase tracking-wider"
-            style="font-family: var(--font-heading);">Admins</span>
-          <div class="w-7 h-7 rounded-lg bg-purple-50 text-purple-600 flex items-center justify-center text-xs">
+          <span class="text-[var(--text)] text-[15px] font-bold uppercase tracking-wider">Admins</span>
+          <div class="w-7 h-7 rounded-lg bg-[var(--background)] text-[var(--accent)] flex items-center justify-center text-xs border border-[var(--border)]">
             <i class="fa-solid fa-shield-halved"></i>
           </div>
         </div>
         <div class="mt-3">
-          <div class="text-2xl font-extrabold text-gray-900">{{ stats.admins }}</div>
-          <p class="text-[10px] text-gray-400 mt-0.5 font-medium">System access</p>
+          <div class="text-2xl font-extrabold text-[var(--text)]">{{ stats.admins }}</div>
+          <p class="text-[10px] text-[var(--muted)] mt-0.5 font-medium">System access</p>
         </div>
       </div>
 
       <!-- KPI 5: Inactive Users -->
-      <div class="p-4 bg-white border border-gray-200/80 rounded-xl shadow-xs hover:border-gray-300 transition-all flex flex-col justify-between sm:col-span-2 lg:col-span-1">
+      <div class="p-4 bg-[var(--surface)] border border-[var(--border)] rounded-xl shadow-[var(--shadow-sm)] hover:border-[var(--muted)] transition-all flex flex-col justify-between sm:col-span-2 lg:col-span-1">
         <div class="flex items-center justify-between">
-           <span class="text-[#0f172a] text-[15px] font-bold uppercase tracking-wider"
-            style="font-family: var(--font-heading);">Inactive</span>
-          <div class="w-7 h-7 rounded-lg bg-rose-50 text-rose-600 flex items-center justify-center text-xs">
+          <span class="text-[var(--text)] text-[15px] font-bold uppercase tracking-wider">Inactive</span>
+          <div class="w-7 h-7 rounded-lg bg-[var(--background)] text-[var(--danger)] flex items-center justify-center text-xs border border-[var(--border)]">
             <i class="fa-solid fa-user-xmark"></i>
           </div>
         </div>
         <div class="mt-3">
-          <div class="text-2xl font-extrabold text-gray-900">{{ stats.inactive }}</div>
-          <p class="text-[10px] text-rose-600 font-bold mt-0.5">Suspended or inactive</p>
+          <div class="text-2xl font-extrabold text-[var(--text)]">{{ stats.inactive }}</div>
+          <p class="text-[10px] text-[var(--danger)] font-bold mt-0.5">Suspended or inactive</p>
         </div>
       </div>
 
     </div>
 
     <!-- Users Table Container -->
-    <div class="bg-white border border-gray-200/80 rounded-xl shadow-xs overflow-hidden mb-6">
+    <div class="bg-[var(--surface)] border border-[var(--border)] rounded-xl shadow-[var(--shadow-md)] overflow-hidden mb-6">
       
       <!-- Table Search & Filters Control Bar -->
-      <div class="p-4 px-6 border-b border-gray-200/80 bg-white flex flex-col md:flex-row items-stretch md:items-center justify-between gap-4">
+      <div class="p-4 px-6 border-b border-[var(--border)] bg-[var(--surface)] flex flex-col md:flex-row items-stretch md:items-center justify-between gap-4">
         
         <!-- Search Input -->
         <div class="relative flex-1 max-w-md">
-             <input 
+          <input 
             type="text" 
             v-model="searchQuery"
             placeholder="Search by user name, email, or phone..." 
-            class="w-full h-9 pl-9 pr-4 bg-gray-50 border border-gray-200 rounded-lg text-xs font-medium text-gray-900 placeholder:text-gray-400 focus:outline-none focus:bg-white focus:ring-2 focus:ring-blue-500/20 focus:border-blue-600 transition-all shadow-xs"
-          >
+            class="w-full h-9 pl-9 pr-4 bg-[var(--background)] border border-[var(--border)] rounded-lg text-xs font-medium text-[var(--text)] placeholder:text-[var(--muted)] focus:outline-none focus:bg-[var(--background)] focus:ring-2 focus:ring-[var(--accent)]/20 focus:border-[var(--accent)] transition-all shadow-[var(--shadow-sm)]"
+          />
         </div>
 
         <!-- Filter Selects -->
         <div class="flex items-center gap-3">
           <div class="flex items-center gap-2">
-            <label class="text-[11px] font-bold text-gray-400 uppercase tracking-wider">Role:</label>
-            <select v-model="selectedRole" class="h-9 px-3 bg-gray-50 border border-gray-200 rounded-lg text-xs font-semibold text-gray-700 focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-600 transition-all cursor-pointer">
+            <label class="text-[11px] font-bold text-[var(--muted)] uppercase tracking-wider">Role:</label>
+            <select v-model="selectedRole" class="h-9 px-3 bg-[var(--background)] border border-[var(--border)] rounded-lg text-xs font-semibold text-[var(--text)] focus:outline-none focus:ring-2 focus:ring-[var(--accent)]/20 focus:border-[var(--accent)] transition-all cursor-pointer">
               <option value="All">All Roles</option>
               <option value="ADMIN">Admin</option>
               <option value="STAFF">Staff</option>
@@ -129,8 +123,8 @@
           </div>
 
           <div class="flex items-center gap-2">
-            <label class="text-[11px] font-bold text-gray-400 uppercase tracking-wider">Status:</label>
-            <select v-model="selectedStatus" class="h-9 px-3 bg-gray-50 border border-gray-200 rounded-lg text-xs font-semibold text-gray-700 focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-600 transition-all cursor-pointer">
+            <label class="text-[11px] font-bold text-[var(--muted)] uppercase tracking-wider">Status:</label>
+            <select v-model="selectedStatus" class="h-9 px-3 bg-[var(--background)] border border-[var(--border)] rounded-lg text-xs font-semibold text-[var(--text)] focus:outline-none focus:ring-2 focus:ring-[var(--accent)]/20 focus:border-[var(--accent)] transition-all cursor-pointer">
               <option value="All">All Statuses</option>
               <option value="Active">Active</option>
               <option value="Inactive">Inactive</option>
@@ -142,9 +136,9 @@
 
       <!-- Data Table -->
       <div class="overflow-x-auto">
-        <table class="w-full text-left text-xs text-gray-700">
+        <table class="w-full text-left text-xs text-[var(--text)]">
           <thead>
-            <tr class="bg-gray-50 text-gray-500 font-bold uppercase tracking-wider text-[10px] border-b border-gray-200">
+            <tr class="bg-[var(--background)] text-[var(--muted)] font-bold uppercase tracking-wider text-[10px] border-b border-[var(--border)]">
               <th class="py-3 px-6">User</th>
               <th class="py-3 px-5">Phone</th>
               <th class="py-3 px-5">Gender</th>
@@ -153,28 +147,28 @@
               <th class="py-3 px-6 text-right">Actions</th>
             </tr>
           </thead>
-          <tbody class="divide-y divide-gray-100">
+          <tbody class="divide-y divide-[var(--border)]">
             
             <!-- Loading -->
             <tr v-if="loading" v-for="n in 3" :key="n" class="animate-pulse">
-              <td colspan="7" class="py-4 px-6 text-center text-gray-400">Loading user accounts...</td>
+              <td colspan="6" class="py-4 px-6 text-center text-[var(--muted)]">Loading user accounts...</td>
             </tr>
 
             <!-- Error -->
-            <tr v-else-if="error" class="text-rose-600">
-              <td colspan="7" class="py-8 px-6 text-center">
+            <tr v-else-if="error" class="text-[var(--danger)]">
+              <td colspan="6" class="py-8 px-6 text-center">
                 <p class="font-medium mb-2">{{ error }}</p>
-                <button @click="fetchUsers" class="text-xs text-blue-600 underline font-semibold cursor-pointer">Try Again</button>
+                <button @click="fetchUsers" class="text-xs text-[var(--accent)] underline font-semibold cursor-pointer">Try Again</button>
               </td>
             </tr>
 
             <!-- Empty -->
             <tr v-else-if="paginatedUsers.length === 0">
-              <td colspan="7" class="py-8 px-6 text-center text-gray-500">No users found matching criteria.</td>
+              <td colspan="6" class="py-8 px-6 text-center text-[var(--muted)]">No users found matching criteria.</td>
             </tr>
 
             <!-- User Row -->
-            <tr v-else v-for="user in paginatedUsers" :key="user.id" class="hover:bg-gray-50/80 transition-colors">
+            <tr v-else v-for="user in paginatedUsers" :key="user.id" class="hover:bg-[var(--background)]/50 transition-colors">
               <td class="py-3.5 px-6">
                 <div class="flex items-center gap-3">
                   <!-- Avatar Image / Initials -->
@@ -183,20 +177,20 @@
                     :src="getUserAvatar(user)" 
                     :alt="getUserName(user)" 
                     @error="handleImageError"
-                    class="w-8 h-8 rounded-full object-cover ring-1 ring-gray-200 shrink-0"
-                  >
-                  <div v-else class="w-8 h-8 rounded-full bg-slate-800 text-white flex items-center justify-center font-bold text-[10px] shrink-0">
+                    class="w-8 h-8 rounded-full object-cover ring-1 ring-[var(--border)] shrink-0"
+                  />
+                  <div v-else class="w-8 h-8 rounded-full bg-[var(--background)] text-[var(--text)] border border-[var(--border)] flex items-center justify-center font-bold text-[10px] shrink-0">
                     {{ getUserInitials(user) }}
                   </div>
 
                   <div>
-                    <div class="font-bold text-gray-900 text-xs">{{ getUserName(user) }}</div>
-                    <div class="text-[11px] text-gray-400 font-medium">{{ user.email || 'N/A' }}</div>
+                    <div class="font-bold text-[var(--text)] text-xs">{{ getUserName(user) }}</div>
+                    <div class="text-[11px] text-[var(--muted)] font-medium">{{ user.email || 'N/A' }}</div>
                   </div>
                 </div>
               </td>
-              <td class="py-3.5 px-5 text-gray-600 font-medium">{{ user.phone || user.phoneNumber || 'N/A' }}</td>
-              <td class="py-3.5 px-5 text-gray-500 capitalize">{{ user.gender || 'N/A' }}</td>
+              <td class="py-3.5 px-5 text-[var(--muted)] font-medium">{{ user.phone || user.phoneNumber || 'N/A' }}</td>
+              <td class="py-3.5 px-5 text-[var(--muted)] capitalize">{{ user.gender || 'N/A' }}</td>
               <td class="py-3.5 px-5">
                 <span :class="getRoleBadgeClass(user.role)">
                   {{ getRoleText(user.role) }}
@@ -208,21 +202,21 @@
                   {{ getStatusText(user.status) }}
                 </span>
               </td>
-              <td class="py-3.5 px-6 text-right ">
-                <div class="flex items-center gap-1">
+              <td class="py-3.5 px-6 text-right">
+                <div class="flex items-center justify-end gap-1">
                   <!-- View -->
-                  <button @click="navigateToDetail(user.id)" class="p-1.5 rounded-lg text-gray-400 hover:text-blue-600 hover:bg-blue-50 transition-all cursor-pointer" title="View Profile">
+                  <button @click="navigateToDetail(user.id)" class="p-1.5 rounded-lg text-[var(--muted)] hover:text-[var(--accent)] hover:bg-[var(--background)] transition-all cursor-pointer" title="View Profile">
                     <i class="fa-regular fa-eye text-xs"></i>
                   </button>
 
                   <!-- Edit -->
-                  <button @click="navigateToEdit(user.id)" class="p-1.5 rounded-lg text-gray-400 hover:text-amber-600 hover:bg-amber-50 transition-all cursor-pointer" title="Edit User">
+                  <button @click="navigateToEdit(user.id)" class="p-1.5 rounded-lg text-[var(--muted)] hover:text-[var(--warning)] hover:bg-[var(--background)] transition-all cursor-pointer" title="Edit User">
                     <i class="fa-regular fa-pen-to-square text-xs"></i>
                   </button>
 
                   <!-- Delete -->
-                  <button @click="handleDelete(user)" :disabled="deletingId === user.id" class="p-1.5 rounded-lg text-gray-400 hover:text-rose-600 hover:bg-rose-50 transition-all cursor-pointer disabled:opacity-50" title="Delete User">
-                    <i v-if="deletingId === user.id" class="fa-solid fa-circle-notch fa-spin text-xs text-rose-600"></i>
+                  <button @click="handleDelete(user)" :disabled="deletingId === user.id" class="p-1.5 rounded-lg text-[var(--muted)] hover:text-[var(--danger)] hover:bg-[var(--background)] transition-all cursor-pointer disabled:opacity-50" title="Delete User">
+                    <i v-if="deletingId === user.id" class="fa-solid fa-circle-notch fa-spin text-xs text-[var(--danger)]"></i>
                     <i v-else class="fa-regular fa-trash-can text-xs"></i>
                   </button>
                 </div>
@@ -234,12 +228,12 @@
       </div>
 
       <!-- Pagination Footer (10 per page) -->
-      <div v-if="!loading && filteredUsers.length > 0" class="flex flex-col sm:flex-row items-center justify-between p-4 px-6 border-t border-gray-100 text-xs text-gray-500 gap-3">
+      <div v-if="!loading && filteredUsers.length > 0" class="flex flex-col sm:flex-row items-center justify-between p-4 px-6 border-t border-[var(--border)] text-xs text-[var(--muted)] gap-3">
         <div>
           Showing 
-          <span class="font-bold text-gray-900">{{ startItemIndex }}–{{ endItemIndex }}</span> 
+          <span class="font-bold text-[var(--text)]">{{ startItemIndex }}–{{ endItemIndex }}</span> 
           of 
-          <span class="font-bold text-gray-900">{{ filteredUsers.length }}</span> 
+          <span class="font-bold text-[var(--text)]">{{ filteredUsers.length }}</span> 
           entries
         </div>
 
@@ -247,7 +241,7 @@
           <button 
             @click="currentPage--" 
             :disabled="currentPage === 1" 
-            class="w-7 h-7 rounded-md border border-gray-200 flex items-center justify-center text-gray-500 hover:bg-gray-100 transition-colors cursor-pointer disabled:opacity-40 disabled:cursor-not-allowed"
+            class="w-7 h-7 rounded-md border border-[var(--border)] flex items-center justify-center text-[var(--muted)] hover:bg-[var(--background)] hover:text-[var(--text)] transition-colors cursor-pointer disabled:opacity-40 disabled:cursor-not-allowed"
           >
             <i class="fa-solid fa-chevron-left text-[10px]"></i>
           </button>
@@ -259,8 +253,8 @@
             :class="[
               'w-7 h-7 rounded-md font-bold flex items-center justify-center text-xs transition-colors cursor-pointer',
               currentPage === page 
-                ? 'bg-blue-600 text-white shadow-xs' 
-                : 'border border-gray-200 text-gray-700 hover:bg-gray-100'
+                ? 'bg-[var(--accent)] text-[var(--background)] shadow-[var(--shadow-sm)]' 
+                : 'border border-[var(--border)] text-[var(--text)] hover:bg-[var(--background)]'
             ]"
           >
             {{ page }}
@@ -269,7 +263,7 @@
           <button 
             @click="currentPage++" 
             :disabled="currentPage === totalPages || totalPages === 0" 
-            class="w-7 h-7 rounded-md border border-gray-200 flex items-center justify-center text-gray-500 hover:bg-gray-100 transition-colors cursor-pointer disabled:opacity-40 disabled:cursor-not-allowed"
+            class="w-7 h-7 rounded-md border border-[var(--border)] flex items-center justify-center text-[var(--muted)] hover:bg-[var(--background)] hover:text-[var(--text)] transition-colors cursor-pointer disabled:opacity-40 disabled:cursor-not-allowed"
           >
             <i class="fa-solid fa-chevron-right text-[10px]"></i>
           </button>

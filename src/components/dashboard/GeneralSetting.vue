@@ -1,5 +1,5 @@
 <template>
-  <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+  <div class="grid grid-cols-1 lg:grid-cols-3 gap-6 text-[--text">
     <!-- Left Configuration Columns -->
     <div class="lg:col-span-2 space-y-6">
 
@@ -8,18 +8,18 @@
         <div
           v-if="toast.show"
           :class="[
-            'p-4 rounded-xl border flex items-center justify-between shadow-sm',
+            'p-4 rounded-xl border flex items-center justify-between shadow-[0_1px_3px_rgba(0,0,0,0.2)]',
             toast.type === 'success'
-              ? 'bg-emerald-50 border-emerald-200 text-emerald-800'
-              : 'bg-red-50 border-red-200 text-red-800'
+              ? 'bg-[#10b981]/10 border-[#10b981]/20 text-[#10b981]'
+              : 'bg-[#ef4444]/10 border-[#ef4444]/20 text-[#ef4444]'
           ]"
         >
           <div class="flex items-center gap-3 text-sm font-medium">
             <i
               :class="
                 toast.type === 'success'
-                  ? 'fa-solid fa-circle-check text-emerald-600'
-                  : 'fa-solid fa-circle-exclamation text-red-600'
+                  ? 'fa-solid fa-circle-check text-[#10b981]'
+                  : 'fa-solid fa-circle-exclamation text-[#ef4444]'
               "
             ></i>
             <span>{{ toast.message }}</span>
@@ -28,7 +28,7 @@
           <button
             type="button"
             @click="toast.show = false"
-            class="text-xs opacity-70 hover:opacity-100 cursor-pointer"
+            class="text-xs opacity-70 hover:opacity-100 cursor-pointer text-[#94a3b8]"
           >
             <i class="fa-solid fa-xmark text-base"></i>
           </button>
@@ -38,24 +38,24 @@
       <!-- Loading State -->
       <div
         v-if="loading"
-        class="bg-white border border-[#D3DAEF] rounded-xl p-12 text-center text-[#7A8190] shadow-sm"
+        class="bg-[--background] border border-[#334155] rounded-xl p-12 text-center text-[#94a3b8] shadow-[0_1px_3px_rgba(0,0,0,0.2)]"
       >
-        <i class="fa-solid fa-spinner animate-spin text-3xl text-[#2563EB] mb-3"></i>
+        <i class="fa-solid fa-spinner animate-spin text-3xl text-[--text] mb-3"></i>
         <p class="text-sm font-medium">Loading customizer settings...</p>
       </div>
 
       <div v-else class="space-y-6">
         <!-- Site Branding Card -->
-        <div class="bg-white border border-[#D3DAEF] rounded-xl p-6 shadow-sm">
-          <h2 class="text-base font-bold text-[#111827] mb-1">Site Branding</h2>
-          <p class="text-xs text-[#7A8190] mb-4">
+        <div class="bg-[--background] border border-[#334155] rounded-xl p-6 shadow-[0_1px_3px_rgba(0,0,0,0.2)]">
+          <h2 class="text-base font-bold text-[--text] mb-1">Site Branding</h2>
+          <p class="text-xs text-[--text] mb-4">
             Manage your platform logo and visual identity.
           </p>
 
           <div class="flex flex-col sm:flex-row items-start sm:items-center gap-4">
             <!-- Logo Preview -->
             <div
-              class="px-6 py-4 bg-[#F1F3FF] border border-[#D3DAEF] rounded-lg font-bold text-[#111827] text-sm flex items-center justify-center min-w-[160px] min-h-[60px]"
+              class="px-6 py-4 bg-[--background] border border-[#334155] rounded-lg font-bold text-[--text] text-sm flex items-center justify-center min-w-[160px] min-h-[60px]"
             >
               <img
                 v-if="form.logoUrl"
@@ -79,13 +79,13 @@
               <button
                 type="button"
                 @click="logoInputRef?.click()"
-                class="inline-flex items-center gap-2 px-4 py-2 bg-white border border-[#D3DAEF] rounded-lg text-sm font-medium text-[#111827] hover:bg-[#E1E8FD] transition-colors shadow-sm cursor-pointer"
+                class="inline-flex items-center gap-2 px-4 py-2 bg-[--background] border border-[#334155] rounded-lg text-sm font-medium text-[--text] hover:bg-[#334155] transition-colors shadow-[0_1px_3px_rgba(0,0,0,0.2)] cursor-pointer"
               >
-                <i class="fa-solid fa-upload text-xs"></i>
+                <i class="fa-solid fa-upload text-xs text-[--text]"></i>
                 Upload Logo
               </button>
 
-              <div class="text-xs text-[#7A8190] mt-2">
+              <div class="text-xs text-[--text] mt-2">
                 Recommended: 200×50px, PNG or SVG.
               </div>
             </div>
@@ -93,9 +93,9 @@
         </div>
 
         <!-- Hero Section Card -->
-        <div class="bg-white border border-[#D3DAEF] rounded-xl p-6 shadow-sm">
-          <h2 class="text-base font-bold text-[#111827] mb-1">Hero Section</h2>
-          <p class="text-xs text-[#7A8190] mb-4">
+        <div class="bg-[--background] border border-[#334155] rounded-xl p-6 shadow-[0_1px_3px_rgba(0,0,0,0.2)]">
+          <h2 class="text-base font-bold text-[#f8fafc] mb-1">Hero Section</h2>
+          <p class="text-xs text-[--text] mb-4">
             Configure homepage hero banner imagery.
           </p>
 
@@ -110,7 +110,7 @@
 
           <!-- Hero Preview -->
           <div
-            class="mb-4 rounded-lg overflow-hidden border border-[#D3DAEF] relative h-36 bg-[#F1F3FF] flex items-center justify-center"
+            class="mb-4 rounded-lg overflow-hidden border border-[#334155] relative h-36 bg-[--background] flex items-center justify-center"
           >
             <img
               v-if="form.heroBannerUrl"
@@ -120,7 +120,7 @@
             />
             <div
               v-else
-              class="text-xs text-[#7A8190] flex flex-col items-center gap-1"
+              class="text-xs text-[--text] flex flex-col items-center gap-1"
             >
               <i class="fa-regular fa-image text-2xl"></i>
               <span>No hero banner selected</span>
@@ -131,7 +131,7 @@
             <button
               type="button"
               @click="heroInputRef?.click()"
-              class="px-4 py-2 bg-white border border-[#D3DAEF] rounded-lg text-sm font-medium text-[#111827] hover:bg-[#E1E8FD] transition-colors shadow-sm cursor-pointer"
+              class="px-4 py-2 bg-[#0f172a] border border-[#334155] rounded-lg text-sm font-medium text-[#f8fafc] hover:bg-[#334155] transition-colors shadow-[0_1px_3px_rgba(0,0,0,0.2)] cursor-pointer"
             >
               Replace
             </button>
@@ -139,7 +139,7 @@
             <button
               type="button"
               @click="removeHeroBanner"
-              class="px-4 py-2 text-sm font-medium text-[#DC2626] hover:bg-[#FEE2E2]/50 rounded-lg transition-colors cursor-pointer"
+              class="px-4 py-2 text-sm font-medium text-[#ef4444] hover:bg-[#ef4444]/10 rounded-lg transition-colors cursor-pointer"
             >
               Remove
             </button>
@@ -147,51 +147,51 @@
         </div>
 
         <!-- Homepage Content Card -->
-        <div class="bg-white border border-[#D3DAEF] rounded-xl p-6 shadow-sm">
-          <h2 class="text-base font-bold text-[#111827] mb-1">
+        <div class="bg-[--background] border border-[#334155] rounded-xl p-6 shadow-[0_1px_3px_rgba(0,0,0,0.2)]">
+          <h2 class="text-base font-bold text-[--text] mb-1">
             Homepage Content
           </h2>
-          <p class="text-xs text-[#7A8190] mb-4">
+          <p class="text-xs text-[--text] mb-4">
             Edit primary titles and meta tag descriptions.
           </p>
 
           <div class="space-y-4">
             <!-- Site Name -->
             <div>
-              <label class="block text-xs font-semibold text-[#43474E] mb-1">
+              <label class="block text-xs font-semibold text-[--text] mb-1">
                 Brand/Site Name
               </label>
               <input
                 v-model="form.siteName"
                 type="text"
                 placeholder="e.g. Precision Auto"
-                class="w-full h-10 px-3 bg-[#F1F3FF] border border-[#D3DAEF] rounded-lg text-sm text-[#111827] focus:outline-none focus:border-[#2563EB]"
+                class="w-full h-10 px-3 bg-[--background] border border-[#334155] rounded-lg text-sm text-[--text] placeholder:text-[#94a3b8] focus:outline-none focus:border-[#10b981]"
               />
             </div>
 
             <!-- Website Title -->
             <div>
-              <label class="block text-xs font-semibold text-[#43474E] mb-1">
+              <label class="block text-xs font-semibold text-[#94a3b8] mb-1">
                 Website Title
               </label>
               <input
                 v-model="form.websiteTitle"
                 type="text"
                 placeholder="Website Header Title"
-                class="w-full h-10 px-3 bg-[#F1F3FF] border border-[#D3DAEF] rounded-lg text-sm text-[#111827] focus:outline-none focus:border-[#2563EB]"
+                class="w-full h-10 px-3 bg-[--background] border border-[#334155] rounded-lg text-sm text-[--text] placeholder:text-[#94a3b8] focus:outline-none focus:border-[#10b981]"
               />
             </div>
 
             <!-- Description -->
             <div>
-              <label class="block text-xs font-semibold text-[#43474E] mb-1">
+              <label class="block text-xs font-semibold text-[--text] mb-1">
                 Description
               </label>
               <textarea
                 v-model="form.description"
                 rows="3"
                 placeholder="Homepage description..."
-                class="w-full p-3 bg-[#F1F3FF] border border-[#D3DAEF] rounded-lg text-sm text-[#111827] focus:outline-none focus:border-[#2563EB]"
+                class="w-full p-3 bg-[--background] border border-[#334155] rounded-lg text-sm text-[#f8fafc] placeholder:text-[--text] focus:outline-none focus:border-[#10b981]"
               ></textarea>
             </div>
           </div>
@@ -203,7 +203,7 @@
             type="button"
             @click="saveSettings"
             :disabled="saving"
-            class="px-6 py-2.5 bg-[#2563EB] hover:bg-blue-700 active:bg-blue-800 text-white font-medium text-sm rounded-lg shadow-sm focus:ring-4 focus:ring-[#2563EB]/20 transition-all disabled:opacity-50 flex items-center gap-2 cursor-pointer"
+            class="px-6 py-2.5 bg-[#10b981] hover:bg-[#34d399] active:scale-95 text-[#0f172a] font-semibold text-sm rounded-lg shadow-[0_1px_3px_rgba(0,0,0,0.2)] focus:ring-4 focus:ring-[#10b981]/20 transition-all disabled:opacity-50 flex items-center gap-2 cursor-pointer"
           >
             <i
               v-if="saving"
@@ -218,21 +218,21 @@
 
     <!-- Live Preview -->
     <div>
-      <div class="sticky top-6 bg-white border border-[#D3DAEF] rounded-xl p-5 shadow-sm">
-        <h2 class="text-sm font-bold text-[#111827] mb-3">Live Preview</h2>
+      <div class="sticky top-6 bg-[#1e293b] border border-[#334155] rounded-xl p-5 shadow-[0_1px_3px_rgba(0,0,0,0.2)]">
+        <h2 class="text-sm font-bold text-[#f8fafc] mb-3">Live Preview</h2>
 
         <!-- Mock Browser Frame -->
-        <div class="border border-[#D3DAEF] rounded-lg overflow-hidden bg-[#111827] shadow-sm mb-3">
+        <div class="border border-[#334155] rounded-lg overflow-hidden bg-[#0f172a] shadow-[0_1px_3px_rgba(0,0,0,0.2)] mb-3">
           <!-- Browser Header -->
-          <div class="flex items-center gap-1.5 px-3 py-2 bg-[#1F2937]">
-            <div class="w-2.5 h-2.5 rounded-full bg-[#EF4444]"></div>
-            <div class="w-2.5 h-2.5 rounded-full bg-[#F59E0B]"></div>
-            <div class="w-2.5 h-2.5 rounded-full bg-[#10B981]"></div>
+          <div class="flex items-center gap-1.5 px-3 py-2 bg-[#1e293b] border-b border-[#334155]">
+            <div class="w-2.5 h-2.5 rounded-full bg-[#ef4444]"></div>
+            <div class="w-2.5 h-2.5 rounded-full bg-[#f59e0b]"></div>
+            <div class="w-2.5 h-2.5 rounded-full bg-[#10b981]"></div>
           </div>
 
           <!-- Mock Homepage -->
           <div
-            class="p-4 bg-slate-900 text-white min-h-[220px] flex flex-col justify-between relative bg-cover bg-center transition-all"
+            class="p-4 bg-[#0f172a] text-[#f8fafc] min-h-[220px] flex flex-col justify-between relative bg-cover bg-center transition-all"
             :style="
               form.heroBannerUrl
                 ? {
@@ -242,7 +242,7 @@
             "
           >
             <!-- Mock Header -->
-            <div class="flex justify-between items-center text-xs text-slate-400 relative z-10">
+            <div class="flex justify-between items-center text-xs text-[#94a3b8] relative z-10">
               <div class="flex items-center gap-2">
                 <img
                   v-if="form.logoUrl"
@@ -250,7 +250,7 @@
                   alt="Logo"
                   class="h-4 max-w-[70px] object-contain"
                 />
-                <span class="font-bold text-white">
+                <span class="font-bold text-[#f8fafc]">
                   {{ form.siteName || 'Precision Auto' }}
                 </span>
               </div>
@@ -264,10 +264,10 @@
 
             <!-- Mock Hero Text -->
             <div class="my-4 relative z-10">
-              <h3 class="font-extrabold text-sm line-clamp-1">
+              <h3 class="font-extrabold text-sm line-clamp-1 text-[#f8fafc]">
                 {{ form.websiteTitle || 'Precision Auto - Premium Vehicle Rentals' }}
               </h3>
-              <p class="text-[10px] text-slate-300 mt-1 line-clamp-2">
+              <p class="text-[10px] text-[#94a3b8] mt-1 line-clamp-2">
                 {{ form.description || 'Experience luxury and performance with our curated fleet of premium vehicles.' }}
               </p>
             </div>
@@ -275,7 +275,7 @@
             <!-- Mock Button -->
             <button
               type="button"
-              class="w-fit px-3 py-1 bg-[#2563EB] text-white text-[10px] font-medium rounded relative z-10 pointer-events-none"
+              class="w-fit px-3 py-1 bg-[#10b981] text-[#0f172a] text-[10px] font-bold rounded relative z-10 pointer-events-none"
             >
               Explore Fleet
             </button>
@@ -283,8 +283,8 @@
         </div>
 
         <!-- Preview Info -->
-        <div class="flex items-center gap-2 p-2.5 bg-[#F1F3FF] border border-[#D3DAEF] rounded-lg text-xs text-[#43474E]">
-          <i class="fa-regular fa-eye text-[#2563EB]"></i>
+        <div class="flex items-center gap-2 p-2.5 bg-[#0f172a] border border-[#334155] rounded-lg text-xs text-[#94a3b8]">
+          <i class="fa-regular fa-eye text-[#10b981]"></i>
           <span>Preview updates in real-time as you type.</span>
         </div>
       </div>

@@ -1,24 +1,24 @@
 <template>
-  <main class="min-h-[calc(100vh-64px)] bg-[#F8FAFC] p-4 sm:p-6">
+  <main class="min-h-[calc(100vh-64px)] bg-[var(--background)] p-4 sm:p-8 text-[var(--text)]">
 
     <!-- PAGE HEADER -->
     <section class="mb-6 flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
       <div>
         <div class="mb-1 flex items-center gap-2">
-          <h1 class="text-3xl font-bold tracking-tight text-slate-900">
+          <h1 class="text-3xl font-bold tracking-tight text-[var(--text)]">
             Payments
           </h1>
         </div>
-        <p class="text-xl text-gray-900">
+        <p class="text-xl text-[var(--muted)]">
           Monitor rental payments and transaction activity.
         </p>
       </div>
 
       <button
         @click="exportReport"
-        class="inline-flex h-12 items-center justify-center gap-2 rounded-lg border border-slate-200 bg-gray-900 px-4 text-sm font-semibold text-white shadow-sm transition hover:border-slate-300 hover:bg-gray-800 focus:outline-none focus:ring-2 focus:ring-blue-500/20 active:scale-95 cursor-pointer"
+        class="inline-flex h-12 items-center justify-center gap-2 rounded-lg border border-[var(--border)] bg-[var(--accent)] px-4 text-sm font-semibold text-[var(--background)] shadow-[var(--shadow-sm)] transition hover:bg-[var(--accent-hover)] focus:outline-none focus:ring-2 focus:ring-[var(--accent)]/20 active:scale-95 cursor-pointer"
       >
-        <i class="fa-solid fa-download text-xs text-slate-400"></i>
+        <i class="fa-solid fa-download text-xs text-[var(--background)]"></i>
         Export Report
       </button>
     </section>
@@ -27,115 +27,110 @@
     <section class="mb-6 grid grid-cols-1 gap-4 sm:grid-cols-2 xl:grid-cols-5">
 
       <!-- Total Revenue -->
-      <div class="group rounded-xl border border-slate-200 bg-white p-5 shadow-sm transition hover:-translate-y-0.5 hover:shadow-md">
+      <div class="group rounded-xl border border-[var(--border)] bg-[var(--surface)] p-5 shadow-[var(--shadow-sm)] transition hover:-translate-y-0.5 hover:border-[var(--muted)]">
         <div class="mb-4 flex items-start justify-between">
           <div>
-            <span class="text-[#0f172a] text-[15px] font-bold uppercase tracking-wider"
-            style="font-family: var(--font-heading);">
+            <span class="text-[var(--text)] text-[15px] font-bold uppercase tracking-wider">
               Total Revenue
-          </span>
-            <h2 class="mt-2 text-2xl font-bold tracking-tight text-slate-900">
+            </span>
+            <h2 class="mt-2 text-2xl font-bold tracking-tight text-[var(--text)]">
               ${{ stats.totalRevenue.toLocaleString() }}
             </h2>
           </div>
-          <div class="flex h-10 w-10 items-center justify-center rounded-lg bg-blue-50 text-blue-600">
+          <div class="flex h-10 w-10 items-center justify-center rounded-lg bg-[var(--background)] text-[var(--accent)] border border-[var(--border)]">
             <i class="fa-solid fa-dollar-sign text-sm"></i>
           </div>
         </div>
         <div class="flex items-center gap-2">
-          <span class="inline-flex items-center gap-1 rounded-full bg-emerald-50 px-2 py-1 text-[11px] font-semibold text-emerald-700">
+          <span class="inline-flex items-center gap-1 rounded-full bg-[var(--accent)]/10 px-2 py-1 text-[11px] font-semibold text-[var(--accent)] border border-[var(--accent)]/20">
             <i class="fa-solid fa-arrow-up text-[9px]"></i>
             Live
           </span>
-          <span class="text-xs text-slate-400">{{ payments.length }} transactions</span>
+          <span class="text-xs text-[var(--muted)]">{{ payments.length }} transactions</span>
         </div>
       </div>
 
       <!-- Paid -->
-      <div class="group rounded-xl border border-slate-200 bg-white p-5 shadow-sm transition hover:-translate-y-0.5 hover:shadow-md">
+      <div class="group rounded-xl border border-[var(--border)] bg-[var(--surface)] p-5 shadow-[var(--shadow-sm)] transition hover:-translate-y-0.5 hover:border-[var(--muted)]">
         <div class="mb-4 flex items-start justify-between">
           <div>
-             <span class="text-[#0f172a] text-[15px] font-bold uppercase tracking-wider"
-            style="font-family: var(--font-heading);">
+            <span class="text-[var(--text)] text-[15px] font-bold uppercase tracking-wider">
               Paid
             </span>
-            <h2 class="mt-2 text-2xl font-bold tracking-tight text-slate-900">
+            <h2 class="mt-2 text-2xl font-bold tracking-tight text-[var(--text)]">
               ${{ stats.paidTotal.toLocaleString() }}
             </h2>
           </div>
-          <div class="flex h-10 w-10 items-center justify-center rounded-lg bg-emerald-50 text-emerald-600">
+          <div class="flex h-10 w-10 items-center justify-center rounded-lg bg-[var(--background)] text-[var(--accent)] border border-[var(--border)]">
             <i class="fa-solid fa-circle-check text-sm"></i>
           </div>
         </div>
         <div class="flex items-center gap-2">
-          <span class="text-xs font-medium text-emerald-600">{{ stats.paidPct }}%</span>
-          <span class="text-xs text-slate-400">of total revenue</span>
+          <span class="text-xs font-medium text-[var(--accent)]">{{ stats.paidPct }}%</span>
+          <span class="text-xs text-[var(--muted)]">of total revenue</span>
         </div>
       </div>
 
       <!-- Pending -->
-      <div class="group rounded-xl border border-slate-200 bg-white p-5 shadow-sm transition hover:-translate-y-0.5 hover:shadow-md">
+      <div class="group rounded-xl border border-[var(--border)] bg-[var(--surface)] p-5 shadow-[var(--shadow-sm)] transition hover:-translate-y-0.5 hover:border-[var(--muted)]">
         <div class="mb-4 flex items-start justify-between">
           <div>
-            <span class="text-[#0f172a] text-[15px] font-bold uppercase tracking-wider"
-            style="font-family: var(--font-heading);">
+            <span class="text-[var(--text)] text-[15px] font-bold uppercase tracking-wider">
               Pending
             </span>
-            <h2 class="mt-2 text-2xl font-bold tracking-tight text-slate-900">
+            <h2 class="mt-2 text-2xl font-bold tracking-tight text-[var(--text)]">
               ${{ stats.pendingTotal.toLocaleString() }}
             </h2>
           </div>
-          <div class="flex h-10 w-10 items-center justify-center rounded-lg bg-amber-50 text-amber-600">
+          <div class="flex h-10 w-10 items-center justify-center rounded-lg bg-[var(--background)] text-[var(--warning)] border border-[var(--border)]">
             <i class="fa-solid fa-clock text-sm"></i>
           </div>
         </div>
         <div class="flex items-center gap-2">
-          <span class="text-xs font-medium text-amber-600">{{ stats.pendingPct }}%</span>
-          <span class="text-xs text-slate-400">awaiting payment</span>
+          <span class="text-xs font-medium text-[var(--warning)]">{{ stats.pendingPct }}%</span>
+          <span class="text-xs text-[var(--muted)]">awaiting payment</span>
         </div>
       </div>
 
       <!-- Failed -->
-      <div class="group rounded-xl border border-slate-200 bg-white p-5 shadow-sm transition hover:-translate-y-0.5 hover:shadow-md">
+      <div class="group rounded-xl border border-[var(--border)] bg-[var(--surface)] p-5 shadow-[var(--shadow-sm)] transition hover:-translate-y-0.5 hover:border-[var(--muted)]">
         <div class="mb-4 flex items-start justify-between">
           <div>
-           <span class="text-[#0f172a] text-[15px] font-bold uppercase tracking-wider"
-            style="font-family: var(--font-heading);">
+            <span class="text-[var(--text)] text-[15px] font-bold uppercase tracking-wider">
               Failed
             </span>
-            <h2 class="mt-2 text-2xl font-bold tracking-tight text-slate-900">
+            <h2 class="mt-2 text-2xl font-bold tracking-tight text-[var(--text)]">
               ${{ stats.failedTotal.toLocaleString() }}
             </h2>
           </div>
-          <div class="flex h-10 w-10 items-center justify-center rounded-lg bg-red-50 text-red-600">
+          <div class="flex h-10 w-10 items-center justify-center rounded-lg bg-[var(--background)] text-[var(--danger)] border border-[var(--border)]">
             <i class="fa-solid fa-circle-xmark text-sm"></i>
           </div>
         </div>
         <div class="flex items-center gap-2">
-          <span class="text-xs font-medium text-red-600">{{ stats.failedPct }}%</span>
-          <span class="text-xs text-slate-400">of total revenue</span>
+          <span class="text-xs font-medium text-[var(--danger)]">{{ stats.failedPct }}%</span>
+          <span class="text-xs text-[var(--muted)]">of total revenue</span>
         </div>
       </div>
 
       <!-- Refunded -->
-      <div class="group rounded-xl border border-slate-200 bg-white p-5 shadow-sm transition hover:-translate-y-0.5 hover:shadow-md">
+      <div class="group rounded-xl border border-[var(--border)] bg-[var(--surface)] p-5 shadow-[var(--shadow-sm)] transition hover:-translate-y-0.5 hover:border-[var(--muted)]">
         <div class="mb-4 flex items-start justify-between">
           <div>
-           <span class="text-[#0f172a] text-[15px] font-bold uppercase tracking-wider"
-            style="font-family: var(--font-heading);">
+            <span class="text-[var(--text)] text-[15px] font-bold uppercase tracking-wider">
               Refunded
             </span>
-            <h2 class="mt-2 text-2xl font-bold tracking-tight text-slate-900">
+            <h2 class="mt-2 text-2xl font-bold tracking-tight text-[var(--text)]">
               ${{ stats.refundedTotal.toLocaleString() }}
             </h2>
           </div>
-          <div class="flex h-10 w-10 items-center justify-center rounded-lg bg-slate-100 text-slate-600">
+          <div class="flex h-10 w-10 items-center justify-center rounded-lg bg-[var(--background)] text-[var(--muted)] border border-[var(--border)]">
             <i class="fa-solid fa-rotate-left text-sm"></i>
           </div>
         </div>
         <div class="flex items-center gap-2">
-          <span class="text-xs font-medium text-slate-600">{{ stats.refundedPct }}%</span>
-          <span class="text-xs text-slate-400">of total revenue</span>
+          <span class="text-xs font-medium text-[var(--muted)]">{{ stats.refundedPct }}%</span>
+          <span class="text-xs text-[var(--muted)]">of total revenue</span>
         </div>
       </div>
 
@@ -145,15 +140,15 @@
     <section class="mb-6 grid grid-cols-1 gap-6 xl:grid-cols-3">
 
       <!-- DYNAMIC REVENUE GRAPH -->
-      <div class="xl:col-span-2 overflow-hidden rounded-xl border border-slate-200 bg-white shadow-sm">
+      <div class="xl:col-span-2 overflow-hidden rounded-xl border border-[var(--border)] bg-[var(--surface)] shadow-[var(--shadow-md)]">
         
         <!-- Chart Header -->
-        <div class="flex flex-col gap-4 border-b border-slate-100 px-5 py-4 sm:flex-row sm:items-center sm:justify-between">
+        <div class="flex flex-col gap-4 border-b border-[var(--border)] px-5 py-4 sm:flex-row sm:items-center sm:justify-between">
           <div>
-            <h2 class="text-base font-bold text-slate-900">Revenue Overview</h2>
+            <h2 class="text-base font-bold text-[var(--text)]">Revenue Overview</h2>
             <div class="mt-1 flex items-center gap-2">
-              <span class="text-xl font-bold text-slate-900">${{ stats.totalRevenue.toLocaleString() }}</span>
-              <span class="inline-flex items-center gap-1 rounded-full bg-emerald-50 px-2 py-1 text-[10px] font-semibold text-emerald-700">
+              <span class="text-xl font-bold text-[var(--text)]">${{ stats.totalRevenue.toLocaleString() }}</span>
+              <span class="inline-flex items-center gap-1 rounded-full bg-[var(--accent)]/10 px-2 py-1 text-[10px] font-semibold text-[var(--accent)] border border-[var(--accent)]/20">
                 <i class="fa-solid fa-arrow-up text-[8px]"></i>
                 Realtime
               </span>
@@ -161,24 +156,24 @@
           </div>
 
           <!-- Time Period Selectors -->
-          <div class="flex items-center rounded-lg border border-slate-200 bg-slate-50 p-1">
+          <div class="flex items-center rounded-lg border border-[var(--border)] bg-[var(--background)] p-1">
             <button 
               @click="selectedPeriod = '7D'" 
-              :class="selectedPeriod === '7D' ? 'bg-white text-slate-900 font-semibold shadow-sm' : 'text-slate-500 font-medium hover:text-slate-700'"
+              :class="selectedPeriod === '7D' ? 'bg-[var(--surface)] text-[var(--text)] font-semibold shadow-[var(--shadow-sm)]' : 'text-[var(--muted)] font-medium hover:text-[var(--text)]'"
               class="rounded-md px-3 py-1.5 text-xs transition cursor-pointer"
             >
               7D
             </button>
             <button 
               @click="selectedPeriod = '30D'" 
-              :class="selectedPeriod === '30D' ? 'bg-white text-slate-900 font-semibold shadow-sm' : 'text-slate-500 font-medium hover:text-slate-700'"
+              :class="selectedPeriod === '30D' ? 'bg-[var(--surface)] text-[var(--text)] font-semibold shadow-[var(--shadow-sm)]' : 'text-[var(--muted)] font-medium hover:text-[var(--text)]'"
               class="rounded-md px-3 py-1.5 text-xs transition cursor-pointer"
             >
               30D
             </button>
             <button 
               @click="selectedPeriod = '12M'" 
-              :class="selectedPeriod === '12M' ? 'bg-white text-slate-900 font-semibold shadow-sm' : 'text-slate-500 font-medium hover:text-slate-700'"
+              :class="selectedPeriod === '12M' ? 'bg-[var(--surface)] text-[var(--text)] font-semibold shadow-[var(--shadow-sm)]' : 'text-[var(--muted)] font-medium hover:text-[var(--text)]'"
               class="rounded-md px-3 py-1.5 text-xs transition cursor-pointer"
             >
               12M
@@ -188,18 +183,18 @@
 
         <!-- Dynamic SVG Chart -->
         <div class="p-5">
-          <div class="relative h-[280px] overflow-hidden rounded-lg bg-slate-50">
+          <div class="relative h-[280px] overflow-hidden rounded-lg bg-[var(--background)] border border-[var(--border)]">
             <!-- Dashed Grid lines -->
             <div class="absolute inset-0 flex flex-col justify-between py-6">
-              <div class="border-t border-dashed border-slate-200"></div>
-              <div class="border-t border-dashed border-slate-200"></div>
-              <div class="border-t border-dashed border-slate-200"></div>
-              <div class="border-t border-dashed border-slate-200"></div>
-              <div class="border-t border-dashed border-slate-200"></div>
+              <div class="border-t border-dashed border-[var(--border)]"></div>
+              <div class="border-t border-dashed border-[var(--border)]"></div>
+              <div class="border-t border-dashed border-[var(--border)]"></div>
+              <div class="border-t border-dashed border-[var(--border)]"></div>
+              <div class="border-t border-dashed border-[var(--border)]"></div>
             </div>
 
             <!-- Y-Axis Labels -->
-            <div class="absolute bottom-8 left-2 top-5 flex flex-col justify-between text-[10px] text-slate-400 font-medium">
+            <div class="absolute bottom-8 left-2 top-5 flex flex-col justify-between text-[10px] text-[var(--muted)] font-medium">
               <span>${{ chartYMax >= 1000 ? (chartYMax / 1000).toFixed(0) + 'k' : chartYMax }}</span>
               <span>${{ (chartYMax * 0.75) >= 1000 ? ((chartYMax * 0.75) / 1000).toFixed(0) + 'k' : Math.round(chartYMax * 0.75) }}</span>
               <span>${{ (chartYMax * 0.5) >= 1000 ? ((chartYMax * 0.5) / 1000).toFixed(0) + 'k' : Math.round(chartYMax * 0.5) }}</span>
@@ -211,8 +206,8 @@
             <svg viewBox="0 0 900 260" preserveAspectRatio="none" class="absolute inset-x-12 bottom-8 top-5 h-[230px] w-[calc(100%-64px)]">
               <defs>
                 <linearGradient id="revenueGradient" x1="0" y1="0" x2="0" y2="1">
-                  <stop offset="0%" stop-color="#2563EB" stop-opacity="0.25" />
-                  <stop offset="100%" stop-color="#2563EB" stop-opacity="0" />
+                  <stop offset="0%" stop-color="#10b981" stop-opacity="0.3" />
+                  <stop offset="100%" stop-color="#10b981" stop-opacity="0" />
                 </linearGradient>
               </defs>
               
@@ -220,7 +215,7 @@
               <path :d="chartPaths.area" fill="url(#revenueGradient)" />
               
               <!-- Line -->
-              <path :d="chartPaths.line" fill="none" stroke="#2563EB" stroke-width="3" stroke-linecap="round" vector-effect="non-scaling-stroke" />
+              <path :d="chartPaths.line" fill="none" stroke="var(--accent)" stroke-width="3" stroke-linecap="round" vector-effect="non-scaling-stroke" />
               
               <!-- Dynamic Plot Points -->
               <circle 
@@ -228,15 +223,15 @@
                 :key="idx" 
                 :cx="pt.x" 
                 :cy="pt.y" 
-                r="4.5" 
-                fill="#2563EB" 
-                stroke="#FFFFFF" 
+                :r="4.5" 
+                fill="var(--accent)" 
+                stroke="var(--surface)" 
                 stroke-width="1.5"
               />
             </svg>
 
             <!-- X-Axis Date Labels -->
-            <div class="absolute bottom-2 left-12 right-4 flex justify-between text-[10px] text-slate-400 font-medium">
+            <div class="absolute bottom-2 left-12 right-4 flex justify-between text-[10px] text-[var(--muted)] font-medium">
               <span v-for="(lbl, i) in chartXLabels" :key="i">{{ lbl }}</span>
             </div>
           </div>
@@ -244,10 +239,10 @@
       </div>
 
       <!-- DYNAMIC PAYMENT METHODS DONUT -->
-      <div class="rounded-xl border border-slate-200 bg-white shadow-sm flex flex-col justify-between">
-        <div class="border-b border-slate-100 px-5 py-4">
-          <h2 class="text-base font-bold text-slate-900">Payment Methods</h2>
-          <p class="mt-1 text-xs text-slate-500">Revenue distribution by payment method</p>
+      <div class="rounded-xl border border-[var(--border)] bg-[var(--surface)] shadow-[var(--shadow-md)] flex flex-col justify-between">
+        <div class="border-b border-[var(--border)] px-5 py-4">
+          <h2 class="text-base font-bold text-[var(--text)]">Payment Methods</h2>
+          <p class="mt-1 text-xs text-[var(--muted)]">Revenue distribution by payment method</p>
         </div>
 
         <div class="p-5 flex-1 flex flex-col justify-center">
@@ -256,8 +251,8 @@
           <div class="flex justify-center">
             <div class="relative h-44 w-44">
               <svg viewBox="0 0 120 120" class="h-full w-full -rotate-90">
-                <!-- Base Gray Circle -->
-                <circle cx="60" cy="60" r="45" fill="none" stroke="#F1F5F9" stroke-width="14" />
+                <!-- Base Circle -->
+                <circle cx="60" cy="60" r="45" fill="none" stroke="var(--background)" stroke-width="14" />
                 
                 <!-- Dynamic Slices -->
                 <circle
@@ -277,8 +272,8 @@
               </svg>
 
               <div class="absolute inset-0 flex flex-col items-center justify-center">
-                <span class="text-[11px] text-slate-400 font-medium">Total</span>
-                <span class="mt-0.5 text-lg font-bold text-slate-900">
+                <span class="text-[11px] text-[var(--muted)] font-medium">Total</span>
+                <span class="mt-0.5 text-lg font-bold text-[var(--text)]">
                   ${{ stats.totalRevenue >= 1000 ? (stats.totalRevenue / 1000).toFixed(1) + 'K' : stats.totalRevenue }}
                 </span>
               </div>
@@ -294,16 +289,16 @@
             >
               <div class="flex items-center gap-2">
                 <span class="h-2.5 w-2.5 rounded-full" :style="{ backgroundColor: method.color }"></span>
-                <span class="font-medium text-slate-700">{{ method.name }}</span>
+                <span class="font-medium text-[var(--text)]">{{ method.name }}</span>
               </div>
               <div class="flex items-center gap-3">
-                <span class="text-slate-400 font-medium">${{ method.amount.toLocaleString() }}</span>
-                <span class="font-bold text-slate-900 w-10 text-right">{{ method.percentage }}%</span>
+                <span class="text-[var(--muted)] font-medium">${{ method.amount.toLocaleString() }}</span>
+                <span class="font-bold text-[var(--text)] w-10 text-right">{{ method.percentage }}%</span>
               </div>
             </div>
 
             <!-- Empty State if no methods -->
-            <div v-if="dynamicPaymentMethods.length === 0" class="text-center py-2 text-xs text-slate-400">
+            <div v-if="dynamicPaymentMethods.length === 0" class="text-center py-2 text-xs text-[var(--muted)]">
               No transactions recorded
             </div>
           </div>
@@ -313,37 +308,33 @@
     </section>
 
     <!-- TRANSACTIONS TABLE SECTION -->
-    <section class="overflow-hidden rounded-xl border border-slate-200 bg-white shadow-sm">
+    <section class="overflow-hidden rounded-xl border border-[var(--border)] bg-[var(--surface)] shadow-[var(--shadow-md)]">
       
       <!-- Header & Filters -->
-      <div class="flex flex-col gap-4 border-b border-slate-100 p-5 lg:flex-row lg:items-center lg:justify-between">
+      <div class="flex flex-col gap-4 border-b border-[var(--border)] p-5 lg:flex-row lg:items-center lg:justify-between">
         <div>
           <div class="flex items-center gap-2">
-            <h2 class="text-base font-bold text-slate-900">Recent Transactions</h2>
-            <span class="rounded-full bg-slate-100 px-2 py-0.5 text-[10px] font-semibold text-slate-500">
+            <h2 class="text-base font-bold text-[var(--text)]">Recent Transactions</h2>
+            <span class="rounded-full bg-[var(--background)] border border-[var(--border)] px-2 py-0.5 text-[10px] font-semibold text-[var(--muted)]">
               {{ filteredPayments.length }} transactions
             </span>
           </div>
-          <p class="mt-1 text-xs text-slate-500">Latest payment activity from rental bookings</p>
-
-          
+          <p class="mt-1 text-xs text-[var(--muted)]">Latest payment activity from rental bookings</p>
         </div>
-         <!-- Search -->
-          <div class="relative">
-             <input
+
+        <!-- Search & Filters -->
+        <div class="flex flex-col gap-3 sm:flex-row items-center">
+          <div class="relative w-full sm:w-auto">
+            <input
               type="text"
               v-model="searchQuery"
               placeholder="Search payment or customer..."
-              class="h-9 w-full rounded-lg border border-slate-200 mx-20 bg-white pl-9 pr-3 text-xs text-slate-700 placeholder:text-slate-400 focus:border-blue-500 focus:outline-none focus:ring-2 focus:ring-blue-500/10 sm:w-44"
+              class="h-9 w-full rounded-lg border border-[var(--border)] bg-[var(--background)] pl-3 pr-3 text-xs text-[var(--text)] placeholder:text-[var(--muted)] focus:border-[var(--accent)] focus:outline-none focus:ring-2 focus:ring-[var(--accent)]/20 sm:w-48 shadow-[var(--shadow-sm)]"
             />
           </div>
 
-        <!-- Filters -->
-        <div class="flex flex-col gap-2 sm:flex-row ">
-         
-
           <!-- Status Filter -->
-          <select v-model="selectedStatus" class="h-9 rounded-lg border border-slate-200 bg-white px-3 text-xs font-medium text-slate-600 focus:border-blue-500 focus:outline-none focus:ring-2 focus:ring-blue-500/10 cursor-pointer">
+          <select v-model="selectedStatus" class="h-9 w-full sm:w-auto rounded-lg border border-[var(--border)] bg-[var(--background)] px-3 text-xs font-medium text-[var(--text)] focus:border-[var(--accent)] focus:outline-none focus:ring-2 focus:ring-[var(--accent)]/20 cursor-pointer">
             <option value="All">All Status</option>
             <option value="PAID">Paid</option>
             <option value="PENDING">Pending</option>
@@ -352,7 +343,7 @@
           </select>
 
           <!-- Method Filter -->
-          <select v-model="selectedMethod" class="h-9 rounded-lg border border-slate-200 bg-white px-3 text-xs font-medium text-slate-600 focus:border-blue-500 focus:outline-none focus:ring-2 focus:ring-blue-500/10 cursor-pointer">
+          <select v-model="selectedMethod" class="h-9 w-full sm:w-auto rounded-lg border border-[var(--border)] bg-[var(--background)] px-3 text-xs font-medium text-[var(--text)] focus:border-[var(--accent)] focus:outline-none focus:ring-2 focus:ring-[var(--accent)]/20 cursor-pointer">
             <option value="All">All Methods</option>
             <option value="ABA">ABA</option>
             <option value="CASH">Cash</option>
@@ -364,11 +355,11 @@
 
       <!-- Table -->
       <div class="overflow-x-auto">
-        <table class="w-full min-w-250 text-left">
+        <table class="w-full min-w-250 text-left text-xs text-[var(--text)]">
           
           <!-- Head -->
           <thead>
-            <tr class="border-b border-slate-100 bg-slate-50/70 text-[10px] font-bold uppercase tracking-wider text-slate-400">
+            <tr class="border-b border-[var(--border)] bg-[var(--background)] text-[10px] font-bold uppercase tracking-wider text-[var(--muted)]">
               <th class="px-5 py-3.5">Payment</th>
               <th class="px-4 py-3.5">Booking</th>
               <th class="px-4 py-3.5">Customer</th>
@@ -382,60 +373,60 @@
           </thead>
 
           <!-- Body -->
-          <tbody class="divide-y divide-slate-100">
+          <tbody class="divide-y divide-[var(--border)]">
 
             <!-- Loading -->
             <tr v-if="loading" v-for="n in 3" :key="n" class="animate-pulse">
-              <td colspan="9" class="py-6 px-5 text-center text-xs text-slate-400">
+              <td colspan="9" class="py-6 px-5 text-center text-xs text-[var(--muted)]">
                 Loading payment transactions...
               </td>
             </tr>
 
             <!-- Error -->
             <tr v-else-if="error">
-              <td colspan="9" class="py-8 px-5 text-center text-rose-600">
+              <td colspan="9" class="py-8 px-5 text-center text-[var(--danger)]">
                 <p class="font-medium text-xs mb-2">{{ error }}</p>
-                <button @click="fetchPayments" class="text-xs text-blue-600 underline font-semibold cursor-pointer">Try Again</button>
+                <button @click="fetchPayments" class="text-xs text-[var(--accent)] underline font-semibold cursor-pointer">Try Again</button>
               </td>
             </tr>
 
             <!-- Empty -->
             <tr v-else-if="paginatedPayments.length === 0">
-              <td colspan="9" class="py-8 px-5 text-center text-xs text-slate-500">
+              <td colspan="9" class="py-8 px-5 text-center text-xs text-[var(--muted)]">
                 No payment transactions found.
               </td>
             </tr>
 
             <!-- Payment Rows -->
-            <tr v-else v-for="payment in paginatedPayments" :key="payment.id" class="group transition hover:bg-slate-50/70">
+            <tr v-else v-for="payment in paginatedPayments" :key="payment.id" class="group transition hover:bg-[var(--background)]/50">
               
               <td class="px-5 py-4">
                 <div>
-                  <p class="text-sm font-semibold text-slate-900">PAY-{{ payment.id }}</p>
-                  <p class="mt-0.5 text-[11px] text-slate-400">Payment</p>
+                  <p class="text-sm font-semibold text-[var(--text)]">PAY-{{ payment.id }}</p>
+                  <p class="mt-0.5 text-[11px] text-[var(--muted)]">Payment</p>
                 </div>
               </td>
 
               <td class="px-4 py-4">
-                <span class="rounded-md bg-slate-100 px-2 py-1 text-xs font-semibold text-slate-600">
+                <span class="rounded-md bg-[var(--background)] border border-[var(--border)] px-2 py-1 text-xs font-semibold text-[var(--muted)]">
                   {{ payment.bookingCode || payment.booking_id || ('BK-' + (payment.bookingId || '000')) }}
                 </span>
               </td>
 
               <td class="px-4 py-4">
                 <div class="flex items-center gap-3">
-                  <div class="flex h-8 w-8 items-center justify-center rounded-full bg-blue-50 text-xs font-bold text-blue-600">
+                  <div class="flex h-8 w-8 items-center justify-center rounded-full bg-[var(--background)] border border-[var(--border)] text-xs font-bold text-[var(--accent)]">
                     {{ getInitials(payment.customerName || payment.user?.name || 'Customer') }}
                   </div>
                   <div>
-                    <p class="text-sm font-semibold text-slate-800">{{ payment.customerName || payment.user?.name || 'Customer' }}</p>
-                    <p class="text-[11px] text-slate-400">{{ payment.customerEmail || payment.user?.email || 'Registered User' }}</p>
+                    <p class="text-sm font-semibold text-[var(--text)]">{{ payment.customerName || payment.user?.name || 'Customer' }}</p>
+                    <p class="text-[11px] text-[var(--muted)]">{{ payment.customerEmail || payment.user?.email || 'Registered User' }}</p>
                   </div>
                 </div>
               </td>
 
               <td class="px-4 py-4">
-                <span class="text-sm font-bold text-slate-900">${{ Number(payment.amount || payment.totalAmount || 0).toFixed(2) }}</span>
+                <span class="text-sm font-bold text-[var(--text)]">${{ Number(payment.amount || payment.totalAmount || 0).toFixed(2) }}</span>
               </td>
 
               <td class="px-4 py-4">
@@ -443,18 +434,18 @@
                   <span :class="getMethodIconBadgeClass(payment.paymentMethod || payment.method)">
                     {{ getMethodLetter(payment.paymentMethod || payment.method) }}
                   </span>
-                  <span class="text-sm font-medium text-slate-700">{{ getMethodName(payment.paymentMethod || payment.method) }}</span>
+                  <span class="text-sm font-medium text-[var(--text)]">{{ getMethodName(payment.paymentMethod || payment.method) }}</span>
                 </div>
               </td>
 
               <td class="px-4 py-4">
-                <span class="font-mono text-xs text-slate-500">{{ payment.transactionNo || payment.transactionId || 'TRX-' + payment.id }}</span>
+                <span class="font-mono text-xs text-[var(--muted)]">{{ payment.transactionNo || payment.transactionId || 'TRX-' + payment.id }}</span>
               </td>
 
               <td class="px-4 py-4">
                 <div>
-                  <p class="text-sm font-medium text-slate-700">{{ formatDate(payment.paymentDate || payment.createdAt) }}</p>
-                  <p class="text-[11px] text-slate-400">{{ formatTime(payment.paymentDate || payment.createdAt) }}</p>
+                  <p class="text-sm font-medium text-[var(--text)]">{{ formatDate(payment.paymentDate || payment.createdAt) }}</p>
+                  <p class="text-[11px] text-[var(--muted)]">{{ formatTime(payment.paymentDate || payment.createdAt) }}</p>
                 </div>
               </td>
 
@@ -469,7 +460,7 @@
                 <div class="flex items-center justify-end gap-1">
                   <button 
                     @click="navigateToDetail(payment.id)" 
-                    class="p-1.5 rounded-lg text-slate-400 hover:text-blue-600 hover:bg-blue-50 transition-all cursor-pointer" 
+                    class="p-1.5 rounded-lg text-[var(--muted)] hover:text-[var(--accent)] hover:bg-[var(--background)] transition-all cursor-pointer" 
                     title="View Payment"
                   >
                     <i class="fa-regular fa-eye text-xs"></i>
@@ -477,7 +468,7 @@
 
                   <button 
                     @click="navigateToEdit(payment.id)" 
-                    class="p-1.5 rounded-lg text-slate-400 hover:text-amber-600 hover:bg-amber-50 transition-all cursor-pointer" 
+                    class="p-1.5 rounded-lg text-[var(--muted)] hover:text-[var(--warning)] hover:bg-[var(--background)] transition-all cursor-pointer" 
                     title="Edit Payment"
                   >
                     <i class="fa-regular fa-pen-to-square text-xs"></i>
@@ -486,10 +477,10 @@
                   <button 
                     @click="handleDelete(payment)" 
                     :disabled="deletingId === payment.id" 
-                    class="p-1.5 rounded-lg text-slate-400 hover:text-rose-600 hover:bg-rose-50 transition-all cursor-pointer disabled:opacity-50" 
+                    class="p-1.5 rounded-lg text-[var(--muted)] hover:text-[var(--danger)] hover:bg-[var(--background)] transition-all cursor-pointer disabled:opacity-50" 
                     title="Delete Payment"
                   >
-                    <i v-if="deletingId === payment.id" class="fa-solid fa-circle-notch fa-spin text-xs text-rose-600"></i>
+                    <i v-if="deletingId === payment.id" class="fa-solid fa-circle-notch fa-spin text-xs text-[var(--danger)]"></i>
                     <i v-else class="fa-regular fa-trash-can text-xs"></i>
                   </button>
                 </div>
@@ -502,16 +493,16 @@
       </div>
 
       <!-- Pagination Footer -->
-      <div v-if="!loading && filteredPayments.length > 0" class="flex flex-col sm:flex-row items-center justify-between p-4 px-6 border-t border-slate-100 text-xs text-slate-500 gap-3">
+      <div v-if="!loading && filteredPayments.length > 0" class="flex flex-col sm:flex-row items-center justify-between p-4 px-6 border-t border-[var(--border)] text-xs text-[var(--muted)] gap-3">
         <div>
-          Showing <span class="font-bold text-slate-900">{{ startItemIndex }}–{{ endItemIndex }}</span> of <span class="font-bold text-slate-900">{{ filteredPayments.length }}</span> entries
+          Showing <span class="font-bold text-[var(--text)]">{{ startItemIndex }}–{{ endItemIndex }}</span> of <span class="font-bold text-[var(--text)]">{{ filteredPayments.length }}</span> entries
         </div>
 
         <div class="flex items-center gap-1">
           <button 
             @click="currentPage--" 
             :disabled="currentPage === 1" 
-            class="w-7 h-7 rounded-md border border-slate-200 flex items-center justify-center text-slate-500 hover:bg-slate-100 transition-colors cursor-pointer disabled:opacity-40 disabled:cursor-not-allowed"
+            class="w-7 h-7 rounded-md border border-[var(--border)] flex items-center justify-center text-[var(--muted)] hover:bg-[var(--background)] hover:text-[var(--text)] transition-colors cursor-pointer disabled:opacity-40 disabled:cursor-not-allowed"
           >
             <i class="fa-solid fa-chevron-left text-[10px]"></i>
           </button>
@@ -523,8 +514,8 @@
             :class="[
               'w-7 h-7 rounded-md font-bold flex items-center justify-center text-xs transition-colors cursor-pointer',
               currentPage === page 
-                ? 'bg-blue-600 text-white shadow-xs' 
-                : 'border border-slate-200 text-slate-700 hover:bg-slate-100'
+                ? 'bg-[var(--accent)] text-[var(--background)] shadow-[var(--shadow-sm)]' 
+                : 'border border-[var(--border)] text-[var(--text)] hover:bg-[var(--background)]'
             ]"
           >
             {{ page }}
@@ -533,7 +524,7 @@
           <button 
             @click="currentPage++" 
             :disabled="currentPage === totalPages || totalPages === 0" 
-            class="w-7 h-7 rounded-md border border-slate-200 flex items-center justify-center text-slate-500 hover:bg-slate-100 transition-colors cursor-pointer disabled:opacity-40 disabled:cursor-not-allowed"
+            class="w-7 h-7 rounded-md border border-[var(--border)] flex items-center justify-center text-[var(--muted)] hover:bg-[var(--background)] hover:text-[var(--text)] transition-colors cursor-pointer disabled:opacity-40 disabled:cursor-not-allowed"
           >
             <i class="fa-solid fa-chevron-right text-[10px]"></i>
           </button>

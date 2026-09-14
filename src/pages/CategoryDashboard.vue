@@ -1,25 +1,25 @@
 <template>
-  <main class="p-6 md:p-8 min-h-[calc(100vh-64px)] bg-gray-50/50">
+  <main class="p-6 md:p-8 min-h-[calc(100vh-64px)] bg-[var(--background)] text-[var(--text)]">
     
     <!-- Page Header -->
     <div class="flex flex-col md:flex-row md:items-center justify-between mb-8 gap-4">
       <div>
-        <h1 class="text-3xl font-bold tracking-tight text-gray-900">Categories</h1>
-        <p class="text-xl text-gray-900 mt-1">Manage vehicle classifications and fleet distribution</p>
+        <h1 class="text-3xl font-bold tracking-tight text-[var(--primary)]">Categories</h1>
+        <p class="text-xl text-[var(--secondary)] mt-1">Manage vehicle classifications and fleet distribution</p>
       </div>
       
       <div class="flex items-center gap-3 w-full md:w-auto">
         <div class="relative flex-1 md:w-64">
-               <input 
+          <input 
             type="text" 
             v-model="searchQuery"
             placeholder="Search categories..." 
-            class="w-full h-9 pl-9 pr-4 bg-white border border-gray-200 rounded-lg text-xs font-medium text-gray-900 placeholder:text-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-600 transition-all shadow-xs"
+            class="w-full h-9 pl-9 pr-4 bg-[var(--surface)] border border-[var(--border)] rounded-lg text-xs font-medium text-[var(--text)] placeholder:text-[var(--muted)] focus:outline-none focus:ring-2 focus:ring-[var(--accent)]/20 focus:border-[var(--accent)] transition-all shadow-[var(--shadow-sm)]"
           >
         </div>
         <button 
           @click="navigateToAdd" 
-          class="inline-flex items-center justify-center gap-2 h-12 px-4 rounded-[8px] text-xs font-semibold text-white bg-gray-900 hover:bg-gray-800 transition-all shadow-xs shrink-0 active:scale-95 cursor-pointer"
+          class="inline-flex items-center justify-center gap-2 h-12 px-4 rounded-[8px] text-xs font-semibold text-[var(--background)] bg-[var(--accent)] hover:bg-[var(--accent-hover)] transition-all shadow-[var(--shadow-sm)] shrink-0 active:scale-95 cursor-pointer"
         >
           <i class="fa-solid fa-plus text-[10px]"></i> 
           <span>Add Category</span>
@@ -31,43 +31,43 @@
     <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 mb-8">
       
       <!-- Card 1: Total Categories -->
-      <div class="p-5 bg-white border border-gray-200/80 rounded-xl shadow-xs hover:border-gray-300 transition-all flex items-center justify-between">
+      <div class="p-5 bg-[var(--surface)] border border-[var(--border)] rounded-xl shadow-[var(--shadow-sm)] hover:border-[var(--primary-soft)] transition-all flex items-center justify-between">
         <div>
-          <span class="text-[#0f172a] text-[15px] font-bold uppercase tracking-wider"
+          <span class="text-[var(--primary)] text-[15px] font-bold uppercase tracking-wider"
             style="font-family: var(--font-heading);">Total Categories</span>
-          <div class="mt-2 text-2xl font-extrabold text-gray-900">{{ categories.length }}</div>
-          <p class="text-[11px] text-gray-400 mt-0.5 font-medium">Active fleet groups</p>
+          <div class="mt-2 text-2xl font-extrabold text-[var(--primary)]">{{ categories.length }}</div>
+          <p class="text-[11px] text-[var(--muted)] mt-0.5 font-medium">Active fleet groups</p>
         </div>
-        <div class="w-10 h-10 rounded-lg bg-blue-50 text-blue-600 flex items-center justify-center text-sm">
+        <div class="w-10 h-10 rounded-lg bg-[var(--background)] text-[var(--accent)] flex items-center justify-center text-sm border border-[var(--border)]">
           <i class="fa-solid fa-shapes"></i>
         </div>
       </div>
 
       <!-- Card 2: Total Fleet Size -->
-      <div class="p-5 bg-white border border-gray-200/80 rounded-xl shadow-xs hover:border-gray-300 transition-all flex items-center justify-between">
+      <div class="p-5 bg-[var(--surface)] border border-[var(--border)] rounded-xl shadow-[var(--shadow-sm)] hover:border-[var(--primary-soft)] transition-all flex items-center justify-between">
         <div>
-           <span class="text-[#0f172a] text-[15px] font-bold uppercase tracking-wider"
+           <span class="text-[var(--primary)] text-[15px] font-bold uppercase tracking-wider"
             style="font-family: var(--font-heading);">Total Fleet Size</span>
-          <div class="mt-2 text-2xl font-extrabold text-gray-900">{{ totalFleetCount }}</div>
-          <p class="text-[11px] text-gray-400 mt-0.5 font-medium">Vehicles assigned</p>
+          <div class="mt-2 text-2xl font-extrabold text-[var(--primary)]">{{ totalFleetCount }}</div>
+          <p class="text-[11px] text-[var(--muted)] mt-0.5 font-medium">Vehicles assigned</p>
         </div>
-        <div class="w-10 h-10 rounded-lg bg-indigo-50 text-indigo-600 flex items-center justify-center text-sm">
+        <div class="w-10 h-10 rounded-lg bg-[var(--background)] text-[var(--accent)] flex items-center justify-center text-sm border border-[var(--border)]">
           <i class="fa-solid fa-car"></i>
         </div>
       </div>
 
       <!-- Card 3: Top Category -->
-      <div class="p-5 bg-white border border-gray-200/80 rounded-xl shadow-xs hover:border-gray-300 transition-all flex items-center justify-between sm:col-span-2 lg:col-span-1">
+      <div class="p-5 bg-[var(--surface)] border border-[var(--border)] rounded-xl shadow-[var(--shadow-sm)] hover:border-[var(--primary-soft)] transition-all flex items-center justify-between sm:col-span-2 lg:col-span-1">
         <div>
-           <span class="text-[#0f172a] text-[15px] font-bold uppercase tracking-wider"
+           <span class="text-[var(--primary)] text-[15px] font-bold uppercase tracking-wider"
             style="font-family: var(--font-heading);">Top Demand Category</span>
-          <div class="mt-2 text-2xl font-extrabold text-gray-900">{{ topCategory.name }}</div>
-          <p class="text-[11px] text-emerald-600 font-bold mt-0.5 inline-flex items-center gap-1">
+          <div class="mt-2 text-2xl font-extrabold text-[var(--primary)]">{{ topCategory.name }}</div>
+          <p class="text-[11px] text-[var(--success)] font-bold mt-0.5 inline-flex items-center gap-1">
             <i class="fa-solid fa-arrow-trend-up text-[10px]"></i> 
             {{ topCategory.count }} Vehicles ({{ topCategory.percentage }}%)
           </p>
         </div>
-        <div class="w-10 h-10 rounded-lg bg-emerald-50 text-emerald-600 flex items-center justify-center text-sm">
+        <div class="w-10 h-10 rounded-lg bg-[var(--background)] text-[var(--success)] flex items-center justify-center text-sm border border-[var(--border)]">
           <i class="fa-solid fa-chart-pie"></i>
         </div>
       </div>
@@ -75,19 +75,19 @@
     </div>
 
     <!-- Category Directory Table Card -->
-    <div class="bg-white border border-gray-200/80 rounded-xl shadow-xs overflow-hidden mb-6">
+    <div class="bg-[var(--surface)] border border-[var(--border)] rounded-xl shadow-[var(--shadow-md)] overflow-hidden mb-6">
       
       <!-- Table Filter Header -->
-      <div class="flex items-center justify-between p-4 px-6 border-b border-gray-200/80 bg-white">
+      <div class="flex items-center justify-between p-4 px-6 border-b border-[var(--border)] bg-[var(--surface)]">
         <div class="flex items-center gap-2">
-          <h2 class="font-bold text-sm text-gray-900">Category Directory</h2>
-          <span class="px-2 py-0.5 rounded-full text-[10px] font-bold bg-gray-100 text-gray-600">
+          <h2 class="font-bold text-sm text-[var(--primary)]">Category Directory</h2>
+          <span class="px-2 py-0.5 rounded-full text-[10px] font-bold bg-[var(--background)] text-[var(--secondary)] border border-[var(--border)]">
             {{ filteredCategories.length }} Items
           </span>
         </div>
         
         <div class="flex items-center gap-2">
-          <select v-model="selectedStatus" class="h-8 px-3 bg-gray-50 border border-gray-200 rounded-lg text-xs font-semibold text-gray-700 focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-600 transition-all cursor-pointer">
+          <select v-model="selectedStatus" class="h-8 px-3 bg-[var(--background)] border border-[var(--border)] rounded-lg text-xs font-semibold text-[var(--text)] focus:outline-none focus:ring-2 focus:ring-[var(--accent)]/20 focus:border-[var(--accent)] transition-all cursor-pointer">
             <option value="All">All Statuses</option>
             <option value="Active">Active</option>
             <option value="Inactive">Inactive</option>
@@ -96,9 +96,9 @@
       </div>
 
       <div class="overflow-x-auto">
-        <table class="w-full text-left text-xs text-gray-700">
+        <table class="w-full text-left text-xs text-[var(--text)]">
           <thead>
-            <tr class="bg-gray-50 text-gray-500 font-bold uppercase tracking-wider text-[10px] border-b border-gray-200">
+            <tr class="bg-[var(--background)] text-[var(--muted)] font-bold uppercase tracking-wider text-[10px] border-b border-[var(--border)]">
               <th class="py-3 px-6">Category</th>
               <th class="py-3 px-5">Description</th>
               <th class="py-3 px-5">Fleet Count</th>
@@ -108,40 +108,40 @@
               <th class="py-3 px-6 text-right">Action</th>
             </tr>
           </thead>
-          <tbody class="divide-y divide-gray-100">
+          <tbody class="divide-y divide-[var(--border)]">
             
             <!-- Loading -->
             <tr v-if="loading" v-for="n in 3" :key="n" class="animate-pulse">
-              <td colspan="7" class="py-4 px-6 text-center text-gray-400">Loading categories...</td>
+              <td colspan="7" class="py-4 px-6 text-center text-[var(--muted)]">Loading categories...</td>
             </tr>
 
             <!-- Error -->
-            <tr v-else-if="error" class="text-rose-600">
+            <tr v-else-if="error" class="text-[var(--danger)]">
               <td colspan="7" class="py-8 px-6 text-center">
                 <p class="font-medium mb-2">{{ error }}</p>
-                <button @click="fetchCategories" class="text-xs text-blue-600 underline font-semibold">Try Again</button>
+                <button @click="fetchCategories" class="text-xs text-[var(--accent)] underline font-semibold">Try Again</button>
               </td>
             </tr>
 
             <!-- Empty -->
             <tr v-else-if="paginatedCategories.length === 0">
-              <td colspan="7" class="py-8 px-6 text-center text-gray-500">No categories found matching criteria.</td>
+              <td colspan="7" class="py-8 px-6 text-center text-[var(--muted)]">No categories found matching criteria.</td>
             </tr>
 
             <!-- Rows -->
-            <tr v-else v-for="cat in paginatedCategories" :key="cat.id" class="hover:bg-gray-50/80 transition-colors">
+            <tr v-else v-for="cat in paginatedCategories" :key="cat.id" class="hover:bg-[var(--background)]/50 transition-colors">
               <td class="py-3.5 px-6">
                 <div class="flex items-center gap-3">
-                  <div class="w-8 h-8 rounded-lg bg-blue-50 border border-blue-100 flex items-center justify-center text-blue-600 shrink-0">
+                  <div class="w-8 h-8 rounded-lg bg-[var(--background)] border border-[var(--border)] flex items-center justify-center text-[var(--accent)] shrink-0">
                     <i :class="getCategoryIcon(cat.name)"></i>
                   </div>
-                  <span class="font-bold text-gray-900 text-xs">{{ cat.name }}</span>
+                  <span class="font-bold text-[var(--primary)] text-xs">{{ cat.name }}</span>
                 </div>
               </td>
-              <td class="py-3.5 px-5 text-gray-500 max-w-xs truncate">{{ cat.description || 'N/A' }}</td>
-              <td class="py-3.5 px-5 font-bold text-gray-900">{{ getFleetCount(cat) }}</td>
-              <td class="py-3.5 px-5 text-gray-600 font-medium">{{ getAssociatedBrands(cat) }}</td>
-              <td class="py-3.5 px-5 text-gray-400">{{ formatDate(cat.created_at || cat.createdAt) }}</td>
+              <td class="py-3.5 px-5 text-[var(--muted)] max-w-xs truncate">{{ cat.description || 'N/A' }}</td>
+              <td class="py-3.5 px-5 font-bold text-[var(--primary)]">{{ getFleetCount(cat) }}</td>
+              <td class="py-3.5 px-5 text-[var(--secondary)] font-medium">{{ getAssociatedBrands(cat) }}</td>
+              <td class="py-3.5 px-5 text-[var(--muted)]">{{ formatDate(cat.created_at || cat.createdAt) }}</td>
               <td class="py-3.5 px-5">
                 <span :class="getStatusBadgeClass(cat.status)">
                   <span class="w-1.5 h-1.5 rounded-full" :class="getStatusDotClass(cat.status)"></span>
@@ -151,18 +151,18 @@
               <td class="py-3.5 px-6 text-right">
                 <div class="flex items-center justify-end gap-1">
                   <!-- View -->
-                  <button @click="navigateToDetail(cat.id)" class="p-1.5 rounded-lg text-gray-400 hover:text-blue-600 hover:bg-blue-50 transition-all cursor-pointer" title="View Details">
+                  <button @click="navigateToDetail(cat.id)" class="p-1.5 rounded-lg text-[var(--muted)] hover:text-[var(--accent)] hover:bg-[var(--background)] transition-all cursor-pointer" title="View Details">
                     <i class="fa-regular fa-eye text-xs"></i>
                   </button>
 
                   <!-- Edit -->
-                  <button @click="navigateToEdit(cat.id)" class="p-1.5 rounded-lg text-gray-400 hover:text-amber-600 hover:bg-amber-50 transition-all cursor-pointer" title="Edit Category">
+                  <button @click="navigateToEdit(cat.id)" class="p-1.5 rounded-lg text-[var(--muted)] hover:text-[var(--warning)] hover:bg-[var(--background)] transition-all cursor-pointer" title="Edit Category">
                     <i class="fa-regular fa-pen-to-square text-xs"></i>
                   </button>
 
                   <!-- Delete -->
-                  <button @click="handleDelete(cat)" :disabled="deletingId === cat.id" class="p-1.5 rounded-lg text-gray-400 hover:text-rose-600 hover:bg-rose-50 transition-all cursor-pointer disabled:opacity-50" title="Delete Category">
-                    <i v-if="deletingId === cat.id" class="fa-solid fa-circle-notch fa-spin text-xs text-rose-600"></i>
+                  <button @click="handleDelete(cat)" :disabled="deletingId === cat.id" class="p-1.5 rounded-lg text-[var(--muted)] hover:text-[var(--danger)] hover:bg-[var(--background)] transition-all cursor-pointer disabled:opacity-50" title="Delete Category">
+                    <i v-if="deletingId === cat.id" class="fa-solid fa-circle-notch fa-spin text-xs text-[var(--danger)]"></i>
                     <i v-else class="fa-regular fa-trash-can text-xs"></i>
                   </button>
                 </div>
@@ -174,12 +174,12 @@
       </div>
 
       <!-- Pagination Footer (10 items per page) -->
-      <div v-if="!loading && filteredCategories.length > 0" class="flex flex-col sm:flex-row items-center justify-between p-4 border-t border-gray-100 text-xs text-gray-500 gap-3">
+      <div v-if="!loading && filteredCategories.length > 0" class="flex flex-col sm:flex-row items-center justify-between p-4 border-t border-[var(--border)] text-xs text-[var(--muted)] gap-3">
         <div>
           Showing 
-          <span class="font-bold text-gray-900">{{ startItemIndex }}–{{ endItemIndex }}</span> 
+          <span class="font-bold text-[var(--primary)]">{{ startItemIndex }}–{{ endItemIndex }}</span> 
           of 
-          <span class="font-bold text-gray-900">{{ filteredCategories.length }}</span> 
+          <span class="font-bold text-[var(--primary)]">{{ filteredCategories.length }}</span> 
           categories
         </div>
 
@@ -187,7 +187,7 @@
           <button 
             @click="currentPage--" 
             :disabled="currentPage === 1" 
-            class="w-7 h-7 rounded-md border border-gray-200 flex items-center justify-center text-gray-500 hover:bg-gray-100 transition-colors cursor-pointer disabled:opacity-40 disabled:cursor-not-allowed"
+            class="w-7 h-7 rounded-md border border-[var(--border)] flex items-center justify-center text-[var(--muted)] hover:bg-[var(--background)] hover:text-[var(--text)] transition-colors cursor-pointer disabled:opacity-40 disabled:cursor-not-allowed"
           >
             <i class="fa-solid fa-chevron-left text-[10px]"></i>
           </button>
@@ -199,8 +199,8 @@
             :class="[
               'w-7 h-7 rounded-md font-bold flex items-center justify-center text-xs transition-colors cursor-pointer',
               currentPage === page 
-                ? 'bg-blue-600 text-white shadow-xs' 
-                : 'border border-gray-200 text-gray-700 hover:bg-gray-100'
+                ? 'bg-[var(--accent)] text-[var(--background)] shadow-[var(--shadow-sm)]' 
+                : 'border border-[var(--border)] text-[var(--text)] hover:bg-[var(--background)]'
             ]"
           >
             {{ page }}
@@ -209,7 +209,7 @@
           <button 
             @click="currentPage++" 
             :disabled="currentPage === totalPages || totalPages === 0" 
-            class="w-7 h-7 rounded-md border border-gray-200 flex items-center justify-center text-gray-500 hover:bg-gray-100 transition-colors cursor-pointer disabled:opacity-40 disabled:cursor-not-allowed"
+            class="w-7 h-7 rounded-md border border-[var(--border)] flex items-center justify-center text-[var(--muted)] hover:bg-[var(--background)] hover:text-[var(--text)] transition-colors cursor-pointer disabled:opacity-40 disabled:cursor-not-allowed"
           >
             <i class="fa-solid fa-chevron-right text-[10px]"></i>
           </button>

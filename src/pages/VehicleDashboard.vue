@@ -1,11 +1,12 @@
 <template>
-  <main class="p-6 md:p-8 min-h-[calc(100vh-64px)] bg-gray-50/50">
+  <main class="p-6 md:p-8 min-h-[calc(100vh-64px)] bg-gray-50/50"
+  style="background-color: var(--background); font-family: var(--font-body); color: var(--text);">
     
     <!-- Page Header -->
     <div class="flex flex-col md:flex-row md:items-center justify-between mb-8 gap-4">
       <div>
-        <h1 class="text-3xl font-bold tracking-tight text-gray-900">Vehicles</h1>
-        <p class="text-xl text-[#0f172a] mt-1">Manage and monitor your rental fleet inventory</p>
+        <h1 class="text-3xl font-bold tracking-tight text-(--text)">Vehicles</h1>
+        <p class="text-xl text-(--text) mt-1">Manage and monitor your rental fleet inventory</p>
       </div>
       
       <div class="flex items-center gap-3 w-full md:w-auto">
@@ -29,75 +30,75 @@
 
     <!-- KPI Cards Grid -->
     <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-4 mb-8">
-      <div class="p-4 bg-white border border-gray-200/80 rounded-xl shadow-xs hover:border-gray-300 transition-all flex flex-col justify-between">
+      <div class="p-4 bg-(--background) border border-gray-200/80 rounded-xl shadow-xs hover:border-gray-300 transition-all flex flex-col justify-between">
         <div class="flex items-center justify-between">
-          <span class="text-[#0f172a] text-[15px] font-bold uppercase tracking-wider" style="font-family: var(--font-heading);">Total Fleet</span>
+          <span class="text-(--text) text-[15px] font-bold uppercase tracking-wider" style="font-family: var(--font-heading);">Total Fleet</span>
           <div class="w-7 h-7 rounded-lg bg-gray-100 text-gray-600 flex items-center justify-center text-xs">
             <i class="fa-solid fa-car"></i>
           </div>
         </div>
         <div class="mt-3">
-          <div class="text-2xl font-extrabold text-gray-900">{{ stats.total }}</div>
+          <div class="text-2xl font-extrabold text-(--text)">{{ stats.total }}</div>
           <p class="text-[11px] text-gray-400 mt-0.5 font-medium">All registered vehicles</p>
         </div>
       </div>
 
-      <div class="p-4 bg-white border border-gray-200/80 border-l-4 border-l-emerald-500 rounded-xl shadow-xs hover:border-gray-300 transition-all flex flex-col justify-between">
+      <div class="p-4  bg-(--background)  border border-gray-200/80 border-l-4 border-l-emerald-500 rounded-xl shadow-xs hover:border-gray-300 transition-all flex flex-col justify-between">
         <div class="flex items-center justify-between">
-          <span class="text-[#0f172a] text-[15px] font-bold uppercase tracking-wider" style="font-family: var(--font-heading);">Available</span>
-          <div class="w-7 h-7 rounded-lg bg-emerald-50 text-emerald-600 flex items-center justify-center text-xs">
+          <span class="text-(--text) text-[15px] font-bold uppercase tracking-wider" style="font-family: var(--font-heading);">Available</span>
+          <div class="w-7 h-7 rounded-lg bg-emerald-50 text-(--text) flex items-center justify-center text-xs">
             <i class="fa-solid fa-circle-check"></i>
           </div>
         </div>
         <div class="mt-3">
-          <div class="text-2xl font-extrabold text-emerald-600">{{ stats.available }}</div>
+          <div class="text-2xl font-extrabold text-(--text)">{{ stats.available }}</div>
           <p class="text-[11px] text-gray-400 mt-0.5 font-medium">Ready for dispatch</p>
         </div>
       </div>
 
-      <div class="p-4 bg-white border border-gray-200/80 border-l-4 border-l-blue-600 rounded-xl shadow-xs hover:border-gray-300 transition-all flex flex-col justify-between">
+      <div class="p-4  bg-(--background)  border border-gray-200/80 border-l-4 border-l-blue-600 rounded-xl shadow-xs hover:border-gray-300 transition-all flex flex-col justify-between">
         <div class="flex items-center justify-between">
-          <span class="text-[#0f172a] text-[15px] font-bold uppercase tracking-wider" style="font-family: var(--font-heading);">On Rent</span>
+          <span class="text-(--text) text-[15px] font-bold uppercase tracking-wider" style="font-family: var(--font-heading);">On Rent</span>
           <div class="w-7 h-7 rounded-lg bg-blue-50 text-blue-600 flex items-center justify-center text-xs">
             <i class="fa-solid fa-key"></i>
           </div>
         </div>
         <div class="mt-3">
-          <div class="text-2xl font-extrabold text-blue-600">{{ stats.rented }}</div>
+          <div class="text-2xl font-extrabold text-(--text)">{{ stats.rented }}</div>
           <p class="text-[11px] text-gray-400 mt-0.5 font-medium">Currently active</p>
         </div>
       </div>
 
-      <div class="p-4 bg-white border border-gray-200/80 border-l-4 border-l-amber-500 rounded-xl shadow-xs hover:border-gray-300 transition-all flex flex-col justify-between">
+      <div class="p-4  bg-(--background)  border border-gray-200/80 border-l-4 border-l-amber-500 rounded-xl shadow-xs hover:border-gray-300 transition-all flex flex-col justify-between">
         <div class="flex items-center justify-between">
-          <span class="text-[#0f172a] text-[15px] font-bold uppercase tracking-wider" style="font-family: var(--font-heading);">Maintenance</span>
+          <span class="text-(--text) text-[15px] font-bold uppercase tracking-wider" style="font-family: var(--font-heading);">Maintenance</span>
           <div class="w-7 h-7 rounded-lg bg-amber-50 text-amber-600 flex items-center justify-center text-xs">
             <i class="fa-solid fa-wrench"></i>
           </div>
         </div>
         <div class="mt-3">
-          <div class="text-2xl font-extrabold text-amber-600">{{ stats.maintenance }}</div>
+          <div class="text-2xl font-extrabold text-(--text)">{{ stats.maintenance }}</div>
           <p class="text-[11px] text-gray-400 mt-0.5 font-medium">In service bay</p>
-        </div>
+        </div>  
       </div>
 
-      <div class="p-4 bg-white border border-gray-200/80 border-l-4 border-l-rose-500 rounded-xl shadow-xs hover:border-gray-300 transition-all flex flex-col justify-between sm:col-span-2 lg:col-span-1">
+      <div class="p-4 bg-(--background)  border border-gray-200/80 border-l-4 border-l-rose-500 rounded-xl shadow-xs hover:border-gray-300 transition-all flex flex-col justify-between sm:col-span-2 lg:col-span-1">
         <div class="flex items-center justify-between">
-          <span class="text-[#0f172a] text-[15px] font-bold uppercase tracking-wider" style="font-family: var(--font-heading);">Unavailable</span>
-          <div class="w-7 h-7 rounded-lg bg-rose-50 text-rose-600 flex items-center justify-center text-xs">
+          <span class="text-(--text) text-[15px] font-bold uppercase tracking-wider" style="font-family: var(--font-heading);">Unavailable</span>
+          <div class="w-7 h-7 rounded-lg bg-rose-50 text-(--text) flex items-center justify-center text-xs">
             <i class="fa-solid fa-ban"></i>
           </div>
         </div>
         <div class="mt-3">
-          <div class="text-2xl font-extrabold text-rose-600">{{ stats.unavailable }}</div>
+          <div class="text-2xl font-extrabold text-(--text)">{{ stats.unavailable }}</div>
           <p class="text-[11px] text-gray-400 mt-0.5 font-medium">Out of service</p>
         </div>
       </div>
     </div>
 
     <!-- Multi-Filter Bar -->
-    <div class="p-3 bg-white border border-gray-200/80 rounded-xl shadow-xs mb-6 grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-2.5">
-      <select v-model="selectedBrand" class="h-9 px-3 bg-gray-50 border border-gray-200 rounded-lg text-xs font-semibold text-gray-700 focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-600 transition-all cursor-pointer">
+    <div class="p-3 bg-(--background) border border-gray-200/80 rounded-xl shadow-xs mb-6 grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-2.5">
+      <select v-model="selectedBrand" class="h-9 px-3 bg-(--background) border border-gray-200 rounded-lg text-xs font-semibold text-gray-700 focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-600 transition-all cursor-pointer">
         <option value="All Brands">All Brands</option>
         <option v-for="brand in brandOptions" :key="brand.id || brand" :value="extractName(brand)">
           {{ extractName(brand) }}
@@ -133,7 +134,7 @@
     </div>
 
     <!-- Vehicles Table Card -->
-    <div class="bg-white border border-gray-200/80 rounded-xl shadow-xs overflow-hidden mb-6">
+    <div class="bg-(--background) border border-gray-200/80 rounded-xl shadow-xs overflow-hidden mb-6">
       <div class="overflow-x-auto">
         <table class="w-full text-left text-xs text-gray-700 border-collapse">
           <thead>
