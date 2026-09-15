@@ -75,7 +75,7 @@ const routes = [
       component: VehiclesView
     },
     {
-      path: 'vehicles/:id',
+      path: '/vehicles/:vehicleId',
       name: 'vehicle-detail',
       component: VehicleDetailView
     },

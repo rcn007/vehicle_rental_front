@@ -115,17 +115,15 @@
           </div>
 
           <!-- User name -->
-          <span>
-            {{ userProfile?.name || 'Admin' }}
-          </span>
+         
         </router-link>
     </div>
   </header>
 </template>
 
 <script setup>
-import { ref, onMounted } from 'vue'
-import { getUserById } from '../../api/user'
+import { ref, onMounted, onUnmounted } from 'vue'
+import { getLoggedInAdminProfile } from '../../api/user'
 import { useTheme } from '../../composables/useTheme'
 
 defineEmits(['search', 'notification-click'])
@@ -141,27 +139,19 @@ const {
 
 async function loadLoggedInAdmin() {
   try {
-    const userId = localStorage.getItem('userId')
-    const role = localStorage.getItem('role')
+    const userData = await getLoggedInAdminProfile()
 
-    console.log('Logged-in user ID:', userId)
-    console.log('Logged-in role:', role)
+    console.log('Logged-in Admin Profile:', userData)
 
-    if (!userId || role !== 'ADMIN') {
-      console.warn('No logged-in admin found')
-      return
-    }
-
-    const response = await getUserById(userId)
-
-    console.log('Admin user response:', response)
-
-    const data = response?.data ?? response
-
-    userProfile.value = data
+    userProfile.value = userData
   } catch (error) {
     console.error('Failed to load logged-in admin:', error)
+    userProfile.value = null
   }
+}
+
+function handleAdminProfileUpdated() {
+  loadLoggedInAdmin()
 }
 
 function getInitial(name) {
@@ -197,6 +187,19 @@ function getAvatarColor(name) {
 
 onMounted(async () => {
   initTheme()
+
   await loadLoggedInAdmin()
+
+  window.addEventListener(
+    'admin-profile-updated',
+    handleAdminProfileUpdated
+  )
+})
+
+onUnmounted(() => {
+  window.removeEventListener(
+    'admin-profile-updated',
+    handleAdminProfileUpdated
+  )
 })
 </script>

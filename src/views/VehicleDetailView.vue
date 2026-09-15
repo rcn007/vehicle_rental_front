@@ -1,179 +1,273 @@
 <template>
-  <section class="vehicle-page">
-    <div class="container">
-      <!-- Back Button Navigation -->
-      <div class="nav-back-wrapper">
-        <RouterLink to="/vehicles" class="back-button">
-          <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="19" y1="12" x2="5" y2="12"></line><polyline points="12 19 5 12 12 5"></polyline></svg>
+  <section class="min-h-screen bg-[#F4F6F9] py-8 px-4 sm:px-6 lg:px-8 text-slate-800 font-sans">
+    <div class="max-w-6xl mx-auto space-y-6">
+      
+      <!-- =====================================================
+           TOP NAVIGATION BAR
+      ====================================================== -->
+      <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4 bg-white px-6 py-4 rounded-2xl shadow-xs border border-slate-100">
+        <div class="flex items-center gap-4">
+          <button 
+            type="button" 
+            @click="goBack" 
+            class="text-slate-400 hover:text-slate-700 transition-colors cursor-pointer flex items-center gap-2 text-sm font-medium"
+          >
+            <i class="fa-solid fa-arrow-left text-base"></i>
+            <span>Back</span>
+          </button>
+          
+          <span class="text-xl font-bold text-slate-900">Car Details</span>
+
+          <!-- Status Badge -->
+          <span 
+            :class="[
+              'text-xs font-bold px-3 py-1 rounded-full uppercase tracking-wider',
+              vehicleStatusClass
+            ]"
+          >
+            {{ vehicleStatusText }}
+          </span>
+        </div>
+
+        <!-- Navigation Pills -->
+        <div class="flex items-center gap-2 sm:gap-3 text-sm font-semibold">
+          <button class="px-5 py-2 rounded-full bg-[#1E3A8A] text-white shadow-xs cursor-pointer">
+            Info and price
+          </button>
+          <button class="px-5 py-2 rounded-full text-slate-500 hover:bg-slate-100 transition-colors cursor-pointer">
+            Guest Ratings
+          </button>
+          <button class="px-5 py-2 rounded-full text-slate-500 hover:bg-slate-100 transition-colors cursor-pointer">
+            Location
+          </button>
+        </div>
+      </div>
+
+      <!-- =====================================================
+           LOADING STATE
+      ====================================================== -->
+      <div v-if="vehicleStore.loading" class="flex flex-col items-center justify-center py-24 text-slate-400 bg-white rounded-3xl border border-slate-100 shadow-xs">
+        <i class="fa-solid fa-circle-notch animate-spin text-4xl text-blue-600 mb-3"></i>
+        <p class="text-sm font-medium">Loading vehicle details...</p>
+      </div>
+
+      <!-- =====================================================
+           NOT FOUND STATE
+      ====================================================== -->
+      <div v-else-if="!vehicleStore.vehicle" class="flex flex-col items-center justify-center py-24 bg-white rounded-3xl border border-slate-100 text-center">
+        <div class="w-16 h-16 rounded-full bg-slate-100 flex items-center justify-center mb-4">
+          <i class="fa-solid fa-car text-2xl text-slate-400"></i>
+        </div>
+        <h2 class="text-xl font-bold text-slate-800">Vehicle Not Found</h2>
+        <p class="text-sm text-slate-500 mt-2">The vehicle you are looking for does not exist or has been removed.</p>
+        <button
+          type="button"
+          @click="goBack"
+          class="mt-6 px-5 py-2.5 rounded-xl bg-blue-600 hover:bg-blue-700 text-white text-sm font-semibold transition cursor-pointer"
+        >
+          <i class="fa-solid fa-arrow-left mr-2"></i>
           Back to Vehicles
-        </RouterLink>
+        </button>
       </div>
 
-      <!-- Loading State -->
-      <div v-if="vehicleStore.loading" class="loading-state">
-        <div class="spinner"></div>
-        <p>Loading vehicle details...</p>
-      </div>
-
-      <!-- Vehicle Content Shell -->
-      <div
-        v-else-if="vehicleStore.vehicle"
-        class="vehicle-detail-shell"
-      >
-        <!-- Main Vehicle Section -->
-        <div class="vehicle-main">
-
-          <!-- Image Showcase Panel -->
-          <div class="image-showcase">
-            <div class="main-image-wrapper">
+      <!-- =====================================================
+           MAIN VEHICLE DETAILS CARD
+      ====================================================== -->
+      <div v-else class="bg-white rounded-3xl p-6 sm:p-8 shadow-xs border border-slate-100">
+        <div class="grid grid-cols-1 lg:grid-cols-12 gap-8 items-center">
+          
+          <!-- Vehicle Image Display -->
+          <div class="lg:col-span-5 flex flex-col items-center">
+            <div class="relative w-full aspect-[4/3] flex items-center justify-center bg-slate-50/50 rounded-2xl p-4 overflow-hidden">
               <img
-                :src="selectedImage || primaryImage"
-                :alt="vehicleStore.vehicle.name"
-                class="detail-image"
-                @error="handleMainImageError"
-              />
-              <div
-                class="status-badge-floating"
-                :class="{ unavailable: !isAvailable }"
-              >
-                {{ statusText }}
-              </div>
-            </div>
-
-            <!-- Thumbnail Selector Strip -->
-            <div v-if="galleryImages.length > 1" class="thumbnail-strip">
-              <button
-                v-for="(img, index) in galleryImages"
-                :key="index"
-                class="thumb-btn"
-                :class="{ active: (selectedImage || primaryImage) === img }"
-                @click="selectedImage = img"
-              >
-                <img :src="img" alt="Thumbnail preview" />
-              </button>
-            </div>
-          </div>
-
-          <!-- Vehicle Information Panel -->
-          <div class="detail-panel">
-            <div class="brand-subtitle">
-              {{ vehicleStore.vehicle.brand_name || 'Brand' }} • {{ vehicleStore.vehicle.model || 'Model' }} ({{ vehicleStore.vehicle.year || '2026' }})
-            </div>
-
-            <h1>{{ vehicleStore.vehicle.name }}</h1>
-
-            <p class="vehicle-description">
-              {{
-                vehicleStore.vehicle.description ||
-                'Experience premium comfort, reliability, and modern efficiency on your upcoming journey with this top-tier vehicle.'
-              }}
-            </p>
-
-            <!-- Expanded Specifications Grid -->
-            <div class="spec-grid">
-              <!-- Category -->
-              <div class="spec-item">
-                <span class="spec-label">Category</span>
-                <span class="spec-value">{{ vehicleStore.vehicle.category_name || '-' }}</span>
-              </div>
-
-              <!-- Fuel Type -->
-              <div class="spec-item">
-                <span class="spec-label">Fuel Type</span>
-                <span class="spec-value">{{ vehicleStore.vehicle.fuel_type || 'Gasoline' }}</span>
-              </div>
-
-              <!-- Transmission -->
-              <div class="spec-item">
-                <span class="spec-label">Transmission</span>
-                <span class="spec-value">{{ vehicleStore.vehicle.transmission || 'Automatic' }}</span>
-              </div>
-
-              <!-- Seats -->
-              <div class="spec-item">
-                <span class="spec-label">Capacity</span>
-                <span class="spec-value">{{ vehicleStore.vehicle.seat ?? 4 }} Seats</span>
-              </div>
-
-              <!-- Year -->
-              <div class="spec-item">
-                <span class="spec-label">Year</span>
-                <span class="spec-value">{{ vehicleStore.vehicle.year || '-' }}</span>
-              </div>
-
-              <!-- Plate Number -->
-              <div class="spec-item">
-                <span class="spec-label">Plate No.</span>
-                <span class="spec-value plate-text">{{ vehicleStore.vehicle.plate_number || 'Confidential' }}</span>
-              </div>
-            </div>
-
-            <!-- Price & Booking Block -->
-            <div class="booking-card-action">
-              <div class="price-block">
-                <span class="currency">$</span>
-                <span class="amount">{{ vehicleStore.vehicle.pricePerDay || 0 }}</span>
-                <small>/ day</small>
-              </div>
-
-              <RouterLink
-                v-if="isAvailable"
-                :to="`/booking/${vehicleStore.vehicle.id}`"
-                class="book-button"
-              >
-                Book This Vehicle Now
-              </RouterLink>
-
-              <button
-                v-else
-                class="book-button disabled-button"
-                disabled
-              >
-                Currently Unavailable
-              </button>
-            </div>
-
-          </div>
-        </div>
-
-        <!-- Gallery Grid Section -->
-        <div class="gallery-section">
-          <h2>Vehicle Gallery</h2>
-
-          <div
-            v-if="galleryImages.length"
-            class="gallery-grid"
-          >
-            <div
-              v-for="(img, index) in galleryImages"
-              :key="index"
-              class="gallery-item"
-              @click="selectedImage = img"
-            >
-              <img
-                :src="img"
-                :alt="`${vehicleStore.vehicle.name} gallery view ${index + 1}`"
-                @error="handleGalleryImageError"
+                :src="vehicleImage"
+                :alt="vehicleName"
+                class="w-full h-full object-contain max-h-[300px] hover:scale-105 transition-transform duration-300"
+                @error="handleImageError"
               />
             </div>
           </div>
 
-          <div
-            v-else
-            class="no-images"
-          >
-            <p>No additional gallery images available for this vehicle.</p>
+          <!-- Info & Actions Panel -->
+          <div class="lg:col-span-7 space-y-6">
+            
+            <!-- Header Title & Redesigned Pricing/Action Card -->
+            <div class="flex flex-col sm:flex-row sm:items-stretch justify-between gap-6 border-b border-slate-100 pb-6">
+              
+              <!-- Vehicle Header Details -->
+              <div class="flex-1">
+                <h1 class="text-2xl sm:text-3xl font-extrabold text-slate-900 leading-tight">
+                  {{ vehicleName }}
+                </h1>
+                <p class="text-sm text-slate-500 mt-1 flex items-center gap-1.5 font-medium">
+                  <i class="fa-solid fa-location-dot text-blue-600"></i>
+                  {{ vehicleBrand }} • {{ vehicleCategory }}
+                </p>
+
+                <!-- Rating Badge -->
+                <div class="flex items-center gap-3 mt-4">
+                  <div class="flex items-center gap-1.5 bg-[#1E3A8A] text-white px-3 py-1 rounded-lg font-bold text-sm shadow-xs">
+                    <span>4.9</span>
+                    <i class="fa-solid fa-star text-amber-300 text-xs"></i>
+                  </div>
+                  <div>
+                    <span class="font-bold text-slate-800 text-sm block leading-none">Excellent</span>
+                    <span class="text-xs text-slate-400">275 Reviews</span>
+                  </div>
+                  <div class="flex text-amber-400 text-xs gap-0.5 ml-1">
+                    <i class="fa-solid fa-star"></i>
+                    <i class="fa-solid fa-star"></i>
+                    <i class="fa-solid fa-star"></i>
+                    <i class="fa-solid fa-star"></i>
+                    <i class="fa-solid fa-star"></i>
+                  </div>
+                </div>
+              </div>
+
+              <!-- Redesigned Interactive Booking Card -->
+              <div class="bg-gradient-to-br from-slate-900 via-slate-800 to-slate-900 text-white p-5 rounded-2xl shadow-xl flex flex-col justify-between shrink-0 min-w-[240px] border border-slate-700/50 relative overflow-hidden group">
+                <!-- Background Accent Glow -->
+                <div class="absolute -right-8 -top-8 w-24 h-24 bg-blue-500/10 rounded-full blur-xl group-hover:bg-blue-500/20 transition-all duration-500"></div>
+
+                <div>
+                  <div class="flex items-center justify-between mb-2">
+                    <span class="bg-gradient-to-r from-amber-400 to-rose-400 text-slate-950 font-black text-[10px] uppercase px-2 py-0.5 rounded-full tracking-wider shadow-xs">
+                      20% OFF
+                    </span>
+                    <span class="text-xs text-slate-400 line-through font-medium">Save $129</span>
+                  </div>
+
+                  <div class="flex items-baseline gap-1.5 my-1">
+                    <span class="text-3xl font-black text-white tracking-tight">${{ vehiclePrice }}</span>
+                    <span class="text-xs text-slate-400 font-medium">/ day</span>
+                  </div>
+                </div>
+
+                <div class="mt-4">
+                              <!-- Active Booking Button -->
+            <div class="vehicle-actions">
+
+
+
+                    <RouterLink
+                      :to="`/booking/${vehicle.id}`"
+                      class="btn btn-primary"
+                    >
+                      Book Now
+                    </RouterLink>
+
+                  </div>
+
+                  <p class="text-[11px] text-slate-400 text-center mt-2 font-medium flex items-center justify-center gap-1">
+                    <i class="fa-solid fa-shield-halved text-emerald-400 text-[10px]"></i>
+                    Free cancellation up to 24h
+                  </p>
+                </div>
+              </div>
+
+            </div>
+
+            <!-- Popular Service Specifications Bar -->
+            <div>
+              <h3 class="text-xs font-bold uppercase tracking-wider text-slate-400 mb-3">Popular Service</h3>
+              <div class="flex flex-wrap items-center gap-6 text-sm text-slate-600 font-medium">
+                <div class="flex items-center gap-2">
+                  <i class="fa-solid fa-square-parking text-slate-400 text-base"></i>
+                  <span>Parking</span>
+                </div>
+                <div class="flex items-center gap-2">
+                  <i class="fa-solid fa-chair text-slate-400 text-base"></i>
+                  <span>{{ seats }} Seats</span>
+                </div>
+                <div class="flex items-center gap-2">
+                  <i class="fa-solid fa-fan text-slate-400 text-base"></i>
+                  <span>{{ transmission }}</span>
+                </div>
+                <div class="flex items-center gap-2">
+                  <i class="fa-solid fa-gas-pump text-slate-400 text-base"></i>
+                  <span>{{ fuelType }}</span>
+                </div>
+              </div>
+            </div>
+
+            <!-- Included Coverage Checkboxes -->
+            <div class="pt-4 border-t border-slate-100">
+              <div class="flex flex-wrap items-center gap-4 text-xs font-bold text-slate-700">
+                <div class="flex items-center gap-2 bg-slate-50 px-3 py-2 rounded-lg border border-slate-200/60">
+                  <i class="fa-solid fa-square-check text-blue-600 text-sm"></i>
+                  <span>Amendments</span>
+                </div>
+                <div class="flex items-center gap-2 bg-slate-50 px-3 py-2 rounded-lg border border-slate-200/60">
+                  <i class="fa-solid fa-square-check text-blue-600 text-sm"></i>
+                  <span>Theft Protection</span>
+                </div>
+                <div class="flex items-center gap-2 bg-slate-50 px-3 py-2 rounded-lg border border-slate-200/60">
+                  <i class="fa-solid fa-square-check text-blue-600 text-sm"></i>
+                  <span>Collision Damage Waiver</span>
+                </div>
+              </div>
+            </div>
+
           </div>
         </div>
-
       </div>
 
-      <!-- Vehicle Not Found -->
-      <div
-        v-else-if="!vehicleStore.loading"
-        class="loading-state"
-      >
-        <p>Vehicle not found or has been removed.</p>
+      <!-- =====================================================
+           SUPPLIER LOCATION CARD
+      ====================================================== -->
+      <div v-if="vehicleStore.vehicle" class="bg-white rounded-3xl p-6 sm:p-8 shadow-xs border border-slate-100">
+        <h2 class="text-xl font-extrabold text-slate-900 mb-6">Supplier Location</h2>
+
+        <div class="grid grid-cols-1 lg:grid-cols-12 gap-8 items-center">
+          
+          <!-- Location Info Column -->
+          <div class="lg:col-span-7 space-y-6">
+            <!-- Pick Up & Drop Off -->
+            <div class="flex items-start gap-4">
+              <div class="w-10 h-10 rounded-full bg-slate-100 flex items-center justify-center shrink-0 text-slate-500">
+                <i class="fa-solid fa-car text-sm"></i>
+              </div>
+              <div>
+                <h4 class="font-bold text-slate-900 text-sm">Pick Up & Drop Off</h4>
+                <p class="text-xs font-semibold text-slate-600 mt-0.5">Alamo - Main Branch</p>
+                <p class="text-xs text-slate-400 mt-0.5">Rental Lounge Vertical Circle, Ground Floor, Central Terminal</p>
+              </div>
+            </div>
+
+            <!-- Opening Hours -->
+            <div class="flex items-start gap-4">
+              <div class="w-10 h-10 rounded-full bg-slate-100 flex items-center justify-center shrink-0 text-slate-500">
+                <i class="fa-regular fa-clock text-sm"></i>
+              </div>
+              <div>
+                <h4 class="font-bold text-slate-900 text-sm">Opening hours</h4>
+                <p class="text-xs text-slate-500 mt-0.5">Monday - Friday</p>
+                <p class="text-xs font-semibold text-slate-700">6:00 AM - 12:00 PM</p>
+              </div>
+            </div>
+          </div>
+
+          <!-- Map Preview Column -->
+          <div class="lg:col-span-5">
+            <div class="relative w-full h-48 bg-slate-100 rounded-2xl overflow-hidden border border-slate-200/80 flex flex-col justify-end p-4 group">
+              <!-- Grid Background Pattern Mockup -->
+              <div class="absolute inset-0 bg-[radial-gradient(#cbd5e1_1px,transparent_1px)] [background-size:16px_16px] opacity-70"></div>
+
+              <!-- Pin Marker -->
+              <div class="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 flex flex-col items-center">
+                <div class="w-9 h-9 rounded-full bg-[#0066FF] text-white flex items-center justify-center shadow-lg border-2 border-white">
+                  <i class="fa-solid fa-car text-xs"></i>
+                </div>
+              </div>
+
+              <!-- Map Overlay Button -->
+              <button class="relative z-10 w-full py-2.5 bg-white hover:bg-slate-50 text-slate-800 font-bold text-xs rounded-xl shadow-md border border-slate-200 transition-colors uppercase tracking-wider text-center cursor-pointer">
+                SHOW ON MAP
+              </button>
+            </div>
+          </div>
+
+        </div>
       </div>
 
     </div>
@@ -181,488 +275,322 @@
 </template>
 
 <script setup>
-import { computed, onMounted, ref, watch } from 'vue'
-import { useRoute } from 'vue-router'
+import { computed, onMounted, ref } from 'vue'
+import { useRoute, useRouter } from 'vue-router'
+
+// Stores
 import { useVehicleStore } from '../stores/Vehicle'
-import { getVehiclesImage } from '../api/vehicle'
+import { useBookingStore } from '../stores/Booking'
+import { useAuthStore } from '../stores/Auth'
 
+// Assets & API
+import BookingForm from '../components/BookingForm.vue'
+import heroImage from '../assets/hero.png'
+import { getVehiclesImage } from '../api/vehicle.js'
+
+// =========================================================
+// ROUTER & STORES
+// =========================================================
 const route = useRoute()
+const router = useRouter()
+
 const vehicleStore = useVehicleStore()
+const bookingStore = useBookingStore()
+const authStore = useAuthStore()
 
+// =========================================================
+// REACTIVE STATE
+// =========================================================
 const vehicleImages = ref([])
-const imageLoading = ref(false)
-const selectedImage = ref(null)
 
-const API_BASE_URL = 'http://localhost:8080'
+// =========================================================
+// BASIC VEHICLE COMPUTEDS
+// =========================================================
+const vehicleId = computed(() => Number(route.params.vehicleId))
 
-function getResponseData(response) {
-  const data = response?.data ?? response
+const vehicle = computed(() => vehicleStore.vehicle)
 
-  if (Array.isArray(data)) return data
-  if (Array.isArray(data?.data)) return data.data
-  if (Array.isArray(data?.content)) return data.content
+const vehicleName = computed(() => {
+  const v = vehicle.value
+  return v?.name || v?.vehicleName || v?.model || 'Premium Vehicle'
+})
 
-  return []
-}
+const vehicleBrand = computed(() => {
+  const v = vehicle.value
+  if (!v) return 'Vehicle'
 
+  const brand = v.brand
+  if (typeof brand === 'string') return brand
+  if (brand && typeof brand === 'object') {
+    return brand.brandName || brand.name || brand.brand_name || brand.make || 'Vehicle'
+  }
+
+  return v.brandName || v.brand_name || v.make || 'Vehicle'
+})
+
+const vehicleCategory = computed(() => {
+  const v = vehicle.value
+  if (!v) return 'Rental'
+
+  const category = v.category
+  if (typeof category === 'string') return category
+  if (category && typeof category === 'object') {
+    return category.categoryName || category.name || category.category_name || category.type || 'Rental'
+  }
+
+  return v.categoryName || v.category_name || v.type || 'Rental'
+})
+
+const vehiclePrice = computed(() => {
+  const v = vehicle.value
+  return v?.pricePerDay ?? v?.price_per_day ?? v?.price ?? v?.rentalPrice ?? 0
+})
+
+const fuelType = computed(() => {
+  const v = vehicle.value
+  return v?.fuelType || v?.fuel_type || v?.fuel || 'Gasoline'
+})
+
+const transmission = computed(() => {
+  const v = vehicle.value
+  return v?.transmission || v?.transmissionType || v?.transmission_type || 'Automatic'
+})
+
+const seats = computed(() => {
+  const v = vehicle.value
+  return v?.seats ?? v?.seat ?? v?.numberOfSeats ?? 4
+})
+
+// =========================================================
+// VEHICLE STATUS COMPUTEDS
+// =========================================================
+const vehicleStatus = computed(() => {
+  return String(vehicle.value?.status || '').toUpperCase()
+})
+
+const vehicleStatusText = computed(() => {
+  switch (vehicleStatus.value) {
+    case 'AVAILABLE': return 'Available'
+    case 'RENTED': return 'Rented'
+    case 'MAINTENANCE': return 'Maintenance'
+    case 'RESERVED': return 'Reserved'
+    default: return 'Unknown'
+  }
+})
+
+const vehicleStatusClass = computed(() => {
+  switch (vehicleStatus.value) {
+    case 'AVAILABLE': return 'bg-emerald-100 text-emerald-700'
+    case 'RENTED': return 'bg-red-100 text-red-700'
+    case 'MAINTENANCE': return 'bg-amber-100 text-amber-700'
+    case 'RESERVED': return 'bg-blue-100 text-blue-700'
+    default: return 'bg-slate-100 text-slate-700'
+  }
+})
+
+const isLambo = computed(() => {
+  return vehicleName.value.toLowerCase() === 'lamborghini aventador'
+})
+
+// =========================================================
+// IMAGE RESOLUTION & HELPERS
+// =========================================================
 function formatImageUrl(rawPath) {
-  if (!rawPath) return null
+  if (!rawPath || typeof rawPath !== 'string') return null
+  const path = rawPath.trim()
+  if (!path) return null
 
   if (
-    rawPath.startsWith('http://') ||
-    rawPath.startsWith('https://') ||
-    rawPath.startsWith('data:')
+    path.startsWith('http://') ||
+    path.startsWith('https://') ||
+    path.startsWith('data:')
   ) {
-    return rawPath
+    return path
   }
 
-  const cleanPath = rawPath.startsWith('/')
-    ? rawPath
-    : `/${rawPath}`
-
-  return `${API_BASE_URL}${cleanPath}`
+  const cleanPath = path.startsWith('/') ? path : `/${path}`
+  return `http://localhost:8080${cleanPath}`
 }
 
-function getImageRawValue(image) {
-  if (!image) return null
-  if (typeof image === 'string') return image
+const vehicleImage = computed(() => {
+  const currentVehicle = vehicle.value
+  if (!currentVehicle) return heroImage
 
-  return (
-    image.image ||
-    image.imageUrl ||
-    image.url ||
-    image.path ||
-    image.imagePath ||
-    null
-  )
-}
+  // 1. Check vehicle.vehicleImages array
+  if (Array.isArray(currentVehicle.vehicleImages) && currentVehicle.vehicleImages.length > 0) {
+    const imgObj = currentVehicle.vehicleImages[0]
+    const raw = typeof imgObj === 'string'
+      ? imgObj
+      : (imgObj?.image || imgObj?.imageUrl || imgObj?.url || imgObj?.path || imgObj?.imagePath)
 
-function isImageForVehicle(image, vehicle) {
-  if (!image || !vehicle) return false
-
-  const vehicleId = Number(vehicle.id)
-  const imageVehicleId = Number(
-    image.vehicle_id ??
-    image.vehicleId ??
-    image.vehicle?.id ??
-    image.vehicle?.vehicleId
-  )
-
-  if (imageVehicleId && vehicleId && imageVehicleId === vehicleId) {
-    return true
+    const formatted = formatImageUrl(raw)
+    if (formatted) return formatted
   }
 
-  const vehicleName = String(vehicle.name || vehicle.model || '').trim().toLowerCase()
-  const imageVehicleName = String(image.vehicle_name || image.vehicleName || image.name || '').trim().toLowerCase()
-
-  return vehicleName && imageVehicleName && vehicleName === imageVehicleName
-}
-
-const currentVehicleImages = computed(() => {
-  const vehicle = vehicleStore.vehicle
-  if (!vehicle) return []
-
-  const matchedImages = vehicleImages.value.filter((image) =>
-    isImageForVehicle(image, vehicle)
-  )
-
-  return matchedImages
-    .map((image) => formatImageUrl(getImageRawValue(image)))
-    .filter(Boolean)
-})
-
-const primaryImage = computed(() => {
-  if (currentVehicleImages.value.length > 0) {
-    return currentVehicleImages.value[0]
+  // 2. Check direct image properties
+  const directPath = currentVehicle.image || currentVehicle.imageUrl || currentVehicle.imagePath
+  if (typeof directPath === 'string' && directPath.trim()) {
+    const formatted = formatImageUrl(directPath)
+    if (formatted) return formatted
   }
 
-  const vehicle = vehicleStore.vehicle
-  const raw = vehicle?.image || vehicle?.imageUrl || vehicle?.imagePath
+  // 3. Search fetched vehicleImages list by vehicle ID
+  if (Array.isArray(vehicleImages.value) && vehicleImages.value.length > 0) {
+    const currentVehicleId = Number(currentVehicle.id)
+    const matchById = vehicleImages.value.find((img) => {
+      const imgVehicleId = Number(
+        img.vehicle_id ?? img.vehicleId ?? img.vehicle?.id ?? img.vehicle?.vehicleId
+      )
+      return imgVehicleId && imgVehicleId === currentVehicleId
+    })
 
-  if (raw) return formatImageUrl(raw)
+    if (matchById) {
+      const raw = matchById.image || matchById.imageUrl || matchById.url || matchById.path || matchById.imagePath
+      const formatted = formatImageUrl(raw)
+      if (formatted) return formatted
+    }
 
-  return '/images/vehicle-placeholder.jpg'
+    // 4. Search fetched vehicleImages list by vehicle Name
+    const currentVehicleName = (
+      currentVehicle.name || `${currentVehicle.brandName || ''} ${currentVehicle.model || ''}`
+    ).trim().toLowerCase()
+
+    const matchByName = vehicleImages.value.find((img) => {
+      const imgVehicleName = String(img.vehicle_name ?? img.vehicleName ?? img.name ?? '').trim().toLowerCase()
+      return imgVehicleName && imgVehicleName === currentVehicleName
+    })
+
+    if (matchByName) {
+      const raw = matchByName.image || matchByName.imageUrl || matchByName.url || matchByName.path || matchByName.imagePath
+      const formatted = formatImageUrl(raw)
+      if (formatted) return formatted
+    }
+  }
+
+  // 5. Default Fallback
+  return heroImage
 })
 
-const galleryImages = computed(() => {
-  return currentVehicleImages.value.length > 0
-    ? currentVehicleImages.value
-    : [primaryImage.value]
-})
+function handleImageError(event) {
+  console.error('Vehicle detail image failed to load:', event.target.src)
+  if (event.target.dataset.fallback === 'true') return
+  event.target.dataset.fallback = 'true'
+  event.target.src = heroImage
+}
 
-const isAvailable = computed(() => {
-  const status = String(
-    vehicleStore.vehicle?.status || 'AVAILABLE'
-  ).toLowerCase()
-
-  return status === 'available'
-})
-
-const statusText = computed(() => {
-  return vehicleStore.vehicle?.status || 'AVAILABLE'
-})
-
+// =========================================================
+// API ACTIONS
+// =========================================================
 async function fetchVehicleImages() {
-  imageLoading.value = true
   try {
     const response = await getVehiclesImage()
-    vehicleImages.value = getResponseData(response)
+    const data = response?.data ?? response
+    vehicleImages.value = Array.isArray(data)
+      ? data
+      : Array.isArray(data?.data)
+        ? data.data
+        : []
   } catch (error) {
     console.error('Failed to fetch vehicle images:', error)
     vehicleImages.value = []
-  } finally {
-    imageLoading.value = false
   }
 }
 
-const handleMainImageError = (event) => {
-  const placeholder = '/images/vehicle-placeholder.jpg'
-  if (!event.target.src.includes(placeholder)) {
-    event.target.src = placeholder
+async function createBooking(data = {}) {
+  try {
+    // Get logged-in user from Pinia
+    let userId = Number(authStore.user?.id)
+
+    // Fallback: restore user from localStorage
+    if (!userId) {
+      const storedUser = localStorage.getItem('user')
+
+      if (storedUser) {
+        try {
+          const parsedUser = JSON.parse(storedUser)
+          userId = Number(parsedUser?.id)
+        } catch (error) {
+          console.error('Invalid stored user:', error)
+        }
+      }
+    }
+
+    // Check login
+    if (!Number.isInteger(userId) || userId <= 0) {
+      alert('Please login before booking a vehicle.')
+      router.push('/login')
+      return
+    }
+
+    // Get vehicle ID
+    const id = vehicleId.value
+
+    if (!Number.isInteger(id) || id <= 0) {
+      throw new Error('Invalid vehicle.')
+    }
+
+    console.log('Creating booking with:', {
+      userId,
+      vehicleId: id
+    })
+
+    // Create booking
+    const booking = await bookingStore.createBooking({
+      userId,
+      vehicleId: id,
+      pickupDate:
+        data.pickupDate ||
+        new Date().toISOString().split('T')[0],
+      returnDate:
+        data.returnDate ||
+        new Date(Date.now() + 86400000)
+          .toISOString()
+          .split('T')[0]
+    })
+
+    console.log('Booking response:', booking)
+
+    // Get booking ID
+    const bookingId = booking?.id || booking?.bookingId
+
+    if (!bookingId) {
+      throw new Error('Booking was created without an id.')
+    }
+
+    // Go to payment page
+    router.push(`/payment/${bookingId}`)
+
+  } catch (error) {
+    console.error('Create booking error:', error)
+
+    alert(
+      error.response?.data?.message ||
+      error.message ||
+      'Failed to create booking'
+    )
   }
 }
 
-const handleGalleryImageError = (event) => {
-  const placeholder = '/images/vehicle-placeholder.jpg'
-  if (!event.target.src.includes(placeholder)) {
-    event.target.src = placeholder
-  }
+function goBack() {
+  router.back()
 }
 
-watch(() => vehicleStore.vehicle?.id, () => {
-  selectedImage.value = null
-})
-
+// =========================================================
+// LIFECYCLE HOOKS
+// =========================================================
 onMounted(async () => {
-  await vehicleStore.fetchVehicle(route.params.id)
-  await fetchVehicleImages()
+  if (!Number.isInteger(vehicleId.value) || vehicleId.value <= 0) {
+    console.error('Invalid vehicle ID:', route.params.vehicleId)
+    return
+  }
+
+  try {
+    await Promise.all([
+      vehicleStore.fetchVehicle(vehicleId.value),
+      fetchVehicleImages()
+    ])
+  } catch (error) {
+    console.error('Failed to fetch vehicle detail:', error)
+  }
 })
 </script>
-
-<style scoped>
-.vehicle-page {
-  padding: 24px 0 80px;
-  background: #f8fafc;
-  min-height: 100vh;
-}
-
-.container {
-  width: min(1300px, 92%);
-  margin: 0 auto;
-}
-
-.nav-back-wrapper {
-  margin-bottom: 20px;
-}
-
-.back-button {
-  display: inline-flex;
-  align-items: center;
-  gap: 8px;
-  color: #475569;
-  font-weight: 600;
-  font-size: 0.95rem;
-  text-decoration: none;
-  background: #ffffff;
-  border: 1px solid #e2e8f0;
-  padding: 8px 16px;
-  border-radius: 10px;
-  transition: all 0.2s ease;
-  box-shadow: 0 2px 4px rgba(15, 23, 42, 0.02);
-}
-
-.back-button:hover {
-  color: #0f172a;
-  background: #f1f5f9;
-  border-color: #cbd5e1;
-}
-
-.loading-state {
-  padding: 80px 20px;
-  text-align: center;
-  color: #64748b;
-  font-size: 1.15rem;
-  font-weight: 500;
-}
-
-.vehicle-detail-shell {
-  background: #ffffff;
-  border: 1px solid #e2e8f0;
-  border-radius: 24px;
-  padding: 24px;
-  box-shadow: 0 10px 30px rgba(15, 23, 42, 0.05);
-}
-
-.vehicle-main {
-  display: grid;
-  grid-template-columns: 1.3fr 1fr;
-  gap: 36px;
-  align-items: start;
-}
-
-.image-showcase {
-  display: flex;
-  flex-direction: column;
-  gap: 16px;
-}
-
-.main-image-wrapper {
-  position: relative;
-  height: 460px;
-  background: #f1f5f9;
-  border-radius: 16px;
-  overflow: hidden;
-  border: 1px solid #e2e8f0;
-}
-
-.detail-image {
-  width: 100%;
-  height: 100%;
-  object-fit: cover;
-  display: block;
-  transition: transform 0.3s ease;
-}
-
-.status-badge-floating {
-  position: absolute;
-  top: 16px;
-  left: 16px;
-  padding: 6px 14px;
-  border-radius: 999px;
-  font-size: 0.75rem;
-  font-weight: 700;
-  letter-spacing: 0.03em;
-  background: #dcfce7;
-  color: #166534;
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
-}
-
-.status-badge-floating.unavailable {
-  background: #fef3c7;
-  color: #92400e;
-}
-
-.thumbnail-strip {
-  display: flex;
-  gap: 12px;
-  overflow-x: auto;
-  padding-bottom: 4px;
-}
-
-.thumb-btn {
-  width: 76px;
-  height: 60px;
-  border-radius: 10px;
-  border: 2px solid transparent;
-  overflow: hidden;
-  background: #f1f5f9;
-  cursor: pointer;
-  padding: 0;
-  transition: all 0.2s ease;
-}
-
-.thumb-btn img {
-  width: 100%;
-  height: 100%;
-  object-fit: cover;
-}
-
-.thumb-btn.active {
-  border-color: #2563eb;
-  transform: scale(1.05);
-}
-
-.detail-panel {
-  display: flex;
-  flex-direction: column;
-}
-
-.brand-subtitle {
-  font-size: 0.9rem;
-  font-weight: 600;
-  color: #2563eb;
-  text-transform: uppercase;
-  letter-spacing: 0.08em;
-  margin-bottom: 6px;
-}
-
-.detail-panel h1 {
-  margin: 0 0 12px 0;
-  font-size: clamp(2rem, 2.5vw, 2.6rem);
-  line-height: 1.15;
-  color: #0f172a;
-  font-weight: 800;
-}
-
-.vehicle-description {
-  margin: 0 0 24px 0;
-  color: #475569;
-  font-size: 1.02rem;
-  line-height: 1.5;
-}
-
-.spec-grid {
-  display: grid;
-  grid-template-columns: repeat(3, minmax(0, 1fr));
-  gap: 12px;
-  margin-bottom: 28px;
-}
-
-.spec-item {
-  display: flex;
-  flex-direction: column;
-  gap: 4px;
-  background: #f8fafc;
-  border: 1px solid #e2e8f0;
-  border-radius: 12px;
-  padding: 12px;
-}
-
-.spec-label {
-  color: #64748b;
-  font-size: 0.75rem;
-  font-weight: 600;
-  text-transform: uppercase;
-}
-
-.spec-value {
-  color: #0f172a;
-  font-size: 1rem;
-  font-weight: 700;
-}
-
-.plate-text {
-  font-family: monospace;
-  letter-spacing: 0.05em;
-}
-
-.booking-card-action {
-  background: #f8fafc;
-  border: 1px solid #e2e8f0;
-  border-radius: 16px;
-  padding: 20px;
-  display: flex;
-  flex-direction: column;
-  gap: 16px;
-}
-
-.price-block {
-  display: flex;
-  align-items: baseline;
-  gap: 2px;
-  color: #0f172a;
-}
-
-.price-block .currency {
-  font-size: 1.4rem;
-  font-weight: 700;
-}
-
-.price-block .amount {
-  font-size: 2.4rem;
-  font-weight: 800;
-  letter-spacing: -0.03em;
-}
-
-.price-block small {
-  font-size: 0.95rem;
-  color: #64748b;
-  margin-left: 4px;
-}
-
-.book-button {
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  width: 100%;
-  min-height: 52px;
-  background: #0f172a;
-  color: #ffffff;
-  font-weight: 700;
-  font-size: 1.05rem;
-  border-radius: 12px;
-  text-decoration: none;
-  border: none;
-  cursor: pointer;
-  transition: background 0.2s ease, transform 0.1s ease;
-}
-
-.book-button:hover {
-  background: #1e293b;
-}
-
-.disabled-button {
-  background: #cbd5e1;
-  cursor: not-allowed;
-}
-
-.gallery-section {
-  margin-top: 48px;
-  border-top: 1px solid #e2e8f0;
-  padding-top: 32px;
-}
-
-.gallery-section h2 {
-  margin: 0 0 20px 0;
-  font-size: 1.5rem;
-  color: #0f172a;
-  font-weight: 700;
-}
-
-.gallery-grid {
-  display: grid;
-  grid-template-columns: repeat(4, minmax(0, 1fr));
-  gap: 16px;
-}
-
-.gallery-item {
-  height: 200px;
-  border-radius: 14px;
-  overflow: hidden;
-  border: 1px solid #e2e8f0;
-  cursor: pointer;
-  background: #f1f5f9;
-  transition: transform 0.2s ease, box-shadow 0.2s ease;
-}
-
-.gallery-item:hover {
-  transform: translateY(-3px);
-  box-shadow: 0 8px 20px rgba(15, 23, 42, 0.08);
-}
-
-.gallery-item img {
-  width: 100%;
-  height: 100%;
-  object-fit: cover;
-  display: block;
-}
-
-.no-images {
-  padding: 30px;
-  text-align: center;
-  background: #f8fafc;
-  border-radius: 12px;
-  color: #64748b;
-  border: 1px dashed #cbd5e1;
-}
-
-@media (max-width: 900px) {
-  .vehicle-main {
-    grid-template-columns: 1fr;
-  }
-
-  .gallery-grid {
-    grid-template-columns: repeat(2, minmax(0, 1fr));
-  }
-}
-
-@media (max-width: 600px) {
-  .spec-grid {
-    grid-template-columns: repeat(2, minmax(0, 1fr));
-  }
-
-  .gallery-grid {
-    grid-template-columns: 1fr;
-  }
-}
-</style>

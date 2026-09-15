@@ -173,7 +173,6 @@ import { useBookingStore } from '../stores/Booking'
 import {
   getBrand,
   getCategory,
-  getVehiclesImage
 } from '../api/vehicle.js'
 import VehicleCard from '../components/VehicleCard.vue'
 import SearchBar from '../components/Searchbar.vue'
@@ -186,7 +185,6 @@ const filterDrawerOpen = ref(false)
 
 const categories = ref(['All'])
 const brands = ref(['All'])
-const vehicleImages = ref([])
 
 const loadingMeta = ref(false)
 
@@ -227,19 +225,14 @@ function getResponseData(response) {
 }
 
 async function fetchMetaData() {
-  loadingMeta.value = true
-
   try {
-    const [brandResponse, categoryResponse, imageResponse] =
-      await Promise.all([
-        getBrand(),
-        getCategory(),
-        getVehiclesImage()
-      ])
+    const [brandResponse, categoryResponse] = await Promise.all([
+      getBrand(),
+      getCategory()
+    ])
 
     const brandData = getResponseData(brandResponse)
     const categoryData = getResponseData(categoryResponse)
-    const imageData = getResponseData(imageResponse)
 
     brands.value = [
       'All',
@@ -260,21 +253,11 @@ async function fetchMetaData() {
         )
         .filter(Boolean)
     ]
-
-    // Store all vehicle images
-    vehicleImages.value = Array.isArray(imageData)
-      ? imageData
-      : []
-
-    console.log('Vehicle images:', vehicleImages.value)
   } catch (error) {
     console.error('Failed to fetch vehicle metadata:', error)
 
     categories.value = ['All']
     brands.value = ['All']
-    vehicleImages.value = []
-  } finally {
-    loadingMeta.value = false
   }
 }
 
@@ -289,7 +272,7 @@ function formatImageUrl(rawPath) {
     return null
   }
 
-  // Cloudinary URL or any external URL
+  // External image URL
   if (
     path.startsWith('http://') ||
     path.startsWith('https://') ||
@@ -307,101 +290,55 @@ function formatImageUrl(rawPath) {
 }
 
 function getVehicleImage(vehicle) {
-  if (!vehicle) return null
+  if (!vehicle) {
+    return null
+  }
 
+  // Backend returns mainImage
+  if (
+    typeof vehicle.mainImage === 'string' &&
+    vehicle.mainImage.trim()
+  ) {
+    return vehicle.mainImage.trim()
+  }
+
+  // Other possible image fields
+  if (
+    typeof vehicle.image === 'string' &&
+    vehicle.image.trim()
+  ) {
+    return vehicle.image.trim()
+  }
+
+  if (
+    typeof vehicle.imageUrl === 'string' &&
+    vehicle.imageUrl.trim()
+  ) {
+    return vehicle.imageUrl.trim()
+  }
+
+  // Optional vehicleImages support
   if (
     Array.isArray(vehicle.vehicleImages) &&
     vehicle.vehicleImages.length > 0
   ) {
-    const imgObj = vehicle.vehicleImages[0]
+    const image = vehicle.vehicleImages[0]
 
     const raw =
-      typeof imgObj === 'string'
-        ? imgObj
-        : imgObj?.image ||
-          imgObj?.imageUrl ||
-          imgObj?.url ||
-          imgObj?.path
+      typeof image === 'string'
+        ? image
+        : image?.image ||
+          image?.imageUrl ||
+          image?.url ||
+          image?.path
 
     if (raw) {
       return formatImageUrl(raw)
     }
   }
 
-  if (
-    typeof vehicle.image === 'string' &&
-    vehicle.image
-  ) {
-    return formatImageUrl(vehicle.image)
-  }
-
-  if (
-    typeof vehicle.imageUrl === 'string' &&
-    vehicle.imageUrl
-  ) {
-    return formatImageUrl(vehicle.imageUrl)
-  }
-
-  if (
-    Array.isArray(vehicleImages.value) &&
-    vehicleImages.value.length > 0
-  ) {
-    const vehicleId = Number(vehicle.id)
-
-    const match = vehicleImages.value.find((img) => {
-      const imgVehicleId = Number(
-        img.vehicle_id ??
-        img.vehicleId ??
-        img.vehicle?.id ??
-        img.vehicle?.vehicleId
-      )
-
-      if (
-        imgVehicleId &&
-        imgVehicleId === vehicleId
-      ) {
-        return true
-      }
-
-      const vehicleName = (
-        vehicle.name ||
-        `${vehicle.brandName || ''} ${vehicle.model || ''}`
-      )
-        .trim()
-        .toLowerCase()
-
-      const imgVehicleName = String(
-        img.vehicle_name ??
-        img.vehicleName ??
-        img.name ??
-        ''
-      )
-        .trim()
-        .toLowerCase()
-
-      return (
-        imgVehicleName &&
-        imgVehicleName === vehicleName
-      )
-    })
-
-    if (match) {
-      const raw =
-        match.image ||
-        match.imageUrl ||
-        match.url ||
-        match.path ||
-        match.imagePath
-
-      if (raw) {
-        return formatImageUrl(raw)
-      }
-    }
-  }
-
   return null
 }
-
 
 function getVehicleBrand(vehicle) {
   if (

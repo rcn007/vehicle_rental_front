@@ -1,176 +1,723 @@
 <template>
-  <section class="section" :class="{ 'lambo-booking': isLambo }">
-    <div class="container narrow" :class="{ 'lambo-container': isLambo }">
-      <div class="page-header">
-        <p class="section-label">BOOKING</p>
-        <h1>Book Your Vehicle</h1>
-      </div>
+  <section
+    :class="[
+      'min-h-screen py-8 sm:py-12 transition-colors duration-500 font-sans antialiased',
+      isLambo
+        ? 'bg-[#090A0F] text-slate-100 selection:bg-amber-500 selection:text-black'
+        : 'bg-slate-50/80 text-slate-900'
+    ]"
+  >
+    <!-- LUXURY BACKGROUND AMBIENCE (LAMBORGHINI MODE) -->
+    <div
+      v-if="isLambo"
+      class="fixed inset-0 pointer-events-none overflow-hidden"
+    >
+      <div class="absolute -top-32 -left-32 w-96 h-96 bg-amber-500/10 rounded-full blur-[120px]"></div>
+      <div class="absolute top-1/3 -right-32 w-96 h-96 bg-orange-600/10 rounded-full blur-[120px]"></div>
+    </div>
 
-      <div v-if="vehicleStore.loading" class="loading">Loading...</div>
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
+      <!-- CLEAN INTEGRATED HEADER BAR -->
+      <div class="mb-8 space-y-6">
+        <div class="flex items-center justify-between">
+          <button
+            @click="router.back()"
+            :class="[
+              'group inline-flex items-center gap-2 text-xs font-bold tracking-wider uppercase transition-colors cursor-pointer',
+              isLambo ? 'text-slate-400 hover:text-white' : 'text-slate-500 hover:text-slate-900'
+            ]"
+          >
+            <span
+              :class="[
+                'w-8 h-8 rounded-full border flex items-center justify-center transition-transform group-hover:-translate-x-1',
+                isLambo
+                  ? 'border-slate-800 bg-slate-900/80 text-slate-300'
+                  : 'border-slate-200 bg-white text-slate-600 shadow-xs'
+              ]"
+            >
+              <i class="fa-solid fa-arrow-left text-[11px]"></i>
+            </span>
+            <span>Back to Fleet</span>
+          </button>
 
-      <div
-        v-else-if="vehicleStore.vehicle"
-        :class="['booking-shell', { 'lambo-shell': isLambo }]"
-      >
-        <div :class="['booking-vehicle', { 'lambo-vehicle': isLambo }]">
-          <img
-            :src="vehicleStore.vehicle.image || heroImage"
-            :alt="vehicleStore.vehicle.name"
-          />
-
-          <div class="vehicle-meta">
-            <h2>{{ vehicleStore.vehicle.name }}</h2>
-            <p>
-              ${{
-                vehicleStore.vehicle.pricePerDay ||
-                vehicleStore.vehicle.price ||
-                0
-              }}
-              / day
-            </p>
+          <div
+            :class="[
+              'inline-flex items-center gap-1.5 px-3 py-1 rounded-full border text-[11px] font-bold uppercase tracking-wider',
+              isLambo
+                ? 'border-emerald-500/20 bg-emerald-500/10 text-emerald-400'
+                : 'border-emerald-200 bg-emerald-50/80 text-emerald-700'
+            ]"
+          >
+            <i class="fa-solid fa-shield-halved text-xs"></i>
+            <span>Secure Reservation</span>
           </div>
         </div>
 
-        <BookingForm
-          :vehicle="vehicleStore.vehicle"
-          :loading="bookingStore.loading"
-          @submit="createBooking"
-        />
+        <div class="flex flex-col lg:flex-row lg:items-end justify-between gap-6 pb-2">
+          <div>
+            <h1 class="text-3xl sm:text-4xl font-extrabold tracking-tight">
+              Reserve Your Vehicle
+            </h1>
+            <p
+              :class="[
+                'mt-1.5 text-xs sm:text-sm font-medium max-w-xl',
+                isLambo ? 'text-slate-400' : 'text-slate-500'
+              ]"
+            >
+              Select your rental period and confirm booking details before proceeding to checkout.
+            </p>
+          </div>
+
+          <div
+            :class="[
+              'flex items-center gap-2 sm:gap-3 p-2 rounded-2xl border shrink-0',
+              isLambo
+                ? 'bg-slate-900/60 border-slate-800/80 backdrop-blur-md'
+                : 'bg-white border-slate-200/80 shadow-xs'
+            ]"
+          >
+            <div class="flex items-center gap-2 px-3 py-1.5 rounded-xl bg-slate-100/10">
+              <span
+                :class="[
+                  'w-6 h-6 rounded-lg flex items-center justify-center text-[10px] font-bold',
+                  isLambo ? 'bg-amber-500 text-black' : 'bg-blue-600 text-white'
+                ]"
+              >1</span>
+              <span class="text-xs font-bold">Vehicle</span>
+            </div>
+
+            <i class="fa-solid fa-chevron-right text-[10px] text-slate-400"></i>
+
+            <div class="flex items-center gap-2 px-3 py-1.5 rounded-xl">
+              <span
+                :class="[
+                  'w-6 h-6 rounded-lg flex items-center justify-center text-[10px] font-bold',
+                  isLambo ? 'bg-amber-500 text-black' : 'bg-blue-600 text-white'
+                ]"
+              >2</span>
+              <span class="text-xs font-bold">Details</span>
+            </div>
+
+            <i class="fa-solid fa-chevron-right text-[10px] text-slate-400"></i>
+
+            <div class="flex items-center gap-2 px-3 py-1.5 text-slate-400 opacity-60">
+              <span
+                :class="[
+                  'w-6 h-6 rounded-lg border flex items-center justify-center text-[10px] font-bold',
+                  isLambo ? 'border-slate-700' : 'border-slate-300'
+                ]"
+              >3</span>
+              <span class="text-xs font-medium">Payment</span>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- LOADING STATE -->
+      <div
+        v-if="vehicleStore.loading"
+        class="flex flex-col items-center justify-center py-32 rounded-3xl border border-dashed border-slate-200"
+      >
+        <div
+          :class="[
+            'w-14 h-14 rounded-2xl flex items-center justify-center mb-4',
+            isLambo ? 'bg-amber-500/10 text-amber-400' : 'bg-blue-50 text-blue-600'
+          ]"
+        >
+          <i class="fa-solid fa-circle-notch animate-spin text-2xl"></i>
+        </div>
+        <h3 class="font-bold text-base">Preparing Vehicle Details</h3>
+        <p class="text-xs text-slate-400 mt-1">Please wait a moment...</p>
+      </div>
+
+      <!-- MAIN CONTENT GRID -->
+      <div
+        v-else-if="vehicleStore.vehicle"
+        class="grid grid-cols-1 lg:grid-cols-12 gap-6 lg:gap-8 items-start"
+      >
+        <!-- LEFT: VEHICLE DISPLAY & SPECIFICATIONS -->
+        <div
+          :class="[
+            'lg:col-span-7 rounded-3xl border overflow-hidden transition-all',
+            isLambo
+              ? 'bg-slate-900/60 border-slate-800 backdrop-blur-xl shadow-2xl'
+              : 'bg-white border-slate-200/80 shadow-xs'
+          ]"
+        >
+          <div class="relative group bg-slate-950/40">
+            <div class="aspect-[16/10] sm:aspect-[16/9] overflow-hidden flex items-center justify-center p-6">
+              <img
+                :src="vehicleImage"
+                :alt="vehicleStore.vehicle.name"
+                class="w-full h-full object-contain transition-transform duration-500 group-hover:scale-105"
+                @error="handleImageError"
+              />
+            </div>
+
+            <div class="absolute inset-0 bg-gradient-to-t from-slate-950/90 via-slate-950/20 to-transparent pointer-events-none"></div>
+
+            <div class="absolute top-4 left-4">
+              <span class="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-emerald-500/90 backdrop-blur-md text-white text-[11px] font-bold shadow-xs">
+                <span class="w-1.5 h-1.5 bg-white rounded-full animate-pulse"></span>
+                Ready for Pickup
+              </span>
+            </div>
+
+            <div class="absolute bottom-5 left-6 right-6 text-white">
+              <p class="text-[10px] uppercase tracking-widest text-slate-400 font-bold mb-0.5">
+                Selected Vehicle
+              </p>
+              <h2 class="text-2xl sm:text-3xl font-black tracking-tight">
+                {{ vehicleStore.vehicle.name }}
+              </h2>
+            </div>
+          </div>
+
+          <div class="p-6 sm:p-7 space-y-6">
+            <div class="flex items-center justify-between pb-6 border-b border-slate-100 dark:border-slate-800/80">
+              <div>
+                <p class="text-[11px] uppercase tracking-wider font-bold text-slate-400">
+                  Daily Rate
+                </p>
+                <div class="flex items-baseline gap-1 mt-0.5">
+                  <span
+                    :class="[
+                      'text-3xl font-extrabold tracking-tight',
+                      isLambo ? 'text-amber-400' : 'text-blue-600'
+                    ]"
+                  >
+                    ${{ vehicleStore.vehicle.pricePerDay || vehicleStore.vehicle.price || 0 }}
+                  </span>
+                  <span class="text-xs text-slate-400 font-medium">/ day</span>
+                </div>
+              </div>
+
+              <div
+                :class="[
+                  'flex items-center gap-2 px-3 py-1.5 rounded-xl border text-xs font-semibold',
+                  isLambo
+                    ? 'bg-slate-800/50 border-slate-700 text-slate-300'
+                    : 'bg-slate-50 border-slate-200/60 text-slate-600'
+                ]"
+              >
+                <i class="fa-solid fa-circle-check text-emerald-500 text-xs"></i>
+                <span>Best Price Guaranteed</span>
+              </div>
+            </div>
+
+            <div>
+              <p class="text-[11px] uppercase tracking-wider font-bold text-slate-400 mb-3">
+                Key Features
+              </p>
+
+              <div class="grid grid-cols-3 gap-3">
+                <div
+                  :class="[
+                    'p-3.5 rounded-2xl border flex flex-col justify-between',
+                    isLambo ? 'bg-slate-800/40 border-slate-800' : 'bg-slate-50/70 border-slate-200/50'
+                  ]"
+                >
+                  <i :class="['fa-solid fa-users text-sm mb-2', isLambo ? 'text-amber-400' : 'text-blue-600']"></i>
+                  <div>
+                    <span class="text-[10px] uppercase tracking-wider font-bold text-slate-400 block">Seats</span>
+                    <span class="text-xs font-extrabold mt-0.5 block">
+                      {{ vehicleStore.vehicle.seats || 2 }} Capacity
+                    </span>
+                  </div>
+                </div>
+
+                <div
+                  :class="[
+                    'p-3.5 rounded-2xl border flex flex-col justify-between',
+                    isLambo ? 'bg-slate-800/40 border-slate-800' : 'bg-slate-50/70 border-slate-200/50'
+                  ]"
+                >
+                  <i :class="['fa-solid fa-gears text-sm mb-2', isLambo ? 'text-amber-400' : 'text-blue-600']"></i>
+                  <div>
+                    <span class="text-[10px] uppercase tracking-wider font-bold text-slate-400 block">Gearbox</span>
+                    <span class="text-xs font-extrabold mt-0.5 block truncate">
+                      {{ vehicleStore.vehicle.transmission || 'Automatic' }}
+                    </span>
+                  </div>
+                </div>
+
+                <div
+                  :class="[
+                    'p-3.5 rounded-2xl border flex flex-col justify-between',
+                    isLambo ? 'bg-slate-800/40 border-slate-800' : 'bg-slate-50/70 border-slate-200/50'
+                  ]"
+                >
+                  <i :class="['fa-solid fa-gas-pump text-sm mb-2', isLambo ? 'text-amber-400' : 'text-blue-600']"></i>
+                  <div>
+                    <span class="text-[10px] uppercase tracking-wider font-bold text-slate-400 block">Fuel Engine</span>
+                    <span class="text-xs font-extrabold mt-0.5 block truncate">
+                      {{ vehicleStore.vehicle.fuelType || 'Gasoline' }}
+                    </span>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <div class="pt-2 flex flex-wrap items-center gap-y-2 gap-x-6 text-xs text-slate-500">
+              <div class="flex items-center gap-2">
+                <i class="fa-solid fa-check text-emerald-500"></i>
+                <span>Free Cancellation</span>
+              </div>
+              <div class="flex items-center gap-2">
+                <i class="fa-solid fa-check text-emerald-500"></i>
+                <span>Unlimited Mileage</span>
+              </div>
+              <div class="flex items-center gap-2">
+                <i class="fa-solid fa-check text-emerald-500"></i>
+                <span>Basic Coverage Included</span>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- RIGHT: RESERVATION FORM CONTAINER -->
+        <div
+          :class="[
+            'lg:col-span-5 rounded-3xl border p-6 sm:p-7 lg:sticky lg:top-8 transition-all',
+            isLambo
+              ? 'bg-slate-900/80 border-slate-800 backdrop-blur-xl shadow-2xl'
+              : 'bg-white border-slate-200/80 shadow-xs'
+          ]"
+        >
+          <div class="flex items-center justify-between gap-4 pb-5 mb-6 border-b border-slate-100 dark:border-slate-800">
+            <div class="flex items-center gap-3">
+              <div
+                :class="[
+                  'w-10 h-10 rounded-xl flex items-center justify-center shrink-0',
+                  isLambo ? 'bg-amber-500/10 text-amber-400' : 'bg-blue-50 text-blue-600'
+                ]"
+              >
+                <i class="fa-regular fa-calendar-check text-base"></i>
+              </div>
+              <div>
+                <h3 class="font-extrabold text-base">Rental Dates</h3>
+                <p class="text-xs text-slate-400">Select pickup & return schedules</p>
+              </div>
+            </div>
+          </div>
+
+          <!-- EMBEDDED BOOKING FORM -->
+          <form
+            :class="['form-card', { 'lambo-form': isLambo }]"
+            @submit.prevent="submitBooking"
+          >
+            <h2>Book Vehicle</h2>
+
+            <div class="form-group">
+              <label>Pickup Date</label>
+              <input
+                v-model="form.pickupDate"
+                type="date"
+                required
+              />
+            </div>
+
+            <div class="form-group">
+              <label>Return Date</label>
+              <input
+                v-model="form.returnDate"
+                type="date"
+                required
+              />
+            </div>
+
+            <div class="booking-summary">
+              <span>Total Days</span>
+              <strong>{{ totalDays }}</strong>
+            </div>
+
+            <div class="booking-summary">
+              <span>Total Price</span>
+              <strong>${{ totalPrice }}</strong>
+            </div>
+
+            <button
+              type="submit"
+              class="btn btn-primary btn-full"
+              :disabled="bookingLoading"
+            >
+              {{ bookingLoading ? 'Booking...' : 'Confirm Booking' }}
+            </button>
+          </form>
+
+          <div
+            :class="[
+              'mt-6 p-4 rounded-2xl border flex items-start gap-3',
+              isLambo
+                ? 'bg-slate-800/30 border-slate-800 text-slate-400'
+                : 'bg-slate-50 border-slate-100 text-slate-600'
+            ]"
+          >
+            <i class="fa-solid fa-shield-halved text-blue-500 text-sm mt-0.5 shrink-0"></i>
+            <div class="text-xs leading-relaxed">
+              <span class="font-bold block text-slate-900 dark:text-slate-200">No payment collected yet</span>
+              <p class="mt-0.5 text-slate-400">Review schedule and lock in vehicle availability before advancing to checkout.</p>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- NOT FOUND STATE -->
+      <div
+        v-else
+        class="flex flex-col items-center justify-center py-28 text-center bg-white rounded-3xl border border-slate-200/80"
+      >
+        <div class="w-14 h-14 rounded-full bg-slate-100 flex items-center justify-center mb-4 text-slate-400">
+          <i class="fa-solid fa-car-side text-xl"></i>
+        </div>
+        <h2 class="text-lg font-extrabold text-slate-800">Vehicle Not Found</h2>
+        <p class="text-xs text-slate-400 mt-1 max-w-sm">We couldn't retrieve the selected car. Please return to the fleet overview.</p>
+        <button
+          @click="router.back()"
+          class="mt-6 px-5 py-2.5 rounded-xl bg-blue-600 hover:bg-blue-700 text-white text-xs font-bold transition-all cursor-pointer"
+        >
+          Return to Fleet
+        </button>
       </div>
     </div>
   </section>
 </template>
 
 <script setup>
-import { computed, onMounted } from 'vue'
+import { computed, onMounted, reactive, ref } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
+
+// Stores
 import { useVehicleStore } from '../stores/Vehicle'
-import { useBookingStore } from '../stores/Booking'
 import { useAuthStore } from '../stores/Auth'
-import BookingForm from '../components/BookingForm.vue'
+
+// Services & Assets
+import { createBooking as createBookingApi } from '../api/booking.js'
+import { getVehiclesImage } from '../api/vehicle.js'
 import heroImage from '../assets/hero.png'
 
 const route = useRoute()
 const router = useRouter()
 
 const vehicleStore = useVehicleStore()
-const bookingStore = useBookingStore()
 const authStore = useAuthStore()
 
-const isLambo = computed(
-  () => vehicleStore.vehicle?.name === 'Lamborghini Aventador'
-)
+const vehicleImages = ref([])
+const bookingLoading = ref(false)
 
-onMounted(() => {
-  vehicleStore.fetchVehicle(route.params.vehicleId)
+const form = reactive({
+  pickupDate: '',
+  returnDate: ''
 })
 
-async function createBooking(data) {
-  try {
-    const userId = authStore.user?.id
-    const vehicleId = Number(route.params.vehicleId)
+const vehicleId = computed(() => Number(route.params.vehicleId))
 
-    if (!userId || !Number.isInteger(vehicleId)) {
-      throw new Error('A valid user and vehicle are required to book.')
-    }
+const isLambo = computed(() => {
+  return vehicleStore.vehicle?.name === 'Lamborghini Aventador'
+})
 
-    const booking = await bookingStore.createBooking({
-      userId,
-      vehicleId,
-      pickupDate: data.pickupDate,
-      returnDate: data.returnDate
+function formatImageUrl(rawPath) {
+  if (!rawPath || typeof rawPath !== 'string') return null
+  const path = rawPath.trim()
+  if (!path) return null
+
+  if (
+    path.startsWith('http://') ||
+    path.startsWith('https://') ||
+    path.startsWith('data:')
+  ) {
+    return path
+  }
+
+  const cleanPath = path.startsWith('/') ? path : `/${path}`
+  return `http://localhost:8080${cleanPath}`
+}
+
+function extractRawImagePath(img) {
+  if (!img) return null
+  if (typeof img === 'string') return img
+  return img.mainImage || img.image || img.imageUrl || img.url || img.path || img.imagePath || null
+}
+
+const vehicleImage = computed(() => {
+  const vehicle = vehicleStore.vehicle
+  if (!vehicle) return heroImage
+
+  const directPath = extractRawImagePath(vehicle)
+  if (directPath) {
+    const formatted = formatImageUrl(directPath)
+    if (formatted) return formatted
+  }
+
+  if (Array.isArray(vehicle.vehicleImages) && vehicle.vehicleImages.length > 0) {
+    const raw = extractRawImagePath(vehicle.vehicleImages[0])
+    const formatted = formatImageUrl(raw)
+    if (formatted) return formatted
+  }
+
+  if (Array.isArray(vehicleImages.value) && vehicleImages.value.length > 0) {
+    const matchById = vehicleImages.value.find((img) => {
+      const imgVehicleId = Number(
+        img.vehicle_id ?? img.vehicleId ?? img.vehicle?.id ?? img.vehicle?.vehicleId
+      )
+      return imgVehicleId && imgVehicleId === vehicleId.value
     })
 
-    const bookingId = booking?.id || booking?.bookingId
+    if (matchById) {
+      const formatted = formatImageUrl(extractRawImagePath(matchById))
+      if (formatted) return formatted
+    }
+  }
+
+  return heroImage
+})
+
+function handleImageError(event) {
+  if (event.target.dataset.fallback === 'true') return
+  event.target.dataset.fallback = 'true'
+  event.target.src = heroImage
+}
+
+const totalDays = computed(() => {
+  if (!form.pickupDate || !form.returnDate) return 0
+
+  const pickup = new Date(form.pickupDate)
+  const returnDate = new Date(form.returnDate)
+
+  const diff = (returnDate - pickup) / (1000 * 60 * 60 * 24)
+  return diff > 0 ? diff : 0
+})
+
+const totalPrice = computed(() => {
+  const price = vehicleStore.vehicle?.pricePerDay || vehicleStore.vehicle?.price || 0
+  return totalDays.value * price
+})
+
+// Reliable User ID extraction across Pinia & localStorage
+function getLoggedInUserId() {
+  let id = authStore.user?.id || authStore.user?.userId || authStore.user?._id
+  if (id && !isNaN(Number(id))) return Number(id)
+
+  const storedUser = localStorage.getItem('user')
+  if (storedUser) {
+    try {
+      const parsed = JSON.parse(storedUser)
+      id = parsed?.id || parsed?.userId || parsed?._id || parsed?.user?.id
+      if (id && !isNaN(Number(id))) return Number(id)
+    } catch (e) {
+      console.error('Error reading localStorage user:', e)
+    }
+  }
+  return null
+}
+
+async function fetchVehicleImages() {
+  try {
+    const response = await getVehiclesImage()
+    const data = response?.data ?? response
+    vehicleImages.value = Array.isArray(data)
+      ? data
+      : Array.isArray(data?.data)
+        ? data.data
+        : []
+  } catch (error) {
+    console.error('Failed to fetch vehicle images:', error)
+    vehicleImages.value = []
+  }
+}
+
+async function submitBooking() {
+  if (totalDays.value <= 0) {
+    alert('Return date must be after pickup date.')
+    return
+  }
+
+  const userId = getLoggedInUserId()
+  const currentVehicleId = Number(
+    vehicleStore.vehicle?.id ?? vehicleStore.vehicle?.vehicleId ?? vehicleId.value
+  )
+
+  if (!Number.isInteger(userId) || userId <= 0) {
+    alert('User information is missing. Please login again.')
+    router.push('/login')
+    return
+  }
+
+  if (!Number.isInteger(currentVehicleId) || currentVehicleId <= 0) {
+    alert('Vehicle information is invalid.')
+    return
+  }
+
+  bookingLoading.value = true
+
+  try {
+    // Calling createBooking directly from ../api/booking.js
+    const response = await createBookingApi({
+      userId,
+      vehicleId: currentVehicleId,
+      pickupDate: form.pickupDate,
+      returnDate: form.returnDate
+    })
+
+    const booking = response?.data ?? response
+    const bookingId = booking?.id ?? booking?.bookingId
 
     if (!bookingId) {
-      throw new Error('Booking was created without an id.')
+      throw new Error('Booking was created, but booking ID was not returned.')
     }
 
     router.push(`/payment/${bookingId}`)
   } catch (error) {
-    alert(
-      error.response?.data?.message ||
-        error.message ||
-        'Failed to create booking'
-    )
-  }
+  console.error('Create booking error:', error)
+
+  console.error('Backend response:', error.response?.data)
+
+  alert(
+    error.response?.data?.message ||
+    error.response?.data?.error ||
+    error.message ||
+    'Failed to create booking.'
+  )
+} finally {
+  bookingLoading.value = false
 }
+}
+
+onMounted(async () => {
+  if (!Number.isInteger(vehicleId.value) || vehicleId.value <= 0) {
+    console.error('Invalid vehicle ID:', route.params.vehicleId)
+    return
+  }
+
+  try {
+    await Promise.all([
+      vehicleStore.fetchVehicle(vehicleId.value),
+      fetchVehicleImages()
+    ])
+  } catch (error) {
+    console.error('Failed to load vehicle details:', error)
+  }
+})
 </script>
 
 <style scoped>
-.lambo-booking {
-  background:
-    radial-gradient(
-      circle at top left,
-      rgba(255, 145, 32, 0.2),
-      transparent 32%
-    ),
-    linear-gradient(135deg, #120d0a 0%, #1f1a17 100%);
+.form-card {
+  display: flex;
+  flex-direction: column;
+  gap: 18px;
+  background: #ffffff;
+  border: 1px solid #e5e7eb;
+  border-radius: 24px;
+  padding: 28px;
+  box-shadow: 0 14px 30px rgba(15, 23, 42, 0.06);
 }
 
-.lambo-container {
-  max-width: 1200px;
+.form-card h2 {
+  margin: 0 0 6px;
+  font-size: 2rem;
+  color: #111827;
 }
 
-.booking-shell {
-  display: grid;
-  gap: 24px;
+.form-group {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
 }
 
-.lambo-shell {
-  grid-template-columns: 1.2fr 0.9fr;
-  align-items: stretch;
+.form-group label {
+  font-size: 0.88rem;
+  font-weight: 600;
+  color: #374151;
 }
 
-.booking-vehicle {
+.form-group input {
+  border: 1px solid #d1d5db;
+  border-radius: 14px;
+  background: #f9fafb;
+  padding: 13px 14px;
+  font-size: 1rem;
+  color: #111827;
+}
+
+.booking-summary {
   display: flex;
   align-items: center;
-  gap: 18px;
-  background: rgba(255, 255, 255, 0.04);
-  border: 1px solid rgba(255, 255, 255, 0.08);
-  border-radius: 26px;
-  padding: 18px;
+  justify-content: space-between;
+  background: #f5f5f5;
+  border: 1px solid #e5e7eb;
+  border-radius: 14px;
+  padding: 14px 16px;
+  font-size: 1rem;
+  color: #374151;
 }
 
-.lambo-vehicle {
+.booking-summary strong {
+  color: #111827;
+  font-size: 1.2rem;
+}
+
+.btn-primary {
+  background: linear-gradient(135deg, #111827 0%, #1f2937 100%);
+  color: #fff;
+  border: none;
+  border-radius: 14px;
+  padding: 14px 18px;
+  font-weight: 700;
+  cursor: pointer;
+}
+
+.btn-primary:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+.lambo-form {
   background: linear-gradient(
     180deg,
-    rgba(255, 123, 0, 0.18),
-    rgba(0, 0, 0, 0.1)
+    rgba(33, 18, 9, 0.97),
+    rgba(17, 17, 17, 0.98)
   );
-  border-color: rgba(255, 162, 76, 0.45);
-  box-shadow: 0 18px 40px rgba(255, 125, 32, 0.18);
+  border: 1px solid rgba(255, 147, 63, 0.35);
+  box-shadow: 0 24px 48px rgba(255, 120, 25, 0.2);
 }
 
-.booking-vehicle img {
-  width: 200px;
-  height: 120px;
-  object-fit: cover;
-  border-radius: 18px;
-}
-
-.vehicle-meta h2 {
-  margin: 0;
-  font-size: clamp(1.5rem, 2vw, 2.2rem);
+.lambo-form h2 {
   color: #fff;
 }
 
-.vehicle-meta p {
-  margin: 8px 0 0;
-  color: #ffbf7a;
-  font-size: 1.15rem;
-  font-weight: 700;
+.lambo-form .form-group label {
+  color: #f4d7b8;
+}
+
+.lambo-form .form-group input {
+  background: rgba(255, 255, 255, 0.04);
+  border-color: rgba(255, 170, 90, 0.38);
+  color: #fff;
+}
+
+.lambo-form .booking-summary {
+  background: rgba(255, 255, 255, 0.04);
+  border-color: rgba(255, 170, 90, 0.22);
+  color: #f4d7b8;
+}
+
+.lambo-form .booking-summary strong {
+  color: #fff;
+}
+
+.lambo-form .btn-primary {
+  background: linear-gradient(
+    135deg,
+    #ff9f43 0%,
+    #ff6b00 100%
+  );
+  color: #1b120d;
+  box-shadow: 0 12px 24px rgba(255, 112, 44, 0.35);
 }
 
 @media (max-width: 768px) {
-  .lambo-shell {
-    grid-template-columns: 1fr;
-  }
-
-  .booking-vehicle {
-    flex-direction: column;
-    text-align: center;
+  .form-card {
+    padding: 20px 16px;
   }
 }
 </style>

@@ -21,7 +21,6 @@ export const useAuthStore = defineStore('auth', {
   },
 
   actions: {
-
     // ================================
     // Login
     // ================================
@@ -31,31 +30,34 @@ export const useAuthStore = defineStore('auth', {
 
       try {
         const response = await loginApi(form)
+        // Extract data payload (handling Axios response wrapper)
+        const loginData = response?.data ?? response
 
-        const loginData = response.data
+        console.log('Login response:', response)
+        console.log('Login data:', loginData)
 
-        this.token = loginData.token
+        // Extract token
+        const token = loginData.token || loginData.accessToken
+        if (token) {
+          this.token = token
+          localStorage.setItem('token', token)
+        }
 
-        localStorage.setItem('token', loginData.token)
+        // Extract user object with multiple fallback structures
+        const userData = loginData.user || loginData.userData || (loginData.id ? loginData : null)
 
-        if (loginData.user) {
-          this.user = loginData.user
-
-          localStorage.setItem(
-            'user',
-            JSON.stringify(loginData.user)
-          )
+        if (userData) {
+          this.user = userData
+          localStorage.setItem('user', JSON.stringify(userData))
         }
 
         return response
-
       } catch (error) {
         this.error =
           error.response?.data?.message ||
           'Login failed. Please check your email and password.'
 
         throw error
-
       } finally {
         this.loading = false
       }
@@ -70,14 +72,12 @@ export const useAuthStore = defineStore('auth', {
 
       try {
         return await registerApi(form)
-
       } catch (error) {
         this.error =
           error.response?.data?.message ||
           'Registration failed.'
 
         throw error
-
       } finally {
         this.loading = false
       }
@@ -92,14 +92,12 @@ export const useAuthStore = defineStore('auth', {
 
       try {
         return await verifyOtpApi(form)
-
       } catch (error) {
         this.error =
           error.response?.data?.message ||
           'OTP verification failed.'
 
         throw error
-
       } finally {
         this.loading = false
       }
@@ -114,14 +112,12 @@ export const useAuthStore = defineStore('auth', {
 
       try {
         return await forgotPasswordApi(form)
-
       } catch (error) {
         this.error =
           error.response?.data?.message ||
           'Failed to send password reset link.'
 
         throw error
-
       } finally {
         this.loading = false
       }
@@ -136,14 +132,12 @@ export const useAuthStore = defineStore('auth', {
 
       try {
         return await resetPasswordApi(form)
-
       } catch (error) {
         this.error =
           error.response?.data?.message ||
           'Failed to reset password.'
 
         throw error
-
       } finally {
         this.loading = false
       }

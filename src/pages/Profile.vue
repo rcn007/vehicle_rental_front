@@ -147,7 +147,7 @@
                 <label class="block text-xs font-semibold uppercase tracking-wider text-slate-600">Full Name</label>
                 <div class="relative">
                   <span class="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none text-slate-400">
-                    <i class="fa-regular fa-user text-sm"></i>
+                   
                   </span>
                   <input 
                     v-model="form.name" 
@@ -164,7 +164,7 @@
                 <label class="block text-xs font-semibold uppercase tracking-wider text-slate-600">Email Address</label>
                 <div class="relative">
                   <span class="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none text-slate-400">
-                    <i class="fa-regular fa-envelope text-sm"></i>
+                    
                   </span>
                   <input 
                     v-model="form.email" 
@@ -181,7 +181,7 @@
                 <label class="block text-xs font-semibold uppercase tracking-wider text-slate-600">Gender</label>
                 <div class="relative">
                   <span class="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none text-slate-400">
-                    <i class="fa-solid fa-venus-mars text-sm"></i>
+                   
                   </span>
                   <select 
                     v-model="form.gender" 
@@ -201,7 +201,7 @@
                 <label class="block text-xs font-semibold uppercase tracking-wider text-slate-600">Phone Number</label>
                 <div class="relative">
                   <span class="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none text-slate-400">
-                    <i class="fa-solid fa-phone text-sm"></i>
+                   
                   </span>
                   <input 
                     v-model="form.tell" 
@@ -231,7 +231,7 @@
                 <label class="block text-xs font-semibold uppercase tracking-wider text-slate-600">Telegram Chat ID</label>
                 <div class="relative">
                   <span class="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none text-slate-400">
-                    <i class="fa-solid fa-paper-plane text-sm"></i>
+                   
                   </span>
                   <input 
                     v-model="form.telegramChatId" 
@@ -277,7 +277,7 @@
 
 <script setup>
 import { ref, onMounted } from 'vue'
-import { getUserById, updateUser } from '../api/user'
+import {  updateUser, getLoggedInAdminProfile } from '../api/user'
 
 const loading = ref(true)
 const saving = ref(false)
@@ -357,35 +357,7 @@ const fetchUserProfile = async () => {
   loading.value = true
 
   try {
-    // Get the ID of the account that logged in
-    const savedUserId = localStorage.getItem('userId')
-    const role = localStorage.getItem('role')
-
-    console.log('Profile User ID:', savedUserId)
-    console.log('Profile Role:', role)
-
-    // Only ADMIN can use this page
-    if (!savedUserId || role !== 'ADMIN') {
-      showToast('No logged-in admin account found.', 'error')
-      return
-    }
-
-    userId.value = Number(savedUserId)
-
-    // Fetch the exact logged-in user
-    const response = await getUserById(userId.value)
-
-    console.log('Profile API Response:', response)
-
-    // Handle:
-    // response.data
-    // or
-    // response.data.data
-    const data = response?.data ?? response
-
-    const userData = data?.data !== undefined
-      ? data.data
-      : data
+    const userData = await getLoggedInAdminProfile()
 
     console.log('Logged-in Admin Profile:', userData)
 
@@ -393,6 +365,8 @@ const fetchUserProfile = async () => {
       showToast('Admin profile not found.', 'error')
       return
     }
+
+    userId.value = userData.id
 
     form.value = {
       name: userData.name || '',
@@ -407,10 +381,12 @@ const fetchUserProfile = async () => {
     }
 
   } catch (error) {
-    console.error('Failed to fetch user:', error)
+    console.error('Failed to fetch admin profile:', error)
 
     showToast(
-      error?.response?.data?.message || 'Failed to load user profile.',
+      error?.response?.data?.message ||
+      error?.message ||
+      'Failed to load user profile.',
       'error'
     )
   } finally {
