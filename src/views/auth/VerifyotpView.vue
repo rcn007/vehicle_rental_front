@@ -11,6 +11,10 @@
         Enter the OTP sent to your email.
       </p>
 
+      <div v-if="route.query.message" class="error-message success-message">
+        {{ route.query.message }}
+      </div>
+
       <form @submit.prevent="verify">
         <div class="form-group">
           <label>Email</label>

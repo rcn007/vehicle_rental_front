@@ -1,6 +1,6 @@
 <template>
-  <section class="section">
-    <div class="container narrow">
+  <section class="section booking-page">
+    <div class="container booking-container">
       <div class="page-header">
         <p class="section-label">BOOKING</p>
         <h1>Book Your Vehicle</h1>
@@ -15,15 +15,30 @@
             :alt="vehicleStore.vehicle.name"
           />
 
-          <div>
+          <div class="booking-vehicle-details">
             <h2>{{ vehicleStore.vehicle.name }}</h2>
-            <p>
-              ${{
-                vehicleStore.vehicle.pricePerDay ||
-                vehicleStore.vehicle.price ||
-                0
-              }}
-              / day
+
+            <div class="booking-vehicle-specs">
+              <span>
+                <Users :size="18" />
+                {{ vehicleStore.vehicle.seats || 5 }} Seats
+              </span>
+              <span>
+                <BriefcaseBusiness :size="18" />
+                {{ vehicleStore.vehicle.bags || 3 }} Bags
+              </span>
+              <span>
+                <Fuel :size="18" />
+                {{ vehicleStore.vehicle.fuelType || 'Petrol' }}
+              </span>
+              <span>
+                <SlidersHorizontal :size="18" />
+                {{ vehicleStore.vehicle.transmission || 'Automatic' }}
+              </span>
+            </div>
+
+            <p class="booking-vehicle-price">
+              <strong>${{ dailyPrice }}</strong> / day
             </p>
           </div>
         </div>
@@ -39,7 +54,13 @@
 </template>
 
 <script setup>
-import { onMounted } from 'vue'
+import { computed, onMounted } from 'vue'
+import {
+  BriefcaseBusiness,
+  Fuel,
+  SlidersHorizontal,
+  Users,
+} from '@lucide/vue'
 import { useRoute, useRouter } from 'vue-router'
 import { useVehicleStore } from '../stores/Vehicle'
 import { useBookingStore } from '../stores/Booking'
@@ -54,24 +75,37 @@ const vehicleStore = useVehicleStore()
 const bookingStore = useBookingStore()
 const authStore = useAuthStore()
 
+const dailyPrice = computed(
+  () =>
+    vehicleStore.vehicle?.pricePerDay ||
+    vehicleStore.vehicle?.price ||
+    0
+)
+
 onMounted(() => {
   vehicleStore.fetchVehicle(route.params.vehicleId)
 })
 
 async function createBooking(data) {
   try {
-    const userId = authStore.user?.id
     const vehicleId = Number(route.params.vehicleId)
 
-    if (!userId || !Number.isInteger(vehicleId)) {
-      throw new Error('A valid user and vehicle are required to book.')
+    if (!authStore.isAuthenticated || !Number.isInteger(vehicleId)) {
+      throw new Error('Please sign in before booking this vehicle.')
     }
 
     const booking = await bookingStore.createBooking({
-      userId,
       vehicleId,
+      vehicleName: vehicleStore.vehicle.name,
+      vehicleImage: vehicleStore.vehicle.image,
       pickupDate: data.pickupDate,
-      returnDate: data.returnDate
+      returnDate: data.returnDate,
+      pickupLocation: data.pickupLocation,
+      returnLocation: data.returnLocation,
+      pickupTime: data.pickupTime,
+      returnTime: data.returnTime,
+      totalDays: data.totalDays,
+      totalPrice: data.totalPrice
     })
 
     const bookingId = booking?.id || booking?.bookingId
@@ -80,7 +114,10 @@ async function createBooking(data) {
       throw new Error('Booking was created without an id.')
     }
 
-    router.push(`/payment/${bookingId}`)
+    router.push({
+      path: `/payment/${bookingId}`,
+      query: { amount: booking?.totalPrice || data.totalPrice },
+    })
   } catch (error) {
     alert(
       error.response?.data?.message ||

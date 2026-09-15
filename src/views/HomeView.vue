@@ -3,10 +3,10 @@
     <section class="hero-customer">
       <div class="container hero-inner">
         <div class="hero-copy">
-          <!-- <div class="availability-pill">
+          <div class="availability-pill">
             <span></span>
             500+ Vehicles Available Now
-          </div> -->
+          </div>
 
           <h1>
             Rent Your Perfect Vehicle
@@ -149,7 +149,7 @@ const stats = [
 const categories = [
   {
     name: 'Sedan',
-    copy: '120+ cars · From $45/day',
+    copy: '120+ cars · From $0.1/day',
     icon: Car,
     image:
       'https://images.unsplash.com/photo-1492144534655-ae79c964c9d7?auto=format&fit=crop&w=900&q=80'

@@ -74,6 +74,20 @@
         <button class="btn btn-primary btn-full" :disabled="auth.loading">
           {{ auth.loading ? 'Signing in...' : 'Sign In' }}
         </button>
+
+        <div class="auth-divider">
+          <span>OR</span>
+        </div>
+
+        <button
+          type="button"
+          class="google-login-button"
+          :disabled="auth.loading"
+          @click="continueWithGoogle"
+        >
+          <img src="../../assets/google-icon.svg" alt="" />
+          <span>{{ auth.loading ? 'Opening Google...' : 'Continue with Google' }}</span>
+        </button>
       </form>
 
       <p class="auth-bottom">
@@ -108,6 +122,14 @@ async function login() {
     const redirect = route.query.redirect || '/'
 
     router.push(redirect)
+  } catch {
+    // Error is stored in auth store.
+  }
+}
+
+async function continueWithGoogle() {
+  try {
+    await auth.startGoogleLogin()
   } catch {
     // Error is stored in auth store.
   }

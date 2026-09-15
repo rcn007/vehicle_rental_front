@@ -11,6 +11,20 @@ function saveDemoBookings(bookings) {
   localStorage.setItem(demoBookingsKey, JSON.stringify(bookings))
 }
 
+function createLocalBooking(data) {
+  const bookings = getDemoBookings()
+  const booking = {
+    id: Date.now(),
+    ...data,
+    status: 'Pending',
+  }
+
+  bookings.unshift(booking)
+  saveDemoBookings(bookings)
+
+  return { booking, bookings }
+}
+
 export const useBookingStore = defineStore('booking', {
   state: () => ({
     bookings: [],
@@ -34,15 +48,7 @@ export const useBookingStore = defineStore('booking', {
           throw error
         }
 
-        const bookings = getDemoBookings()
-        const booking = {
-          id: Date.now(),
-          ...data,
-          status: 'Confirmed',
-        }
-
-        bookings.unshift(booking)
-        saveDemoBookings(bookings)
+        const { booking, bookings } = createLocalBooking(data)
 
         this.booking = booking
         this.bookings = bookings
@@ -55,18 +61,25 @@ export const useBookingStore = defineStore('booking', {
 
     async fetchBookings() {
       this.loading = true
+      this.error = null
 
       try {
         const response = await api.get('/bookings')
+        const apiBookings = response.data?.data || response.data || []
+        const localBookings = getDemoBookings()
 
-        this.bookings = response.data?.data || response.data || []
+        this.bookings = [...apiBookings, ...localBookings].filter(
+          (booking, index, bookings) =>
+            bookings.findIndex((item) => String(item.id) === String(booking.id)) === index
+        )
 
         return this.bookings
       } catch (error) {
-        if (localStorage.getItem('token') !== 'frontend-demo-token') {
-          throw error
-        }
-
+        this.error =
+          error.response?.data?.message ||
+          error.response?.data?.error ||
+          (typeof error.response?.data === 'string' ? error.response.data : '') ||
+          'Could not load bookings'
         this.bookings = getDemoBookings()
 
         return this.bookings
@@ -76,11 +89,23 @@ export const useBookingStore = defineStore('booking', {
     },
 
     async fetchBooking(id) {
-      const response = await api.get(`/bookings/${id}`)
+      try {
+        const response = await api.get(`/bookings/${id}`)
 
-      this.booking = response.data?.data || response.data
+        this.booking = response.data?.data || response.data
 
-      return this.booking
+        return this.booking
+      } catch (error) {
+        if (localStorage.getItem('token') !== 'frontend-demo-token') {
+          throw error
+        }
+
+        this.booking =
+          getDemoBookings().find((booking) => String(booking.id) === String(id)) ||
+          null
+
+        return this.booking
+      }
     },
 
     async cancelBooking(id) {

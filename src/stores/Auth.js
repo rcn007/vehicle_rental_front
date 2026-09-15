@@ -49,7 +49,10 @@ export const useAuthStore = defineStore('auth', {
           return payload
         }
 
-        const response = await api.post('/auth/login', data)
+        const response = await api.post('/auth/login', {
+          email: data.email?.trim().toLowerCase(),
+          pwd: data.password || data.pwd,
+        })
         const payload = response.data?.data || response.data
 
         this.token = payload.token || payload.accessToken
@@ -63,7 +66,12 @@ export const useAuthStore = defineStore('auth', {
 
         return payload
       } catch (error) {
-        this.error = error.response?.data?.message || 'Login failed'
+        const errorBody = error.response?.data
+        this.error =
+          errorBody?.message ||
+          errorBody?.error ||
+          (typeof errorBody === 'string' ? errorBody : '') ||
+          'Login failed'
         throw error
       } finally {
         this.loading = false
@@ -78,7 +86,12 @@ export const useAuthStore = defineStore('auth', {
         const response = await api.post('/auth/register', data)
         return response.data?.data || response.data
       } catch (error) {
-        this.error = error.response?.data?.message || 'Registration failed'
+        const errorBody = error.response?.data
+        this.error =
+          errorBody?.message ||
+          errorBody?.error ||
+          (typeof errorBody === 'string' ? errorBody : '') ||
+          'Registration failed'
         throw error
       } finally {
         this.loading = false
@@ -86,8 +99,38 @@ export const useAuthStore = defineStore('auth', {
     },
 
     async verifyOtp(data) {
-      const response = await api.post('/auth/verify-otp', data)
+      const response = await api.post('/auth/verifyOtp', data)
       return response.data?.data || response.data
+    },
+
+    async startGoogleLogin() {
+      this.loading = true
+      this.error = null
+
+      try {
+        const response = await api.get('/auth/google')
+        const googleUrl = response.data?.data || response.data
+
+        window.location.href = googleUrl
+      } catch (error) {
+        this.error = error.response?.data?.message || 'Google login failed'
+        throw error
+      } finally {
+        this.loading = false
+      }
+    },
+
+    finishGoogleLogin(payload) {
+      this.token = payload.token
+      this.user = {
+        id: payload.id,
+        name: payload.name,
+        email: payload.email,
+        role: payload.role,
+      }
+
+      localStorage.setItem('token', this.token)
+      localStorage.setItem('user', JSON.stringify(this.user))
     },
 
     logout() {
