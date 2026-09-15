@@ -61,64 +61,81 @@ const routes = [
   // Main Customer Layout Routes
   // -------------------------------------------------------------
   {
-    path: '/',
-    component: () => import('../layouts/MainLayout.vue'),
-    children: [
-      {
-        path: '',
-        name: 'home',
-        component: HomeView
-      },
-      {
-        path: 'vehicles',
-        name: 'vehicles',
-        component: VehiclesView
-      },
-      {
-        path: 'vehicles/:id',
-        name: 'vehicle-detail',
-        component: VehicleDetailView
-      },
-      {
-        path: 'booking/:vehicleId',
-        name: 'booking',
-        component: BookingView,
-        meta: { requiresAuth: true }
-      },
-      {
-        path: 'payment/:bookingId',
-        name: 'payment',
-        component: PaymentView,
-        meta: { requiresAuth: true }
-      },
-      {
-        path: 'my-bookings',
-        name: 'my-bookings',
-        component: MyBookingsView
-      },
-      {
-        path: 'rental-history',
-        name: 'rental-history',
-        component: RentalHistoryView
-      },
-      {
-        path: 'locations',
-        name: 'locations',
-        component: LocationView
-      },
-      {
-        path: 'contact',
-        name: 'contact',
-        component: ContactView
-      },
-      {
-        path: 'profile',
-        name: 'profile',
-        component: ProfileView,
-        meta: { requiresAuth: true }
+  path: '/',
+  component: () => import('../layouts/MainLayout.vue'),
+  children: [
+    {
+      path: '',
+      name: 'home',
+      component: HomeView
+    },
+    {
+      path: 'vehicles',
+      name: 'vehicles',
+      component: VehiclesView
+    },
+    {
+      path: 'vehicles/:id',
+      name: 'vehicle-detail',
+      component: VehicleDetailView
+    },
+    {
+      path: 'booking/:vehicleId',
+      name: 'booking',
+      component: BookingView,
+      meta: {
+        requiresAuth: true,
+        roles: ['CLIENT']
       }
-    ]
-  },
+    },
+    {
+      path: 'payment/:bookingId',
+      name: 'payment',
+      component: PaymentView,
+      meta: {
+        requiresAuth: true,
+        roles: ['CLIENT']
+      }
+    },
+    {
+      path: 'my-bookings',
+      name: 'my-bookings',
+      component: MyBookingsView,
+      meta: {
+        requiresAuth: true,
+        roles: ['CLIENT']
+      }
+    },
+    {
+      path: 'rental-history',
+      name: 'rental-history',
+      component: RentalHistoryView,
+      meta: {
+        requiresAuth: true,
+        roles: ['CLIENT']
+      }
+    },
+    {
+      path: 'locations',
+      name: 'locations',
+      component: LocationView
+    },
+    {
+      path: 'contact',
+      name: 'contact',
+      component: ContactView
+    },
+    {
+      path: 'profile',
+      name: 'profile',
+      component: ProfileView,
+      meta: {
+        requiresAuth: true,
+        roles: ['CLIENT', 'ADMIN']
+      }
+    }
+  ]
+},
 
   // -------------------------------------------------------------
   // Authentication Routes
@@ -167,7 +184,10 @@ const routes = [
   {
     path: '/admin',
     component: () => import('../layouts/AdminLayout.vue'),
-    meta: { requiresAdmin: true },
+    meta: {
+    requiresAuth: true,
+    roles: ['ADMIN']
+    },
     children: [
       {
         path: '',

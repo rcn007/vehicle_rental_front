@@ -40,6 +40,7 @@ export const useAuthStore = defineStore('auth', {
 
         if (loginData.user) {
           this.user = loginData.user
+
           localStorage.setItem(
             'user',
             JSON.stringify(loginData.user)
@@ -159,9 +160,13 @@ export const useAuthStore = defineStore('auth', {
     // Logout
     // ================================
     logout() {
+      // Clear Pinia state
       this.user = null
       this.token = null
+      this.error = null
+      this.loading = false
 
+      // Clear authentication data
       localStorage.removeItem('token')
       localStorage.removeItem('user')
     }

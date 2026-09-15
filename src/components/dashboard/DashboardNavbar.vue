@@ -90,42 +90,42 @@
       </button>
 
 
-      <!-- Profile Section Link -->
-      <router-link
-        to="/admin/profile_user"
-        class="flex items-center gap-3
-        font-medium text-sm
-        text-[#111827] dark:text-white
-        bg-white dark:bg-[#1E293B]
-        px-3 py-1.5
-        rounded-lg
-        border border-[#D3DAEF] dark:border-slate-600
-        shadow-sm
-        hover:border-gray-500 dark:hover:border-slate-500
-        transition-colors
-        cursor-pointer"
-      >
-
-        <img
-          :src="userProfile?.profileImage || defaultAvatar"
-          alt="Avatar"
-          class="w-7 h-7 rounded-full object-cover"
+        <!-- Profile -->
+        <router-link
+          to="/admin/profile_user"
+          class="flex items-center gap-3 font-medium text-sm text-[#111827] dark:text-white bg-white dark:bg-[#1E293B] px-3 py-1.5 rounded-lg border border-[#D3DAEF] dark:border-slate-600 shadow-sm hover:border-gray-500 dark:hover:border-slate-500 transition-colors cursor-pointer"
         >
+          <!-- Profile Image -->
+          <img
+            v-if="userProfile?.profileImage"
+            :src="userProfile.profileImage"
+            alt="Profile"
+            class="w-7 h-7 rounded-full object-cover"
+          >
 
-        <span>
-          {{ userProfile?.name || 'Admin' }}
-        </span>
+          <!-- Initial when no profile image -->
+          <div
+            v-else
+            :class="[
+              'w-7 h-7 rounded-full flex items-center justify-center text-white text-xs font-bold shrink-0',
+              getAvatarColor(userProfile?.name)
+            ]"
+          >
+            {{ getInitial(userProfile?.name) }}
+          </div>
 
-      </router-link>
-
+          <!-- User name -->
+          <span>
+            {{ userProfile?.name || 'Admin' }}
+          </span>
+        </router-link>
     </div>
   </header>
 </template>
 
-
 <script setup>
 import { ref, onMounted } from 'vue'
-import { getUser } from '../../api/user'
+import { getUserById } from '../../api/user'
 import { useTheme } from '../../composables/useTheme'
 
 defineEmits(['search', 'notification-click'])
@@ -133,34 +133,70 @@ defineEmits(['search', 'notification-click'])
 const searchQuery = ref('')
 const userProfile = ref(null)
 
-const defaultAvatar =
-  'https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=100'
-
-
-// Dark / Light Mode
 const {
   isDark,
   initTheme,
   toggleTheme
 } = useTheme()
 
+async function loadLoggedInAdmin() {
+  try {
+    const userId = localStorage.getItem('userId')
+    const role = localStorage.getItem('role')
+
+    console.log('Logged-in user ID:', userId)
+    console.log('Logged-in role:', role)
+
+    if (!userId || role !== 'ADMIN') {
+      console.warn('No logged-in admin found')
+      return
+    }
+
+    const response = await getUserById(userId)
+
+    console.log('Admin user response:', response)
+
+    const data = response?.data ?? response
+
+    userProfile.value = data
+  } catch (error) {
+    console.error('Failed to load logged-in admin:', error)
+  }
+}
+
+function getInitial(name) {
+  if (!name) return 'A'
+
+  return name.trim().charAt(0).toUpperCase()
+}
+
+function getAvatarColor(name) {
+  const colors = [
+    'bg-blue-500',
+    'bg-purple-500',
+    'bg-green-500',
+    'bg-orange-500',
+    'bg-pink-500',
+    'bg-indigo-500',
+    'bg-teal-500',
+    'bg-red-500'
+  ]
+
+  if (!name) {
+    return 'bg-slate-500'
+  }
+
+  let hash = 0
+
+  for (let i = 0; i < name.length; i++) {
+    hash = name.charCodeAt(i) + ((hash << 5) - hash)
+  }
+
+  return colors[Math.abs(hash) % colors.length]
+}
 
 onMounted(async () => {
-
-  // Load saved theme
   initTheme()
-
-  // Load user profile
-  try {
-    const data = await getUser()
-
-    // If endpoint returns an array or object
-    userProfile.value = Array.isArray(data)
-      ? data[0]
-      : data
-
-  } catch (error) {
-    console.error('Failed to load user profile:', error)
-  }
+  await loadLoggedInAdmin()
 })
 </script>

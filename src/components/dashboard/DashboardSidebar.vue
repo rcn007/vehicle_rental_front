@@ -4,21 +4,36 @@
   >
     
     <!-- Branding Header -->
-    <div
-      class="flex items-center gap-3 px-6 h-16 border-b border-gray-800 shrink-0"
-    >
+     
       <div
-        class="w-8 h-8 bg-gray-900 rounded-md flex items-center justify-center text-white shrink-0"
+        class="flex items-center gap-3 px-6 h-16 border-b border-gray-800 shrink-0"
       >
-        <i class="fa-solid fa-car-side text-sm"></i>
+        <div class="flex items-center gap-3 min-w-0">
+          <div
+            class="w-8 h-8 rounded-md flex items-center justify-center text-white shrink-0 overflow-hidden"
+          >
+            <img
+              v-if="logoUrl"
+              :src="logoUrl"
+              :alt="siteName"
+              class="w-full h-full object-contain"
+            />
+
+            <i
+              v-else
+              class="fa-solid fa-car-side text-sm"
+            ></i>
+          </div>
+
+          <span
+            class="text-base font-extrabold tracking-tight text-white truncate"
+          >
+            {{ siteName }}
+          </span>
+        </div>
       </div>
 
-      <span
-        class="text-base font-extrabold tracking-tight  text-white"
-      >
-        ChoulTv
-      </span>
-    </div>
+  
 
     <!-- Navigation List -->
     <nav class="flex-1 px-3 py-4 overflow-y-auto custom-scrollbar">
@@ -96,7 +111,13 @@
 </template>
 
 <script setup>
+import { onMounted, ref } from 'vue'
+import { getCustomizerSettings } from '../../api/customizer'
+
 defineEmits(['logout'])
+
+const siteName = ref('ChoulTv')
+const logoUrl = ref('')
 
 const menuItems = [
   {
@@ -150,4 +171,38 @@ const menuItems = [
     icon: 'fa-solid fa-gear'
   }
 ]
+
+function getResponseData(response) {
+  const data = response?.data ?? response
+
+  if (data?.data !== undefined) {
+    return data.data
+  }
+
+  return data
+}
+
+async function fetchCustomizer() {
+  try {
+    const response = await getCustomizerSettings()
+
+    const data = getResponseData(response)
+
+    console.log('Customizer:', data)
+
+    if (data?.websiteName) {
+      siteName.value = data.websiteName
+    }
+
+    if (data?.logo) {
+      logoUrl.value = data.logo
+    }
+  } catch (error) {
+    console.error('Failed to fetch customizer settings:', error)
+  }
+}
+
+onMounted(() => {
+  fetchCustomizer()
+})
 </script>

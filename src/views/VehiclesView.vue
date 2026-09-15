@@ -7,11 +7,20 @@
       </div>
 
       <div class="mobile-search">
-        <SearchBar mobile @search="handleSearch" />
+        <SearchBar
+          mobile
+          :categories="categories"
+          :brands="brands"
+          @search="handleSearch"
+        />
       </div>
 
       <div class="vehicles-layout">
-        <SearchBar @search="handleSearch" />
+        <SearchBar
+          :categories="categories"
+          :brands="brands"
+          @search="handleSearch"
+        />
 
         <div class="vehicles-results">
           <div class="hero-search vehicle-search">
@@ -58,17 +67,50 @@
             Loading vehicles...
           </div>
 
-          <div v-else-if="filteredVehicles.length" class="vehicle-grid">
+          <div v-else-if="paginatedVehicles.length" class="vehicle-grid">
             <VehicleCard
-              v-for="vehicle in filteredVehicles"
+              v-for="vehicle in paginatedVehicles"
               :key="vehicle.id"
               :vehicle="vehicle"
+              :image="getVehicleImage(vehicle)"
             />
           </div>
 
           <div v-else class="empty-state">
             <h3>No vehicles found</h3>
             <p>Try changing your search.</p>
+          </div>
+
+          <!-- Pagination Controls -->
+          <div v-if="totalPages > 1" class="pagination">
+            <button
+              type="button"
+              class="pagination-btn"
+              :disabled="currentPage === 1"
+              @click="goToPage(currentPage - 1)"
+            >
+              Previous
+            </button>
+
+            <button
+              v-for="page in totalPages"
+              :key="page"
+              type="button"
+              class="pagination-num"
+              :class="{ active: page === currentPage }"
+              @click="goToPage(page)"
+            >
+              {{ page }}
+            </button>
+
+            <button
+              type="button"
+              class="pagination-btn"
+              :disabled="currentPage === totalPages"
+              @click="goToPage(currentPage + 1)"
+            >
+              Next
+            </button>
           </div>
         </div>
       </div>
@@ -125,27 +167,32 @@
 </template>
 
 <script setup>
-import { computed, onMounted, reactive, ref } from 'vue'
+import { computed, onMounted, reactive, ref, watch } from 'vue'
 import { useVehicleStore } from '../stores/Vehicle'
 import { useBookingStore } from '../stores/Booking'
+import {
+  getBrand,
+  getCategory,
+  getVehiclesImage
+} from '../api/vehicle.js'
 import VehicleCard from '../components/VehicleCard.vue'
 import SearchBar from '../components/Searchbar.vue'
 
 const vehicleStore = useVehicleStore()
 const bookingStore = useBookingStore()
+
 const sortBy = ref('default')
 const filterDrawerOpen = ref(false)
 
-const categories = ['All', 'Sedan', 'SUV', 'Motorcycle', 'Luxury']
-const brands = [
-  'All',
-  'BMW',
-  'Toyota',
-  'Honda',
-  'Rolls-Royce',
-  'Audi',
-  'Harley-Davidson'
-]
+const categories = ref(['All'])
+const brands = ref(['All'])
+const vehicleImages = ref([])
+
+const loadingMeta = ref(false)
+
+// Pagination state
+const currentPage = ref(1)
+const pageSize = ref(6)
 
 const filters = reactive({
   search: '',
@@ -160,82 +207,587 @@ const draftFilters = reactive({
   brand: 'All'
 })
 
+/*
+|--------------------------------------------------------------------------
+| Normalize API response
+|--------------------------------------------------------------------------
+*/
+function getResponseData(response) {
+  const data = response?.data ?? response
+
+  if (Array.isArray(data)) {
+    return data
+  }
+
+  if (Array.isArray(data?.data)) {
+    return data.data
+  }
+
+  return []
+}
+
+async function fetchMetaData() {
+  loadingMeta.value = true
+
+  try {
+    const [brandResponse, categoryResponse, imageResponse] =
+      await Promise.all([
+        getBrand(),
+        getCategory(),
+        getVehiclesImage()
+      ])
+
+    const brandData = getResponseData(brandResponse)
+    const categoryData = getResponseData(categoryResponse)
+    const imageData = getResponseData(imageResponse)
+
+    brands.value = [
+      'All',
+      ...brandData
+        .map((brand) => brand.brandName || brand.name || brand)
+        .filter(Boolean)
+    ]
+
+    categories.value = [
+      'All',
+      ...categoryData
+        .map(
+          (category) =>
+            category.categoryName ||
+            category.name ||
+            category.category ||
+            category
+        )
+        .filter(Boolean)
+    ]
+
+    // Store all vehicle images
+    vehicleImages.value = Array.isArray(imageData)
+      ? imageData
+      : []
+
+    console.log('Vehicle images:', vehicleImages.value)
+  } catch (error) {
+    console.error('Failed to fetch vehicle metadata:', error)
+
+    categories.value = ['All']
+    brands.value = ['All']
+    vehicleImages.value = []
+  } finally {
+    loadingMeta.value = false
+  }
+}
+
+function formatImageUrl(rawPath) {
+  if (!rawPath || typeof rawPath !== 'string') {
+    return null
+  }
+
+  const path = rawPath.trim()
+
+  if (!path) {
+    return null
+  }
+
+  // Cloudinary URL or any external URL
+  if (
+    path.startsWith('http://') ||
+    path.startsWith('https://') ||
+    path.startsWith('data:')
+  ) {
+    return path
+  }
+
+  // Local backend image
+  const cleanPath = path.startsWith('/')
+    ? path
+    : `/${path}`
+
+  return `http://localhost:8080${cleanPath}`
+}
+
+function getVehicleImage(vehicle) {
+  if (!vehicle) return null
+
+  if (
+    Array.isArray(vehicle.vehicleImages) &&
+    vehicle.vehicleImages.length > 0
+  ) {
+    const imgObj = vehicle.vehicleImages[0]
+
+    const raw =
+      typeof imgObj === 'string'
+        ? imgObj
+        : imgObj?.image ||
+          imgObj?.imageUrl ||
+          imgObj?.url ||
+          imgObj?.path
+
+    if (raw) {
+      return formatImageUrl(raw)
+    }
+  }
+
+  if (
+    typeof vehicle.image === 'string' &&
+    vehicle.image
+  ) {
+    return formatImageUrl(vehicle.image)
+  }
+
+  if (
+    typeof vehicle.imageUrl === 'string' &&
+    vehicle.imageUrl
+  ) {
+    return formatImageUrl(vehicle.imageUrl)
+  }
+
+  if (
+    Array.isArray(vehicleImages.value) &&
+    vehicleImages.value.length > 0
+  ) {
+    const vehicleId = Number(vehicle.id)
+
+    const match = vehicleImages.value.find((img) => {
+      const imgVehicleId = Number(
+        img.vehicle_id ??
+        img.vehicleId ??
+        img.vehicle?.id ??
+        img.vehicle?.vehicleId
+      )
+
+      if (
+        imgVehicleId &&
+        imgVehicleId === vehicleId
+      ) {
+        return true
+      }
+
+      const vehicleName = (
+        vehicle.name ||
+        `${vehicle.brandName || ''} ${vehicle.model || ''}`
+      )
+        .trim()
+        .toLowerCase()
+
+      const imgVehicleName = String(
+        img.vehicle_name ??
+        img.vehicleName ??
+        img.name ??
+        ''
+      )
+        .trim()
+        .toLowerCase()
+
+      return (
+        imgVehicleName &&
+        imgVehicleName === vehicleName
+      )
+    })
+
+    if (match) {
+      const raw =
+        match.image ||
+        match.imageUrl ||
+        match.url ||
+        match.path ||
+        match.imagePath
+
+      if (raw) {
+        return formatImageUrl(raw)
+      }
+    }
+  }
+
+  return null
+}
+
+
+function getVehicleBrand(vehicle) {
+  if (
+    vehicle?.brand &&
+    typeof vehicle.brand === 'object'
+  ) {
+    return (
+      vehicle.brand.brandName ||
+      vehicle.brand.name ||
+      ''
+    )
+  }
+
+  return (
+    vehicle?.brandName ||
+    vehicle?.brand_name ||
+    (typeof vehicle?.brand === 'string'
+      ? vehicle.brand
+      : '') ||
+    vehicle?.make ||
+    ''
+  )
+}
+
+
+function getVehicleCategory(vehicle) {
+  if (
+    vehicle?.category &&
+    typeof vehicle.category === 'object'
+  ) {
+    return (
+      vehicle.category.categoryName ||
+      vehicle.category.name ||
+      vehicle.category.category_name ||
+      ''
+    )
+  }
+
+  return (
+    vehicle?.categoryName ||
+    vehicle?.category_name ||
+    (typeof vehicle?.category === 'string'
+      ? vehicle.category
+      : '') ||
+    vehicle?.type ||
+    ''
+  )
+}
+
+/*
+|--------------------------------------------------------------------------
+| Filter + Sort
+|--------------------------------------------------------------------------
+*/
 const filteredVehicles = computed(() => {
-  const search = filters.search.trim().toLowerCase()
+
+  const search = String(filters.search || '')
+    .trim()
+    .toLowerCase()
+
+  const selectedCategory = String(
+    filters.category || 'All'
+  )
+    .trim()
+    .toLowerCase()
+
+  const selectedBrand = String(
+    filters.brand || 'All'
+  )
+    .trim()
+    .toLowerCase()
+
+
+  // ==========================================================
+  // BOOKING DATE
+  // ==========================================================
+
   const pickupDate = filters.pickupDate
     ? new Date(`${filters.pickupDate}T00:00:00`)
     : null
+
   const returnDate = filters.returnDate
     ? new Date(`${filters.returnDate}T00:00:00`)
     : null
 
+  const hasValidDateRange =
+    pickupDate &&
+    returnDate &&
+    !Number.isNaN(pickupDate.getTime()) &&
+    !Number.isNaN(returnDate.getTime()) &&
+    returnDate >= pickupDate
+
+
+  // ==========================================================
+  // FILTER VEHICLES
+  // ==========================================================
+
   const results = vehicleStore.vehicles.filter((vehicle) => {
-    const name = String(vehicle.name || vehicle.model || '').toLowerCase()
-    const brand = String(vehicle.brand || vehicle.make || '')
+
+    // --------------------------------------------------------
+    // Vehicle name
+    // --------------------------------------------------------
+
+    const name = String(
+      vehicle?.name ||
+      vehicle?.model ||
+      vehicle?.vehicleName ||
+      ''
+    )
+      .trim()
       .toLowerCase()
-      .replace(/[-\s]+/g, '')
-    const type = String(vehicle.type || vehicle.category || '').toLowerCase()
+
+
+    // --------------------------------------------------------
+    // Brand
+    // --------------------------------------------------------
+
+    const brand = String(
+      getVehicleBrand(vehicle) || ''
+    )
+      .trim()
+      .toLowerCase()
+
+
+    // --------------------------------------------------------
+    // Category
+    // --------------------------------------------------------
+
+    const category = String(
+      getVehicleCategory(vehicle) || ''
+    )
+      .trim()
+      .toLowerCase()
+
+
+    // ========================================================
+    // SEARCH
+    // ========================================================
 
     const matchesSearch =
-      !search || name.includes(search) || brand.includes(search)
-    const matchesCategory =
-      filters.category === 'All' || type === filters.category.toLowerCase()
-    const matchesBrand =
-      filters.brand === 'All' ||
-      brand === filters.brand.toLowerCase().replace(/[-\s]+/g, '')
-    const hasOverlappingBooking =
-      pickupDate && returnDate
-        ? bookingStore.bookings.some((booking) => {
-            const bookingStart = new Date(`${booking.pickupDate}T00:00:00`)
-            const bookingEnd = new Date(`${booking.returnDate}T00:00:00`)
-            const status = String(booking.status || '').toLowerCase()
-            const isBlocking = ['pending', 'confirmed', 'active'].includes(
-              status
-            )
+      !search ||
+      name.includes(search) ||
+      brand.includes(search) ||
+      category.includes(search)
 
-            return (
-              isBlocking &&
-              String(booking.vehicleId) === String(vehicle.id) &&
-              bookingStart < returnDate &&
-              bookingEnd > pickupDate
-            )
-          })
-        : false
+
+    // ========================================================
+    // CATEGORY
+    // ========================================================
+
+    const matchesCategory =
+      selectedCategory === 'all' ||
+      category === selectedCategory
+
+
+    // ========================================================
+    // BRAND
+    // ========================================================
+
+    const matchesBrand =
+      selectedBrand === 'all' ||
+      brand === selectedBrand
+
+
+    // ========================================================
+    // VEHICLE STATUS
+    // ========================================================
+
+    const vehicleStatus = String(
+      vehicle?.status || ''
+    )
+      .trim()
+      .toLowerCase()
+
+    const isUnavailable =
+      vehicleStatus === 'rented' ||
+      vehicleStatus === 'maintenance' ||
+      vehicleStatus === 'reserved'
+
+
+    // ========================================================
+    // BOOKING DATE AVAILABILITY
+    // ========================================================
+
+    let hasOverlappingBooking = false
+
+    if (hasValidDateRange) {
+
+      hasOverlappingBooking =
+        bookingStore.bookings.some((booking) => {
+
+          // --------------------------------------------------
+          // Booking vehicle ID
+          // --------------------------------------------------
+
+          const bookingVehicleId =
+            booking?.vehicleId ??
+            booking?.vehicle_id ??
+            booking?.vehicle?.id
+
+
+          // --------------------------------------------------
+          // Booking dates
+          // --------------------------------------------------
+
+          const bookingPickup =
+            booking?.pickupDate ??
+            booking?.pickup_date ??
+            booking?.startDate
+
+          const bookingReturn =
+            booking?.returnDate ??
+            booking?.return_date ??
+            booking?.endDate
+
+
+          if (
+            !bookingPickup ||
+            !bookingReturn ||
+            bookingVehicleId == null
+          ) {
+            return false
+          }
+
+
+          const bookingStart =
+            new Date(`${bookingPickup}T00:00:00`)
+
+          const bookingEnd =
+            new Date(`${bookingReturn}T00:00:00`)
+
+
+          if (
+            Number.isNaN(bookingStart.getTime()) ||
+            Number.isNaN(bookingEnd.getTime())
+          ) {
+            return false
+          }
+
+
+          // --------------------------------------------------
+          // Booking status
+          // --------------------------------------------------
+
+          const bookingStatus = String(
+            booking?.status || ''
+          )
+            .trim()
+            .toLowerCase()
+
+
+          const isBlocking = [
+            'pending',
+            'confirmed',
+            'active'
+          ].includes(bookingStatus)
+
+
+          // --------------------------------------------------
+          // Same vehicle + overlapping dates
+          // --------------------------------------------------
+
+          return (
+            isBlocking &&
+            String(bookingVehicleId) ===
+              String(vehicle?.id) &&
+            bookingStart < returnDate &&
+            bookingEnd > pickupDate
+          )
+        })
+    }
+
+
+    // ========================================================
+    // FINAL RESULT
+    // ========================================================
 
     return (
-      matchesSearch && matchesCategory && matchesBrand && !hasOverlappingBooking
+      matchesSearch &&
+      matchesCategory &&
+      matchesBrand &&
+      !isUnavailable &&
+      !hasOverlappingBooking
     )
   })
 
-  return [...results].sort((a, b) => {
-    const aPrice = Number(a.pricePerDay || a.price || 0)
-    const bPrice = Number(b.pricePerDay || b.price || 0)
 
-    if (sortBy.value === 'priceLow') return aPrice - bPrice
-    if (sortBy.value === 'priceHigh') return bPrice - aPrice
+  // ==========================================================
+  // SORT
+  // ==========================================================
+
+  return [...results].sort((a, b) => {
+
+    const aPrice = Number(
+      a?.pricePerDay ??
+      a?.price_per_day ??
+      a?.price ??
+      a?.rentalPrice ??
+      0
+    )
+
+    const bPrice = Number(
+      b?.pricePerDay ??
+      b?.price_per_day ??
+      b?.price ??
+      b?.rentalPrice ??
+      0
+    )
+
+
+    // Low → High
+    if (sortBy.value === 'priceLow') {
+      return aPrice - bPrice
+    }
+
+
+    // High → Low
+    if (sortBy.value === 'priceHigh') {
+      return bPrice - aPrice
+    }
+
+
+    // Default order
     return 0
   })
 })
 
-function handleSearch(data) {
-  filters.search = data.search || ''
-  filters.category = data.category || 'All'
-  filters.brand = data.brand || 'All'
-  filters.pickupDate = data.pickupDate || filters.pickupDate
-  filters.returnDate = data.returnDate || filters.returnDate
+/*
+|--------------------------------------------------------------------------
+| Pagination Logic
+|--------------------------------------------------------------------------
+*/
+const totalPages = computed(() => {
+  return Math.ceil(filteredVehicles.value.length / pageSize.value) || 1
+})
+
+const paginatedVehicles = computed(() => {
+  const start = (currentPage.value - 1) * pageSize.value
+  const end = start + pageSize.value
+  return filteredVehicles.value.slice(start, end)
+})
+
+function goToPage(page) {
+  if (page >= 1 && page <= totalPages.value) {
+    currentPage.value = page
+  }
 }
 
+// Reset pagination to Page 1 when any filter or sort option changes
+watch(
+  [filters, sortBy],
+  () => {
+    currentPage.value = 1
+  },
+  { deep: true }
+)
+
+/*
+|--------------------------------------------------------------------------
+| Search
+|--------------------------------------------------------------------------
+*/
+function handleSearch(data) {
+  filters.search = data.search ?? ''
+  filters.category = data.category ?? 'All'
+  filters.brand = data.brand ?? 'All'
+}
+
+/*
+|--------------------------------------------------------------------------
+| Filter drawer
+|--------------------------------------------------------------------------
+*/
 function openFilterDrawer() {
   Object.assign(draftFilters, {
     category: filters.category,
     brand: filters.brand
   })
+
   filterDrawerOpen.value = true
 }
 
 function applyFilters() {
   filters.category = draftFilters.category
   filters.brand = draftFilters.brand
+
   filterDrawerOpen.value = false
 }
 
@@ -244,14 +796,55 @@ function resetFilters() {
     category: 'All',
     brand: 'All'
   })
+
   Object.assign(filters, {
     category: 'All',
     brand: 'All'
   })
 }
 
-onMounted(() => {
-  vehicleStore.fetchVehicles()
-  bookingStore.fetchBookings()
+/*
+|--------------------------------------------------------------------------
+| Load data
+|--------------------------------------------------------------------------
+*/
+onMounted(async () => {
+  await Promise.all([
+    vehicleStore.fetchVehicles(),
+    bookingStore.fetchBookings(),
+    fetchMetaData()
+  ])
 })
 </script>
+
+<style scoped>
+.pagination {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 8px;
+  margin-top: 32px;
+}
+
+.pagination-btn,
+.pagination-num {
+  padding: 8px 14px;
+  border: 1px solid #ddd;
+  background-color: #fff;
+  border-radius: 4px;
+  cursor: pointer;
+  font-weight: 500;
+  transition: all 0.2s ease;
+}
+
+.pagination-num.active {
+  background-color: #007bff;
+  color: #fff;
+  border-color: #007bff;
+}
+
+.pagination-btn:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+</style>
