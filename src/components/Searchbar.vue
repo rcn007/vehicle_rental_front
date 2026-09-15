@@ -1,5 +1,17 @@
 <template>
-  <aside class="filter-panel">
+  <aside v-if="mobile" class="mobile-search-panel">
+    <label class="filter-field">
+      Search vehicles
+      <input
+        v-model="filters.search"
+        type="text"
+        placeholder="Search by name or brand..."
+        @input="searchVehicles"
+      />
+    </label>
+  </aside>
+
+  <aside v-else class="filter-panel">
     <h2>
       <SlidersHorizontal :size="22" />
       Filters
@@ -48,6 +60,13 @@
 <script setup>
 import { reactive } from 'vue'
 import { SlidersHorizontal } from '@lucide/vue'
+
+defineProps({
+  mobile: {
+    type: Boolean,
+    default: false
+  }
+})
 
 const emit = defineEmits(['search'])
 

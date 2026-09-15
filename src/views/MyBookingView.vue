@@ -96,16 +96,60 @@
                     </span>
                   </td>
                   <td>
+<<<<<<< HEAD
                     <RouterLink
                       to="/rental-history"
                       class="btn btn-primary"
                     >
                       View
+=======
+                    <RouterLink to="/rental-history" class="view-link">
+                      View Details
+>>>>>>> origin/vehicle_rental_front
                     </RouterLink>
                   </td>
                 </tr>
               </tbody>
             </table>
+            <div class="booking-cards">
+              <article
+                v-for="booking in displayBookings"
+                :key="`mobile-${booking.id}`"
+                class="booking-card"
+              >
+                <div class="booking-card-main">
+                  <img :src="booking.image" :alt="booking.vehicleName" />
+                  <div class="booking-card-vehicle">
+                    <h3>{{ booking.vehicleName }}</h3>
+                    <span>#BK-{{ booking.id }}</span>
+                  </div>
+                  <span
+                    class="status"
+                    :class="
+                      booking.status === 'Confirmed' ? 'confirmed' : 'completed'
+                    "
+                  >
+                    {{ booking.status }}
+                  </span>
+                </div>
+
+                <div class="booking-card-details">
+                  <div>
+                    <span>Dates</span>
+                    <strong>{{ booking.dateRange }}</strong>
+                    <small>{{ booking.totalDays }} days</small>
+                  </div>
+                  <div>
+                    <span>Amount</span>
+                    <strong>${{ booking.totalPrice }}</strong>
+                  </div>
+                </div>
+
+                <RouterLink to="/rental-history" class="booking-card-action">
+                  View Details
+                </RouterLink>
+              </article>
+            </div>
           </div>
 
           <div class="booking-pagination" aria-label="Booking pages">
@@ -533,12 +577,17 @@ onMounted(() => {
 
 .bookings-panel .table-wrapper {
   width: 100%;
+<<<<<<< HEAD
   max-width: 100%;
   flex: 1;
   min-height: 0;
   overflow-x: scroll;
   overflow-y: hidden;
   -webkit-overflow-scrolling: touch;
+=======
+  min-height: 0;
+  overflow-x: auto;
+>>>>>>> origin/vehicle_rental_front
   background: #ffffff;
   border: 1px solid var(--border);
   border-radius: 8px;
@@ -718,17 +767,77 @@ onMounted(() => {
 }
 
 .bookings-panel .loading {
+<<<<<<< HEAD
   flex: 1;
   min-height: 0;
+=======
+  min-height: 160px;
+>>>>>>> origin/vehicle_rental_front
   display: flex;
   align-items: center;
   justify-content: center;
   color: #60708f;
 }
 
+.booking-cards {
+  display: none;
+}
+
 @media (max-width: 750px) {
+  .dashboard-page {
+    padding-bottom: 48px;
+  }
+
+  .customer-stats {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 10px;
+    margin-bottom: 28px;
+  }
+
+  .customer-stats article {
+    min-height: 116px;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    padding: 12px 8px;
+    border-radius: 10px;
+    text-align: center;
+    box-shadow: 0 2px 8px rgba(15, 23, 42, 0.05);
+  }
+
+  .customer-stats .stat-icon {
+    width: 26px;
+    height: 26px;
+    margin: 0;
+  }
+
+  .customer-stats .stat-icon svg {
+    width: 26px;
+    height: 26px;
+  }
+
+  .customer-stats article > div {
+    min-width: 0;
+  }
+
+  .customer-stats strong {
+    margin-bottom: 4px;
+    font-size: 22px;
+  }
+
+  .customer-stats span {
+    margin: 0;
+    font-size: 13px;
+    line-height: 1.25;
+  }
+
+  .customer-stats small {
+    display: none;
+  }
+
   .dashboard-content-grid {
     grid-template-columns: 1fr;
+<<<<<<< HEAD
     height: auto;
   }
 
@@ -750,6 +859,160 @@ onMounted(() => {
 
   .booking-page-tabs {
     justify-content: flex-start;
+=======
+    gap: 28px;
+  }
+
+  .bookings-panel {
+    width: 100%;
+  }
+
+  .bookings-header {
+    min-height: 0;
+    padding: 0 0 14px;
+  }
+
+  .bookings-header h2 {
+    font-size: 20px;
+  }
+
+  .bookings-header .view-link {
+    font-size: 14px;
+  }
+
+  .bookings-panel .table-wrapper {
+    overflow: visible;
+    border: 0;
+    background: transparent;
+    box-shadow: none;
+  }
+
+  .bookings-panel table {
+    display: none;
+  }
+
+  .booking-cards {
+    display: grid;
+    gap: 12px;
+  }
+
+  .booking-card {
+    display: grid;
+    gap: 14px;
+    padding: 14px;
+    background: #ffffff;
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    box-shadow: 0 2px 8px rgba(20, 40, 80, 0.04);
+  }
+
+  .booking-card-main {
+    display: grid;
+    grid-template-columns: 60px minmax(0, 1fr) auto;
+    align-items: center;
+    gap: 10px;
+  }
+
+  .booking-card-main img {
+    width: 60px;
+    height: 48px;
+    object-fit: cover;
+    border-radius: 6px;
+    background: #eef2f7;
+  }
+
+  .booking-card-vehicle {
+    min-width: 0;
+  }
+
+  .booking-card-vehicle h3 {
+    margin: 0 0 4px;
+    color: var(--primary);
+    font-size: 15px;
+    font-weight: 700;
+    line-height: 1.25;
+    overflow-wrap: anywhere;
+  }
+
+  .booking-card-vehicle span,
+  .booking-card-details span,
+  .booking-card-details small {
+    color: var(--secondary);
+    font-size: 12px;
+  }
+
+  .booking-card-main .status {
+    align-self: start;
+    padding: 6px 8px;
+    font-size: 11px;
+    white-space: nowrap;
+  }
+
+  .booking-card-details {
+    display: grid;
+    grid-template-columns: minmax(0, 1.4fr) minmax(80px, 0.8fr);
+    gap: 12px;
+    padding-top: 12px;
+    border-top: 1px solid #eef2f7;
+  }
+
+  .booking-card-details div {
+    display: grid;
+    gap: 3px;
+    min-width: 0;
+  }
+
+  .booking-card-details strong {
+    color: var(--primary);
+    font-size: 13px;
+    line-height: 1.35;
+    overflow-wrap: anywhere;
+  }
+
+  .booking-card-details small {
+    font-size: 11px;
+  }
+
+  .booking-card-action {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    min-height: 44px;
+    padding: 10px 14px;
+    color: #ffffff;
+    background: var(--primary);
+    border-radius: 6px;
+    font-size: 14px;
+    font-weight: 700;
+  }
+}
+
+@media (min-width: 751px) and (max-width: 1100px) {
+  .dashboard-content-grid {
+    grid-template-columns: minmax(260px, 0.75fr) minmax(0, 1.25fr);
+    gap: 18px;
+  }
+
+  .bookings-panel th,
+  .bookings-panel td {
+    padding-right: 14px;
+    padding-left: 14px;
+  }
+
+  .booking-vehicle-cell {
+    min-width: 150px;
+    gap: 10px;
+  }
+
+  .bookings-panel th {
+    font-size: 13px;
+  }
+
+  .bookings-panel td,
+  .bookings-panel td:nth-child(2),
+  .bookings-panel td:nth-child(3) span {
+    font-size: 13px;
+>>>>>>> origin/vehicle_rental_front
   }
 }
 </style>

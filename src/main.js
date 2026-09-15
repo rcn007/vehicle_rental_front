@@ -5,6 +5,8 @@ import router from './router'
 import '@fortawesome/fontawesome-free/css/all.min.css'
 import './assets/main.css'
 
+
+
 const app = createApp(App)
 
 app.use(createPinia())

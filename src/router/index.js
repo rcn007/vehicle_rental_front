@@ -27,8 +27,40 @@ import ReportDashboard from '../pages/ReportDashboard.vue'
 import SettingDashboard from '../pages/SettingDashboard.vue'
 import HistoryDashboard from '../pages/HistoryDashboard.vue'
 import VehicleDashboard from '../pages/VehicleDashboard.vue'
+import CreateBooking from '../components/booking/Create.vue'
+import Update from '../components/booking/Update.vue'
+import Detail from '../components/booking/Detail.vue'
+import CreateVehicle from '../components/vehicles/CreateVehicle.vue'
+import UpdateVehicle from '../components/vehicles/UpdateVehicle.vue'
+import DetailVehicle from '../components/vehicles/DetailVehicle.vue'
+import CreateCategory from '../components/category/CreateCategory.vue'
+import UpdateCategory from '../components/category/UpdateCategory.vue'
+import DetailCategory from '../components/category/DetailCategory.vue'
+import CreateBrand from '../components/brands/CreateBrand.vue'
+import UpdateBrands from '../components/brands/UpdateBrands.vue'
+import DetailBrand from '../components/brands/DetailBrand.vue'
+import CreateUser from '../components/user/CreateUser.vue'
+import UpdateUser from '../components/user/UpdateUser.vue'
+import DetailUser from '../components/user/DetailUser.vue'
+import Profile from '../pages/Profile.vue'
+import ResetPassword from '../views/auth/ResetPassword.vue'
 
 const routes = [
+  // -------------------------------------------------------------
+  // Global Aliases & Redirects
+  // -------------------------------------------------------------
+  {
+    path: '/login',
+    redirect: '/auth/login'
+  },
+  {
+    path: '/register',
+    redirect: '/auth/register'
+  },
+
+  // -------------------------------------------------------------
+  // Main Customer Layout Routes
+  // -------------------------------------------------------------
   {
     path: '/',
     component: () => import('../layouts/MainLayout.vue'),
@@ -91,6 +123,9 @@ const routes = [
     ]
   },
 
+  // -------------------------------------------------------------
+  // Authentication Routes
+  // -------------------------------------------------------------
   {
     path: '/auth',
     children: [
@@ -115,93 +150,185 @@ const routes = [
         component: ForgotPasswordView
       },
       {
+<<<<<<< HEAD
         path: 'google/callback',
         name: 'google-callback',
         component: GoogleCallbackView
+=======
+        path: 'reset-password',
+        name: 'reset-password',
+        component: ResetPassword
+>>>>>>> origin/vehicle_rental_front
       }
     ]
   },
 
+  // Google Callback handler endpoint matching backend Spring Security redirect
+  {
+    path: '/api/auth/google/callback',
+    name: 'google-callback',
+    component: LoginView
+  },
+
+  // -------------------------------------------------------------
+  // Admin Portal Routes
+  // -------------------------------------------------------------
   {
     path: '/admin',
     component: () => import('../layouts/AdminLayout.vue'),
-
+    meta: { requiresAdmin: true },
     children: [
       {
         path: '',
         redirect: '/admin/dashboard'
       },
-
       {
         path: 'dashboard',
         name: 'admin-dashboard',
         component: Dashboard,
         meta: { title: 'Dashboard' }
       },
-
       {
         path: 'vehicles',
         name: 'admin-vehicles',
         component: VehicleDashboard,
         meta: { title: 'Vehicle Management' }
       },
-
       {
         path: 'bookings',
         name: 'admin-bookings',
         component: BookingDashboard,
         meta: { title: 'Booking Management' }
       },
-
       {
         path: 'payments',
         name: 'admin-payments',
         component: PaymentDashboard,
         meta: { title: 'Payment Management' }
       },
-
       {
         path: 'users',
         name: 'admin-users',
         component: UserDashboard,
         meta: { title: 'User Management' }
       },
-
       {
         path: 'categories',
         name: 'admin-categories',
         component: CategoryDashboard,
         meta: { title: 'Categories' }
       },
-
       {
         path: 'brands',
         name: 'admin-brands',
         component: BrandDashboard,
         meta: { title: 'Brands' }
       },
-
       {
         path: 'reports',
         name: 'admin-reports',
         component: ReportDashboard,
         meta: { title: 'Reports & Analytics' }
       },
-
       {
         path: 'history',
         name: 'admin-history',
         component: HistoryDashboard,
         meta: { title: 'History' }
       },
-
       {
         path: 'settings',
         name: 'admin-settings',
         component: SettingDashboard,
         meta: { title: 'Settings' }
+      },
+      {
+        path: 'profile_user',
+        name: 'Profile',
+        component: Profile
+      },
+      {
+        path: 'bookings/create',
+        name: 'CreateBooking',
+        component: CreateBooking
+      },
+      {
+        path: 'bookings/update/:id',
+        name: 'UpdateBooking',
+        component: Update
+      },
+      {
+        path: 'bookings/:id',
+        name: 'DetailBooking',
+        component: Detail
+      },
+      {
+        path: 'vehicles/create',
+        name: 'CreateVehicle',
+        component: CreateVehicle
+      },
+      {
+        path: 'vehicles/update/:id',
+        name: 'UpdateVehicle',
+        component: UpdateVehicle
+      },
+      {
+        path: 'vehicles/:id',
+        name: 'DetailVehicle',
+        component: DetailVehicle
+      },
+      {
+        path: 'categories/create',
+        name: 'CreateCategory',
+        component: CreateCategory
+      },
+      {
+        path: 'categories/update/:id',
+        name: 'UpdateCategory',
+        component: UpdateCategory
+      },
+      {
+        path: 'categories/:id',
+        name: 'DetailCategory',
+        component: DetailCategory
+      },
+      {
+        path: 'brands/create',
+        name: 'CreateBrand',
+        component: CreateBrand
+      },
+      {
+        path: 'brands/update/:id',
+        name: 'UpdateBrand',
+        component: UpdateBrands
+      },
+      {
+        path: 'brands/:id',
+        name: 'DetailBrand',
+        component: DetailBrand
+      },
+      {
+        path: 'users/post',
+        name: 'CreateUser',
+        component: CreateUser
+      },
+      {
+        path: 'users/update/:id',
+        name: 'UpdateUser',
+        component: UpdateUser
+      },
+      {
+        path: 'users/:id',
+        name: 'DetailUser',
+        component: DetailUser
       }
     ]
+  },
+
+  // 404 Fallback
+  {
+    path: '/:pathMatch(.*)*',
+    redirect: '/auth/login'
   }
 ]
 

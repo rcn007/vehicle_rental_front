@@ -1,21 +1,21 @@
 <template>
-  <main class="p-6 min-h-[calc(100vh-64px)]">
+  <main class="p-6 min-h-[calc(100vh-64px)] bg-(--background)">
     
     <!-- Page Header -->
     <div class="mb-6">
-      <h1 class="text-4xl font-bold tracking-tight text-[#111827]">Settings</h1>
-      <p class="text-[#43474E] text-xl mt-1">Manage your vehicle rental website and system preferences.</p>
+      <h1 class="text-3xl font-bold tracking-tight text-[--text]">Settings</h1>
+      <p class="text-[--texttext-xl mt-1">Manage your vehicle rental website and system preferences.</p>
     </div>
 
     <!-- Sub-Tab Navigation Bar -->
     <div class="flex items-center gap-6 border-b border-[#D3DAEF] mb-6">
       <button 
-        v-for="tab in ['Customizer', 'Notification', 'Payment', 'Security']" 
+        v-for="tab in ['General', 'Notification', 'Payment', 'Security']" 
         :key="tab"
         @click="activeSubTab = tab"
         :class="[
           'pb-3 text-sm font-medium  transition-colors relative',
-          activeSubTab === tab ? 'text-[#2563EB] border-b-2 border-[#2563EB]' : 'text-[#7A8190] hover:text-[#111827]'
+          activeSubTab === tab ? 'text-[#2563EB] border-b-2 border-[#2563EB]' : 'text-[--text] hover:text-gray-300'
         ]"
       >
         {{ tab }}
