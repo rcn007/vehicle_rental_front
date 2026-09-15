@@ -9,8 +9,8 @@
           </div>
 
           <h1>
-            Rent Your Perfect
-            <span>Vehicle</span> Anywhere
+            Rent Your Perfect Vehicle
+            Anywhere
           </h1>
 
           <p class="hero-description">
@@ -149,7 +149,7 @@ const stats = [
 const categories = [
   {
     name: 'Sedan',
-    copy: '120+ cars · From $45/day',
+    copy: '120+ cars · From $0.1/day',
     icon: Car,
     image:
       'https://images.unsplash.com/photo-1492144534655-ae79c964c9d7?auto=format&fit=crop&w=900&q=80'

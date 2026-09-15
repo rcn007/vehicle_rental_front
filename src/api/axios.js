@@ -11,7 +11,11 @@ api.interceptors.request.use(
   (config) => {
     const token = localStorage.getItem("token");
 
+<<<<<<< HEAD
+    if (token && token !== "frontend-demo-token") {
+=======
     if (token && token.split(".").length === 3) {
+>>>>>>> origin/vehicle_rental_front
       config.headers.Authorization = `Bearer ${token}`;
     }
 

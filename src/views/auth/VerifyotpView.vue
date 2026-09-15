@@ -34,6 +34,10 @@
       <h1>Verify Code</h1>
       <p>Enter the 6-digit code sent to your email address.</p>
 
+      <div v-if="route.query.message" class="error-message success-message">
+        {{ route.query.message }}
+      </div>
+
       <form @submit.prevent="verify">
         <div class="otp-container">
           <input

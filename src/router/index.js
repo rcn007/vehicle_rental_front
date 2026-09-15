@@ -15,6 +15,7 @@ import LoginView from '../views/auth/LoginView.vue'
 import RegisterView from '../views/auth/RegisterView.vue'
 import VerifyOtpView from '../views/auth/VerifyotpView.vue'
 import ForgotPasswordView from '../views/auth/ForgotPasswordView.vue'
+import GoogleCallbackView from '../views/auth/GoogleCallbackView.vue'
 
 import Dashboard from '../pages/Dashboard.vue'
 import UserDashboard from '../pages/UserDashboard.vue'
@@ -94,12 +95,14 @@ const routes = [
       {
         path: 'my-bookings',
         name: 'my-bookings',
-        component: MyBookingsView
+        component: MyBookingsView,
+        meta: { requiresAuth: true }
       },
       {
         path: 'rental-history',
         name: 'rental-history',
-        component: RentalHistoryView
+        component: RentalHistoryView,
+        meta: { requiresAuth: true }
       },
       {
         path: 'locations',
@@ -147,9 +150,15 @@ const routes = [
         component: ForgotPasswordView
       },
       {
+<<<<<<< HEAD
+        path: 'google/callback',
+        name: 'google-callback',
+        component: GoogleCallbackView
+=======
         path: 'reset-password',
         name: 'reset-password',
         component: ResetPassword
+>>>>>>> origin/vehicle_rental_front
       }
     ]
   },
@@ -339,7 +348,7 @@ router.beforeEach((to) => {
     return {
       name: 'login',
       query: { redirect: to.fullPath }
-    }
+    } 
   }
 
   if (to.meta.requiresAdmin) {

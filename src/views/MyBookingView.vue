@@ -3,7 +3,7 @@
     <div class="container">
       <div class="page-header">
         <h1>My Dashboard</h1>
-        <p>Good evening, John! Here's your rental overview.</p>
+        <p>{{ greeting }}, {{ customerName }}! Here's your rental overview.</p>
       </div>
 
       <div class="customer-stats">
@@ -29,14 +29,14 @@
             <div class="active-rental-info">
               <div class="active-rental-media">
                 <img
-                  :src="activeBooking.image || '/src/assets/hero.png'"
+                  :src="activeBooking.image"
                   :alt="activeBooking.vehicleName"
                 />
-                <span class="status available">Rented</span>
+                <span class="status available">{{ activeBooking.statusLabel }}</span>
               </div>
               <div class="active-rental-details">
                 <h2>{{ activeBooking.vehicleName }}</h2>
-                <p>Returns in 4 days (Jul 2, 2025)</p>
+                <p>{{ activeBooking.returnSummary }}</p>
               </div>
             </div>
 
@@ -49,9 +49,6 @@
         <section class="bookings-panel">
           <div class="bookings-header">
             <h2>My Bookings</h2>
-            <RouterLink to="/rental-history" class="view-link">
-              View All
-            </RouterLink>
           </div>
 
           <div v-if="bookingStore.loading" class="loading">
@@ -71,7 +68,7 @@
                 </tr>
               </thead>
               <tbody>
-                <tr v-for="booking in displayBookings" :key="booking.id">
+                <tr v-for="booking in pagedBookings" :key="booking.id">
                   <td>
                     <div class="booking-vehicle-cell">
                       <img :src="booking.image" :alt="booking.vehicleName" />
@@ -99,8 +96,16 @@
                     </span>
                   </td>
                   <td>
+<<<<<<< HEAD
+                    <RouterLink
+                      to="/rental-history"
+                      class="btn btn-primary"
+                    >
+                      View
+=======
                     <RouterLink to="/rental-history" class="view-link">
                       View Details
+>>>>>>> origin/vehicle_rental_front
                     </RouterLink>
                   </td>
                 </tr>
@@ -146,6 +151,32 @@
               </article>
             </div>
           </div>
+
+          <div class="booking-pagination" aria-label="Booking pages">
+            <span>Bookings page {{ currentBookingPage }} of {{ totalBookingPages }}</span>
+            <div class="booking-page-tabs">
+              <template v-for="page in bookingPageButtons" :key="page.key">
+                <button
+                  v-if="page.type === 'page'"
+                  type="button"
+                  :aria-label="`Show booking page ${page.value}`"
+                  :class="{ active: page.value === currentBookingPage }"
+                  @click="currentBookingPage = page.value"
+                >
+                  {{ page.value }}
+                </button>
+                <button
+                  v-else
+                  type="button"
+                  class="booking-page-ellipsis"
+                  :aria-label="page.direction === 'next' ? 'Show next booking page' : 'Show previous booking page'"
+                  @click="changeBookingPage(page.direction)"
+                >
+                  {{ page.direction === 'next' ? '>>' : '<<' }}
+                </button>
+              </template>
+            </div>
+          </div>
         </section>
       </div>
     </div>
@@ -153,12 +184,28 @@
 </template>
 
 <script setup>
-import { computed, onMounted } from 'vue'
+import { computed, onMounted, ref, watch } from 'vue'
 import { CalendarDays, CarFront, Check, DollarSign } from '@lucide/vue'
 import { useBookingStore } from '../stores/Booking'
+import { useAuthStore } from '../stores/Auth'
 import finishedVehicleImage from '../assets/fa2f74c945e7a5848d48ea787650a361.jpg'
 
 const bookingStore = useBookingStore()
+const authStore = useAuthStore()
+const bookingsPerPage = 3
+const currentBookingPage = ref(1)
+
+const customerName = computed(
+  () => authStore.user?.name || authStore.user?.username || 'Customer'
+)
+
+const greeting = computed(() => {
+  const hour = new Date().getHours()
+
+  if (hour < 12) return 'Good morning'
+  if (hour < 18) return 'Good afternoon'
+  return 'Good evening'
+})
 
 const vehicleImages = {
   'BMW 5 Series':
@@ -227,11 +274,84 @@ const displayBookings = computed(() =>
   apiBookings.value.length ? apiBookings.value : fallbackBookings
 )
 
+const totalBookingPages = computed(() =>
+  Math.max(1, Math.ceil(displayBookings.value.length / bookingsPerPage))
+)
+
+const bookingPageButtons = computed(() => {
+  const pageButton = (page) => ({
+    key: `page-${page}`,
+    type: 'page',
+    value: page
+  })
+  const navButton = (direction) => ({
+    key: `nav-${direction}`,
+    type: 'nav',
+    direction
+  })
+
+  if (totalBookingPages.value <= 4) {
+    return Array.from({ length: totalBookingPages.value }, (_, index) => pageButton(index + 1))
+  }
+
+  if (currentBookingPage.value <= 3) {
+    return [pageButton(1), pageButton(2), pageButton(3), navButton('next'), pageButton(totalBookingPages.value)]
+  }
+
+  if (currentBookingPage.value >= totalBookingPages.value - 2) {
+    return [
+      pageButton(1),
+      navButton('prev'),
+      pageButton(totalBookingPages.value - 2),
+      pageButton(totalBookingPages.value - 1),
+      pageButton(totalBookingPages.value)
+    ]
+  }
+
+  return [
+    pageButton(1),
+    navButton('prev'),
+    pageButton(currentBookingPage.value - 1),
+    pageButton(currentBookingPage.value),
+    pageButton(currentBookingPage.value + 1),
+    navButton('next'),
+    pageButton(totalBookingPages.value)
+  ]
+})
+
+function changeBookingPage(direction) {
+  const step = direction === 'next' ? 1 : -1
+  const nextPage = currentBookingPage.value + step
+
+  currentBookingPage.value = Math.min(Math.max(nextPage, 1), totalBookingPages.value)
+}
+
+const pagedBookings = computed(() => {
+  const start = (currentBookingPage.value - 1) * bookingsPerPage
+
+  return displayBookings.value.slice(start, start + bookingsPerPage)
+})
+
+watch(totalBookingPages, (totalPages) => {
+  if (currentBookingPage.value > totalPages) {
+    currentBookingPage.value = totalPages
+  }
+})
+
 const activeBooking = computed(() => ({
-  vehicleName: 'Toyota RAV4 Hybrid',
-  pickupDate: 'Jun 1',
-  returnDate: 'Jun 5, 2025',
-  image: finishedVehicleImage
+  ...(apiBookings.value.find((booking) =>
+    ['confirmed', 'active'].includes(String(booking.status).toLowerCase())
+  ) || fallbackBookings[0]),
+  statusLabel: 'Paid',
+  returnSummary: `Returns in ${
+    (apiBookings.value.find((booking) =>
+      ['confirmed', 'active'].includes(String(booking.status).toLowerCase())
+    ) || fallbackBookings[0]).totalDays || 1
+  } days (${(
+    apiBookings.value.find((booking) =>
+      ['confirmed', 'active'].includes(String(booking.status).toLowerCase())
+    ) || fallbackBookings[0]
+  ).returnDate})`
 }))
 
 const statCards = computed(() => [
@@ -302,8 +422,9 @@ onMounted(() => {
 .dashboard-content-grid {
   display: grid;
   grid-template-columns: minmax(360px, 0.8fr) minmax(0, 1.7fr);
+  height: 420px;
   gap: 28px;
-  align-items: start;
+  align-items: stretch;
 }
 
 .dashboard-section-header {
@@ -318,6 +439,8 @@ onMounted(() => {
 
 .active-rental-card {
   display: block;
+  flex: 1;
+  min-height: 0;
   overflow: hidden;
   padding: 0 0 14px;
   margin: 0;
@@ -325,6 +448,11 @@ onMounted(() => {
   border-radius: 10px;
   border-left: 1px solid var(--border);
   box-shadow: none;
+}
+
+.active-rental-section {
+  display: flex;
+  flex-direction: column;
 }
 
 .active-rental-info {
@@ -376,7 +504,11 @@ onMounted(() => {
 }
 
 .bookings-panel {
+  display: flex;
+  flex-direction: column;
   min-width: 0;
+  min-height: 0;
+  overflow: hidden;
   background: transparent;
   border: 0;
   border-radius: 0;
@@ -387,6 +519,7 @@ onMounted(() => {
   display: flex;
   align-items: center;
   justify-content: space-between;
+  gap: 18px;
 
   min-height: 30px;
   padding: 0 0 20px;
@@ -399,30 +532,86 @@ onMounted(() => {
   font-weight: 700;
 }
 
-.bookings-header .view-link {
-  color: var(--primary);
-  font-size: 16px;
-  font-weight: 500;
+.booking-pagination {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  min-height: 58px;
+  padding-top: 14px;
+  color: var(--secondary);
+  font-size: 13px;
+}
+
+.booking-page-tabs {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex-wrap: wrap;
+  justify-content: flex-end;
+}
+
+.booking-page-tabs button {
+  width: 34px;
+  height: 34px;
+  display: inline-grid;
+  place-items: center;
+  color: var(--secondary);
+  background: #ffffff;
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  font-size: 14px;
+  font-weight: 700;
+  transition:
+    background 0.18s ease,
+    border-color 0.18s ease,
+    color 0.18s ease;
+}
+
+.booking-page-tabs button:hover,
+.booking-page-tabs button.active {
+  color: #ffffff;
+  background: var(--primary);
+  border-color: var(--primary);
 }
 
 .bookings-panel .table-wrapper {
   width: 100%;
+<<<<<<< HEAD
+  max-width: 100%;
+  flex: 1;
+  min-height: 0;
+  overflow-x: scroll;
+  overflow-y: hidden;
+  -webkit-overflow-scrolling: touch;
+=======
   min-height: 0;
   overflow-x: auto;
+>>>>>>> origin/vehicle_rental_front
   background: #ffffff;
   border: 1px solid var(--border);
-  border-radius: 16px;
+  border-radius: 8px;
   box-shadow: 0 2px 8px rgba(20, 40, 80, 0.04);
 }
 
 .bookings-panel table {
-  width: 100%;
-  min-width: 700px;
+  width: max-content;
+  min-width: 100%;
+  table-layout: auto;
   border-collapse: separate;
   border-spacing: 0;
 }
 
+.bookings-panel th,
+.bookings-panel td {
+  overflow: hidden;
+  white-space: nowrap;
+}
+
 .bookings-panel th {
+  position: sticky;
+  top: 0;
+  z-index: 1;
   height: 88px;
   padding: 0 28px;
   color: var(--secondary);
@@ -447,11 +636,41 @@ onMounted(() => {
   border-bottom: none;
 }
 
+.bookings-panel th:nth-child(1),
+.bookings-panel td:nth-child(1) {
+  width: 25%;
+}
+
+.bookings-panel th:nth-child(2),
+.bookings-panel td:nth-child(2) {
+  width: 24%;
+}
+
+.bookings-panel th:nth-child(3),
+.bookings-panel td:nth-child(3) {
+  width: 22%;
+}
+
+.bookings-panel th:nth-child(4),
+.bookings-panel td:nth-child(4) {
+  width: 11%;
+}
+
+.bookings-panel th:nth-child(5),
+.bookings-panel td:nth-child(5) {
+  width: 10%;
+}
+
+.bookings-panel th:nth-child(6),
+.bookings-panel td:nth-child(6) {
+  width: 8%;
+}
+
 .booking-vehicle-cell {
   display: flex;
   align-items: center;
-  gap: 18px;
-  min-width: 210px;
+  gap: 12px;
+  min-width: 0;
 }
 
 .booking-vehicle-cell img {
@@ -467,11 +686,17 @@ onMounted(() => {
   font-size: 16px;
   font-weight: 500;
   line-height: 1.4;
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
 }
 
 .bookings-panel td:nth-child(2) {
   color: var(--secondary);
   font-size: 16px;
+  overflow: hidden;
+  text-overflow: ellipsis;
 }
 
 .bookings-panel td:nth-child(3) span {
@@ -479,6 +704,8 @@ onMounted(() => {
   color: var(--primary);
   font-size: 16px;
   line-height: 1.35;
+  overflow: hidden;
+  text-overflow: ellipsis;
 }
 
 .bookings-panel td:nth-child(3) small {
@@ -518,6 +745,13 @@ onMounted(() => {
   text-align: center;
 }
 
+.bookings-panel td:last-child .btn {
+  min-height: 34px;
+  padding: 7px 12px;
+  border-radius: 6px;
+  font-size: 13px;
+}
+
 .bookings-panel td:last-child .view-link {
   color: var(--primary);
   font-size: 15px;
@@ -533,7 +767,12 @@ onMounted(() => {
 }
 
 .bookings-panel .loading {
+<<<<<<< HEAD
+  flex: 1;
+  min-height: 0;
+=======
   min-height: 160px;
+>>>>>>> origin/vehicle_rental_front
   display: flex;
   align-items: center;
   justify-content: center;
@@ -598,6 +837,29 @@ onMounted(() => {
 
   .dashboard-content-grid {
     grid-template-columns: 1fr;
+<<<<<<< HEAD
+    height: auto;
+  }
+
+  .active-rental-section {
+    display: block;
+  }
+
+  .bookings-panel .table-wrapper {
+    flex: none;
+    overflow-x: auto;
+    overflow-y: hidden;
+  }
+
+  .booking-pagination {
+    align-items: flex-start;
+    flex-direction: column;
+    gap: 10px;
+  }
+
+  .booking-page-tabs {
+    justify-content: flex-start;
+=======
     gap: 28px;
   }
 
@@ -750,6 +1012,7 @@ onMounted(() => {
   .bookings-panel td:nth-child(2),
   .bookings-panel td:nth-child(3) span {
     font-size: 13px;
+>>>>>>> origin/vehicle_rental_front
   }
 }
 </style>

@@ -109,17 +109,14 @@ const showPassword = ref(false)
 
 async function register() {
   try {
-    await auth.register({
+    const result = await auth.register({
       name: form.name,
       email: form.email,
-      password: form.password,
-      phoneNumber: form.phoneNumber
+      pwd: form.password
     })
 
-    router.push({
-      name: 'verify-otp',
-      query: { email: form.email }
-    })
+    alert(result?.message || 'Registration successful. You can login now.')
+    router.push('/auth/login')
   } catch {
     // Error is stored in auth store.
   }

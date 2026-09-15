@@ -75,6 +75,24 @@
           </svg>
           Continue with Google
         </button>
+<<<<<<< HEAD
+
+        <div class="auth-divider">
+          <span>OR</span>
+        </div>
+
+        <button
+          type="button"
+          class="google-login-button"
+          :disabled="auth.loading"
+          @click="continueWithGoogle"
+        >
+          <img src="../../assets/google-icon.svg" alt="" />
+          <span>{{ auth.loading ? 'Opening Google...' : 'Continue with Google' }}</span>
+        </button>
+      </form>
+=======
+>>>>>>> origin/vehicle_rental_front
 
         <div class="divider">
           <span>or sign in with email</span>
@@ -176,6 +194,14 @@ async function login() {
     router.push(redirect)
   } catch {
     // Error state is maintained in auth.error
+  }
+}
+
+async function continueWithGoogle() {
+  try {
+    await auth.startGoogleLogin()
+  } catch {
+    // Error is stored in auth store.
   }
 }
 </script>
