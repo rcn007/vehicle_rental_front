@@ -841,6 +841,15 @@ select:focus {
   font-size: 17px;
 }
 
+.filter-group label .brand-logo {
+  display: block;
+  width: 24px;
+  height: 24px;
+  min-width: 24px;
+  object-fit: contain;
+  flex: 0 0 24px;
+}
+
 .filter-group input {
   width: 16px;
   min-height: 16px;
