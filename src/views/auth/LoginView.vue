@@ -53,7 +53,7 @@
         <button
           type="button"
           class="btn btn-google btn-full"
-          @click="auth.loginWithGoogle()"
+          @click="continueWithGoogle"
         >
           <svg class="google-icon" viewBox="0 0 24 24" width="18" height="18">
             <path
@@ -75,25 +75,6 @@
           </svg>
           Continue with Google
         </button>
-<<<<<<< HEAD
-
-        <div class="auth-divider">
-          <span>OR</span>
-        </div>
-
-        <button
-          type="button"
-          class="google-login-button"
-          :disabled="auth.loading"
-          @click="continueWithGoogle"
-        >
-          <img src="../../assets/google-icon.svg" alt="" />
-          <span>{{ auth.loading ? 'Opening Google...' : 'Continue with Google' }}</span>
-        </button>
-      </form>
-=======
->>>>>>> origin/vehicle_rental_front
-
         <div class="divider">
           <span>or sign in with email</span>
         </div>
@@ -199,7 +180,7 @@ async function login() {
 
 async function continueWithGoogle() {
   try {
-    await auth.startGoogleLogin()
+    auth.googleLogin()
   } catch {
     // Error is stored in auth store.
   }

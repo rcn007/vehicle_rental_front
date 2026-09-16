@@ -10,12 +10,9 @@ const api = axios.create({
 api.interceptors.request.use(
   (config) => {
     const token = localStorage.getItem("token");
+    const hasUsableToken = token && !["undefined", "null", "frontend-demo-token"].includes(token);
 
-<<<<<<< HEAD
-    if (token && token !== "frontend-demo-token") {
-=======
-    if (token && token.split(".").length === 3) {
->>>>>>> origin/vehicle_rental_front
+    if (hasUsableToken) {
       config.headers.Authorization = `Bearer ${token}`;
     }
 

@@ -2,11 +2,7 @@
 
 @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Montserrat:wght@500;600;700;800&display=swap');
 @import 'tailwindcss';
-<<<<<<< HEAD
-
-=======
 @custom-variant dark (&:where(.dark, .dark *));
->>>>>>> origin/vehicle_rental_front
 :root {
   --primary: #0f172a;
   --primary-soft: #64748b;
@@ -870,6 +866,15 @@ select:focus {
   gap: 10px;
   color: #52627f;
   font-size: 17px;
+}
+
+.filter-group label .brand-logo {
+  display: block;
+  width: 24px;
+  height: 24px;
+  min-width: 24px;
+  object-fit: contain;
+  flex: 0 0 24px;
 }
 
 .filter-group input {

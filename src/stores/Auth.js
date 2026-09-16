@@ -24,7 +24,12 @@ const demoUser = {
 export const useAuthStore = defineStore('auth', {
   state: () => ({
     user: JSON.parse(localStorage.getItem('user') || 'null'),
-    token: localStorage.getItem('token') || null,
+    token: (() => {
+      const storedToken = localStorage.getItem('token')
+      return storedToken && !['undefined', 'null'].includes(storedToken)
+        ? storedToken
+        : null
+    })(),
     loading: false,
     error: null
   }),
@@ -43,38 +48,20 @@ export const useAuthStore = defineStore('auth', {
       this.error = null
 
       try {
-<<<<<<< HEAD
-        if (
-          data.email === demoCredentials.email &&
-          data.password === demoCredentials.password
-        ) {
-          const payload = {
-            token: 'frontend-demo-token',
-            user: demoUser,
-          }
+        const response = await loginApi(form)
 
-          this.token = payload.token
-          this.user = payload.user
-          localStorage.setItem('token', this.token)
-          localStorage.setItem('user', JSON.stringify(this.user))
+        // Support both `{ token, user }` and `{ data: { token, user } }`
+        // responses. Without this, a nested token is stored as `undefined`,
+        // leaving protected endpoints such as /bookings unauthenticated.
+        const loginData = response?.data?.data || response?.data || response
+        const token = loginData?.token || loginData?.accessToken || loginData?.jwt
 
-          return payload
+        if (!token) {
+          throw new Error('The login response did not contain an access token.')
         }
 
-        const response = await api.post('/auth/login', {
-          email: data.email?.trim().toLowerCase(),
-          pwd: data.password || data.pwd,
-        })
-        const payload = response.data?.data || response.data
-=======
-        const response = await loginApi(form)
->>>>>>> origin/vehicle_rental_front
-
-        const loginData = response.data
-
-        this.token = loginData.token
-
-        localStorage.setItem('token', loginData.token)
+        this.token = token
+        localStorage.setItem('token', token)
 
         if (loginData.user) {
           this.user = loginData.user
@@ -87,19 +74,12 @@ export const useAuthStore = defineStore('auth', {
         return response
 
       } catch (error) {
-<<<<<<< HEAD
         const errorBody = error.response?.data
         this.error =
           errorBody?.message ||
           errorBody?.error ||
           (typeof errorBody === 'string' ? errorBody : '') ||
           'Login failed'
-=======
-        this.error =
-          error.response?.data?.message ||
-          'Login failed. Please check your email and password.'
-
->>>>>>> origin/vehicle_rental_front
         throw error
 
       } finally {
@@ -118,19 +98,12 @@ export const useAuthStore = defineStore('auth', {
         return await registerApi(form)
 
       } catch (error) {
-<<<<<<< HEAD
         const errorBody = error.response?.data
         this.error =
           errorBody?.message ||
           errorBody?.error ||
           (typeof errorBody === 'string' ? errorBody : '') ||
           'Registration failed'
-=======
-        this.error =
-          error.response?.data?.message ||
-          'Registration failed.'
-
->>>>>>> origin/vehicle_rental_front
         throw error
 
       } finally {
@@ -138,14 +111,6 @@ export const useAuthStore = defineStore('auth', {
       }
     },
 
-<<<<<<< HEAD
-    async verifyOtp(data) {
-      const response = await api.post('/auth/verifyOtp', data)
-      return response.data?.data || response.data
-    },
-
-    async startGoogleLogin() {
-=======
     // ================================
     // Verify OTP
     // ================================
@@ -172,20 +137,10 @@ export const useAuthStore = defineStore('auth', {
     // Forgot Password
     // ================================
     async forgotPassword(form) {
->>>>>>> origin/vehicle_rental_front
       this.loading = true
       this.error = null
 
       try {
-<<<<<<< HEAD
-        const response = await api.get('/auth/google')
-        const googleUrl = response.data?.data || response.data
-
-        window.location.href = googleUrl
-      } catch (error) {
-        this.error = error.response?.data?.message || 'Google login failed'
-        throw error
-=======
         return await forgotPasswordApi(form)
 
       } catch (error) {
@@ -194,28 +149,11 @@ export const useAuthStore = defineStore('auth', {
           'Failed to send password reset link.'
 
         throw error
-
->>>>>>> origin/vehicle_rental_front
       } finally {
         this.loading = false
       }
     },
 
-<<<<<<< HEAD
-    finishGoogleLogin(payload) {
-      this.token = payload.token
-      this.user = {
-        id: payload.id,
-        name: payload.name,
-        email: payload.email,
-        role: payload.role,
-      }
-
-      localStorage.setItem('token', this.token)
-      localStorage.setItem('user', JSON.stringify(this.user))
-    },
-
-=======
     // ================================
     // Reset Password
     // ================================
@@ -248,7 +186,6 @@ export const useAuthStore = defineStore('auth', {
     // ================================
     // Logout
     // ================================
->>>>>>> origin/vehicle_rental_front
     logout() {
       this.user = null
       this.token = null

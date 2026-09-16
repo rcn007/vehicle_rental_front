@@ -115,8 +115,13 @@ async function register() {
       pwd: form.password
     })
 
-    alert(result?.message || 'Registration successful. You can login now.')
-    router.push('/auth/login')
+    router.push({
+      name: 'verify-otp',
+      query: {
+        email: form.email,
+        message: result?.message || 'Registration successful. Check your email for the verification code.'
+      }
+    })
   } catch {
     // Error is stored in auth store.
   }

@@ -1,11 +1,6 @@
 <template>
-<<<<<<< HEAD
   <section class="section booking-page">
     <div class="container booking-container">
-=======
-  <section class="section" :class="{ 'lambo-booking': isLambo }">
-    <div class="container narrow" :class="{ 'lambo-container': isLambo }">
->>>>>>> origin/vehicle_rental_front
       <div class="page-header">
         <p class="section-label">BOOKING</p>
         <h1>Book Your Vehicle</h1>
@@ -23,11 +18,7 @@
             :alt="vehicleStore.vehicle.name"
           />
 
-<<<<<<< HEAD
           <div class="booking-vehicle-details">
-=======
-          <div class="vehicle-meta">
->>>>>>> origin/vehicle_rental_front
             <h2>{{ vehicleStore.vehicle.name }}</h2>
 
             <div class="booking-vehicle-specs">
@@ -67,15 +58,12 @@
 
 <script setup>
 import { computed, onMounted } from 'vue'
-<<<<<<< HEAD
 import {
   BriefcaseBusiness,
   Fuel,
   SlidersHorizontal,
   Users,
 } from '@lucide/vue'
-=======
->>>>>>> origin/vehicle_rental_front
 import { useRoute, useRouter } from 'vue-router'
 import { useVehicleStore } from '../stores/Vehicle'
 import { useBookingStore } from '../stores/Booking'
@@ -90,16 +78,15 @@ const vehicleStore = useVehicleStore()
 const bookingStore = useBookingStore()
 const authStore = useAuthStore()
 
-<<<<<<< HEAD
 const dailyPrice = computed(
   () =>
     vehicleStore.vehicle?.pricePerDay ||
     vehicleStore.vehicle?.price ||
     0
-=======
+)
+
 const isLambo = computed(
   () => vehicleStore.vehicle?.name === 'Lamborghini Aventador'
->>>>>>> origin/vehicle_rental_front
 )
 
 onMounted(() => {

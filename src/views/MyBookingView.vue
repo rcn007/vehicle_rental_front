@@ -96,16 +96,11 @@
                     </span>
                   </td>
                   <td>
-<<<<<<< HEAD
                     <RouterLink
                       to="/rental-history"
                       class="btn btn-primary"
                     >
                       View
-=======
-                    <RouterLink to="/rental-history" class="view-link">
-                      View Details
->>>>>>> origin/vehicle_rental_front
                     </RouterLink>
                   </td>
                 </tr>
@@ -577,17 +572,14 @@ onMounted(() => {
 
 .bookings-panel .table-wrapper {
   width: 100%;
-<<<<<<< HEAD
   max-width: 100%;
   flex: 1;
   min-height: 0;
   overflow-x: scroll;
   overflow-y: hidden;
   -webkit-overflow-scrolling: touch;
-=======
   min-height: 0;
   overflow-x: auto;
->>>>>>> origin/vehicle_rental_front
   background: #ffffff;
   border: 1px solid var(--border);
   border-radius: 8px;
@@ -767,12 +759,9 @@ onMounted(() => {
 }
 
 .bookings-panel .loading {
-<<<<<<< HEAD
   flex: 1;
   min-height: 0;
-=======
   min-height: 160px;
->>>>>>> origin/vehicle_rental_front
   display: flex;
   align-items: center;
   justify-content: center;
@@ -837,7 +826,6 @@ onMounted(() => {
 
   .dashboard-content-grid {
     grid-template-columns: 1fr;
-<<<<<<< HEAD
     height: auto;
   }
 
@@ -859,7 +847,6 @@ onMounted(() => {
 
   .booking-page-tabs {
     justify-content: flex-start;
-=======
     gap: 28px;
   }
 
@@ -1012,7 +999,6 @@ onMounted(() => {
   .bookings-panel td:nth-child(2),
   .bookings-panel td:nth-child(3) span {
     font-size: 13px;
->>>>>>> origin/vehicle_rental_front
   }
 }
 </style>

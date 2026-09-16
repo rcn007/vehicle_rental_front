@@ -1,5 +1,4 @@
 <template>
-<<<<<<< HEAD
   <form class="booking-form-card" @submit.prevent="submitForm">
     <h2>Book Vehicle</h2>
 
@@ -124,35 +123,6 @@
       class="btn btn-primary btn-full booking-submit-button"
       :disabled="loading"
     >
-=======
-  <form
-    :class="['form-card', { 'lambo-form': isLambo }]"
-    @submit.prevent="submitForm"
-  >
-    <h2>Book Vehicle</h2>
-
-    <div class="form-group">
-      <label>Pickup Date</label>
-      <input v-model="form.pickupDate" type="date" required />
-    </div>
-
-    <div class="form-group">
-      <label>Return Date</label>
-      <input v-model="form.returnDate" type="date" required />
-    </div>
-
-    <div class="booking-summary">
-      <span>Total Days</span>
-      <strong>{{ totalDays }}</strong>
-    </div>
-
-    <div class="booking-summary">
-      <span>Total Price</span>
-      <strong>${{ totalPrice }}</strong>
-    </div>
-
-    <button type="submit" class="btn btn-primary btn-full" :disabled="loading">
->>>>>>> origin/vehicle_rental_front
       {{ loading ? 'Booking...' : 'Confirm Booking' }}
     </button>
   </form>
@@ -182,7 +152,6 @@ const props = defineProps({
 
 const emit = defineEmits(['submit'])
 
-<<<<<<< HEAD
 const locations = [
   {
     name: 'DriveEase Central',
@@ -233,13 +202,6 @@ const form = reactive({
   returnDate: toDateInputValue(addDays(today, 5)),
   pickupTime: '10:00 AM',
   returnTime: '10:00 AM',
-=======
-const isLambo = computed(() => props.vehicle?.name === 'Lamborghini Aventador')
-
-const form = reactive({
-  pickupDate: '',
-  returnDate: ''
->>>>>>> origin/vehicle_rental_front
 })
 
 const pickupLocation = computed(() =>
@@ -315,8 +277,6 @@ function submitForm() {
   })
 }
 </script>
-<<<<<<< HEAD
-=======
 
 <style scoped>
 .form-card {
@@ -430,4 +390,3 @@ function submitForm() {
   }
 }
 </style>
->>>>>>> origin/vehicle_rental_front

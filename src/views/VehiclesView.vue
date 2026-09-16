@@ -7,11 +7,20 @@
       </div>
 
       <div class="mobile-search">
-        <SearchBar mobile @search="handleSearch" />
+        <SearchBar
+          mobile
+          :brands="brands"
+          :categories="categories"
+          @search="handleSearch"
+        />
       </div>
 
       <div class="vehicles-layout">
-        <SearchBar @search="handleSearch" />
+        <SearchBar
+          :brands="brands"
+          :categories="categories"
+          @search="handleSearch"
+        />
 
         <div class="vehicles-results">
           <div class="hero-search vehicle-search">
@@ -104,9 +113,19 @@
 
           <div class="filter-group">
             <h3>Brand</h3>
-            <label v-for="brand in brands" :key="brand">
-              <input v-model="draftFilters.brand" type="radio" :value="brand" />
-              {{ brand }}
+            <label v-for="brand in brands" :key="brand.name">
+              <input
+                v-model="draftFilters.brand"
+                type="radio"
+                :value="brand.name"
+              />
+              <img
+                v-if="brand.logo"
+                class="brand-logo"
+                :src="brand.logo"
+                :alt="`${brand.name} logo`"
+              />
+              {{ brand.name }}
             </label>
           </div>
 
@@ -127,25 +146,22 @@
 <script setup>
 import { computed, onMounted, reactive, ref } from 'vue'
 import { useVehicleStore } from '../stores/Vehicle'
-import { useBookingStore } from '../stores/Booking'
+import { useBrandStore } from '../stores/Brand'
+import { useCategoryStore } from '../stores/Category'
 import VehicleCard from '../components/VehicleCard.vue'
 import SearchBar from '../components/Searchbar.vue'
 
 const vehicleStore = useVehicleStore()
-const bookingStore = useBookingStore()
+const brandStore = useBrandStore()
+const categoryStore = useCategoryStore()
 const sortBy = ref('default')
 const filterDrawerOpen = ref(false)
 
-const categories = ['All', 'Sedan', 'SUV', 'Motorcycle', 'Luxury']
-const brands = [
-  'All',
-  'BMW',
-  'Toyota',
-  'Honda',
-  'Rolls-Royce',
-  'Audi',
-  'Harley-Davidson'
-]
+const brands = computed(() => [{ name: 'All', logo: '' }, ...brandStore.brands])
+const categories = computed(() => [
+  { name: 'All' },
+  ...categoryStore.categories
+])
 
 const filters = reactive({
   search: '',
@@ -162,12 +178,6 @@ const draftFilters = reactive({
 
 const filteredVehicles = computed(() => {
   const search = filters.search.trim().toLowerCase()
-  const pickupDate = filters.pickupDate
-    ? new Date(`${filters.pickupDate}T00:00:00`)
-    : null
-  const returnDate = filters.returnDate
-    ? new Date(`${filters.returnDate}T00:00:00`)
-    : null
 
   const results = vehicleStore.vehicles.filter((vehicle) => {
     const name = String(vehicle.name || vehicle.model || '').toLowerCase()
@@ -183,28 +193,7 @@ const filteredVehicles = computed(() => {
     const matchesBrand =
       filters.brand === 'All' ||
       brand === filters.brand.toLowerCase().replace(/[-\s]+/g, '')
-    const hasOverlappingBooking =
-      pickupDate && returnDate
-        ? bookingStore.bookings.some((booking) => {
-            const bookingStart = new Date(`${booking.pickupDate}T00:00:00`)
-            const bookingEnd = new Date(`${booking.returnDate}T00:00:00`)
-            const status = String(booking.status || '').toLowerCase()
-            const isBlocking = ['pending', 'confirmed', 'active'].includes(
-              status
-            )
-
-            return (
-              isBlocking &&
-              String(booking.vehicleId) === String(vehicle.id) &&
-              bookingStart < returnDate &&
-              bookingEnd > pickupDate
-            )
-          })
-        : false
-
-    return (
-      matchesSearch && matchesCategory && matchesBrand && !hasOverlappingBooking
-    )
+    return matchesSearch && matchesCategory && matchesBrand
   })
 
   return [...results].sort((a, b) => {
@@ -252,6 +241,7 @@ function resetFilters() {
 
 onMounted(() => {
   vehicleStore.fetchVehicles()
-  bookingStore.fetchBookings()
+  brandStore.fetchBrands()
+  categoryStore.fetchCategories()
 })
 </script>

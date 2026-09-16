@@ -150,15 +150,9 @@ const routes = [
         component: ForgotPasswordView
       },
       {
-<<<<<<< HEAD
-        path: 'google/callback',
-        name: 'google-callback',
-        component: GoogleCallbackView
-=======
         path: 'reset-password',
         name: 'reset-password',
         component: ResetPassword
->>>>>>> origin/vehicle_rental_front
       }
     ]
   },
@@ -176,6 +170,8 @@ const routes = [
   {
     path: '/admin',
     component: () => import('../layouts/AdminLayout.vue'),
+    meta: { requiresAuth: true, requiresAdmin: true },
+
     meta: { requiresAdmin: true },
     children: [
       {
@@ -341,7 +337,10 @@ const router = createRouter({
 })
 
 router.beforeEach((to) => {
-  const token = localStorage.getItem('token')
+  const storedToken = localStorage.getItem('token')
+  const token = storedToken && !['undefined', 'null'].includes(storedToken)
+    ? storedToken
+    : null
   const user = JSON.parse(localStorage.getItem('user') || 'null')
 
   if (to.meta.requiresAuth && !token) {

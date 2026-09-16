@@ -2,6 +2,45 @@
 import api from '../api/axios'
 import audiA4Image from '../assets/audiA4.jpg'
 
+function imageUrlFrom(vehicle) {
+  const vehicleImage = vehicle?.vehicle_image || vehicle?.vehicleImage
+  const image = Array.isArray(vehicleImage) ? vehicleImage[0] : vehicleImage
+
+  const url =
+    vehicle?.image ||
+    vehicle?.imageUrl ||
+    image?.url ||
+    image?.imageUrl ||
+    image?.path ||
+    image?.image ||
+    (typeof image === 'string' ? image : null)
+
+  // The image API currently returns Cloudinary URLs in Markdown-link form:
+  // [https://...](https://...). An <img> needs only the URL in parentheses.
+  const markdownUrl =
+    typeof url === 'string' &&
+    url.match(/^\[[^\]]*\]\((https?:\/\/[^)]+)\)$/)
+  return markdownUrl ? markdownUrl[1] : url
+}
+
+function withVehicleImage(vehicle) {
+  if (!vehicle || typeof vehicle !== 'object') return vehicle
+
+  const image = imageUrlFrom(vehicle)
+  return image ? { ...vehicle, image } : vehicle
+}
+
+async function withFetchedVehicleImage(vehicle) {
+  try {
+    const response = await api.get(`/vehicle_image/getById/${vehicle.id}`)
+    const vehicleImage = response.data?.data || response.data
+
+    return withVehicleImage({ ...vehicle, vehicle_image: vehicleImage })
+  } catch {
+    return withVehicleImage(vehicle)
+  }
+}
+
 const sampleVehicles = [
   {
     id: 1,
@@ -52,13 +91,8 @@ const sampleVehicles = [
     type: 'Luxury',
     transmission: 'Automatic',
     fuelType: 'Gasoline',
-<<<<<<< HEAD
-    seats: 4,
-    pricePerDay: 0.3,
-=======
     seats: 2,
     pricePerDay: 350,
->>>>>>> origin/vehicle_rental_front
     rating: '4.9',
     status: 'Unavailable',
     image:
@@ -138,9 +172,13 @@ export const useVehicleStore = defineStore('vehicle', {
       this.error = null
 
       try {
-        const response = await api.get('/vehicle/getAll')
-        const vehicles = response.data?.data || response.data || []
-        this.vehicles = vehicles.length ? vehicles.map(normalizeVehicle) : sampleVehicles
+        const response = await api.get('/vehicle/getAll', {
+          params: { include: 'vehicle_image' }
+        })
+        const vehicles = response.data?.data || response.data || sampleVehicles
+        this.vehicles = Array.isArray(vehicles)
+          ? await Promise.all(vehicles.map(withFetchedVehicleImage))
+          : sampleVehicles
       } catch (error) {
         this.error = error.response?.data?.message || 'Failed to load vehicles'
         this.vehicles = sampleVehicles
@@ -154,11 +192,16 @@ export const useVehicleStore = defineStore('vehicle', {
       this.error = null
 
       try {
+        // The Spring API exposes single vehicles at /vehicle/getById/{id}.
+        // `include=vehicle_image` is not supported by that endpoint; images
+        // are loaded by withFetchedVehicleImage below.
         const response = await api.get(`/vehicle/getById/${id}`)
-        this.vehicle =
-          normalizeVehicle(response.data?.data || response.data) ||
-          sampleVehicles.find((vehicle) => String(vehicle.id) === String(id)) ||
-          sampleVehicles[0]
+        const vehicle = response.data?.data || response.data
+        this.vehicle = withVehicleImage(vehicle)
+
+        // The current backend exposes the image as a separate resource rather
+        // than nesting it in GET /vehicle/{id}.
+        this.vehicle = await withFetchedVehicleImage(vehicle)
       } catch (error) {
         this.error = error.response?.data?.message || 'Failed to load vehicle'
         this.vehicle =
