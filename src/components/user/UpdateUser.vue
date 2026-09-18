@@ -74,9 +74,9 @@
             <div>
               <label class="block text-xs font-bold uppercase tracking-wider text-gray-500 mb-1.5">Gender</label>
               <select v-model="form.gender" class="w-full h-10 px-3.5 bg-gray-50 border border-gray-200 rounded-lg text-xs font-semibold text-gray-900 focus:outline-none">
-                <option value="Male">Male</option>
-                <option value="Female">Female</option>
-                <option value="Other">Other</option>
+                <option value="MALE">Male</option>
+                <option value="FEMALE">Female</option>
+               
               </select>
             </div>
           </div>
@@ -150,7 +150,7 @@ const form = ref({
   name: '',
   email: '',
   phone: '',
-  gender: 'Male',
+  gender: 'MALE',
   role: 'CUSTOMER',
   status: 'ACTIVE'
 })
@@ -183,7 +183,7 @@ const fetchUserDetails = async () => {
       name: data.name || `${data.firstName || ''} ${data.lastName || ''}`.trim() || '',
       email: data.email || '',
       phone: data.phone || data.phoneNumber || '',
-      gender: data.gender || 'Male',
+      gender: data.gender || 'MALE',
       role: String(data.role || 'CUSTOMER').toUpperCase(),
       status: String(data.status || 'ACTIVE').toUpperCase()
     }

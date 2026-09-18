@@ -9,7 +9,7 @@
             Payments
           </h1>
         </div>
-        <p class="text-xl text-[var(--muted)]">
+        <p class="text-xl text-[--text]">
           Monitor rental payments and transaction activity.
         </p>
       </div>
@@ -575,30 +575,29 @@ const fetchPayments = async () => {
   try {
     loading.value = true
     error.value = null
+
     const res = await getPayments()
+
+    console.log("========== PAYMENT API ==========")
+    console.log("FULL RESPONSE:", res)
+    console.log("TYPE:", typeof res)
+    console.log("DATA:", res?.data)
+    console.log("DATA.DATA:", res?.data?.data)
+    console.log("=================================")
+
     payments.value = unwrapData(res)
+
+    console.log("PAYMENTS ARRAY:", payments.value)
+
   } catch (err) {
     console.error('Failed to load payments:', err)
-    error.value = err.response?.data?.message || err.response?.data?.msg || 'Failed to retrieve payment records.'
+
+    error.value =
+      err.response?.data?.message ||
+      err.response?.data?.msg ||
+      'Failed to retrieve payment records.'
   } finally {
     loading.value = false
-  }
-}
-
-/* Delete Payment Action */
-const handleDelete = async (payment) => {
-  const isConfirmed = window.confirm(`Are you sure you want to delete payment PAY-${payment.id}?`)
-  if (!isConfirmed) return
-
-  try {
-    deletingId.value = payment.id
-    await deletePayment(payment.id)
-    payments.value = payments.value.filter(p => p.id !== payment.id)
-  } catch (err) {
-    console.error('Failed to delete payment:', err)
-    alert(err.response?.data?.message || err.response?.data?.msg || 'Failed to delete payment.')
-  } finally {
-    deletingId.value = null
   }
 }
 

@@ -156,24 +156,45 @@ const form = reactive({
 const showPassword = ref(false)
 
 // Intercept OAuth callback parameter if redirected back from Google authentication
-onMounted(async () => {
-  const code = route.query.code
-  if (code) {
-    try {
-      await auth.handleGoogleCallback(code)
-      const redirect = route.query.redirect || '/'
-      router.push(redirect)
-    } catch {
-      // Handled in store
+onMounted(() => {
+  const token = route.query.token
+  const error = route.query.error
+
+  if (error) {
+    auth.error = 'Google login failed. Please try again.'
+    return
+  }
+
+  if (token) {
+    const success = auth.handleGoogleCallback()
+
+    if (success) {
+      const user = auth.user
+      console.log('Logged in user:', user)
+      console.log('User role:', user?.role)
+
+      if (user?.role === 'ADMIN') {
+        router.push('/admin/dashboard')
+      } else {
+        router.push('/')
+      }
     }
   }
 })
-
 async function login() {
   try {
     await auth.login(form)
-    const redirect = route.query.redirect || '/'
-    router.push(redirect)
+
+    // Get logged-in user's role
+    const user = auth.user
+
+    if (user?.role === 'ADMIN') {
+      router.push('/admin/dashboard')
+      
+    } else {
+      const redirect = route.query.redirect || '/'
+      router.push(redirect)
+    }
   } catch {
     // Error state is maintained in auth.error
   }

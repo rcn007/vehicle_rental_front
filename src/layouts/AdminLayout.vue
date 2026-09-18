@@ -2,7 +2,7 @@
   <div class="min-h-screen bg-slate-50">
 
     <!-- Fixed Sidebar -->
-    <DashboardSidebar />
+    <DashboardSidebar @logout="logout"/>
 
     <!-- Main Area -->
     <div class="ml-60 min-h-screen">
@@ -27,4 +27,14 @@
 import DashboardSidebar from '../components/dashboard/DashboardSidebar.vue'
 import DashboardNavbar from '../components/dashboard/DashboardNavbar.vue'
 import NotificationPopup from '../components/dashboard/NotificationPopup.vue';
+import { useRouter } from 'vue-router'
+import { useAuthStore } from '../stores/Auth'
+
+const auth = useAuthStore()
+const router = useRouter()
+
+function logout() {
+  auth.logout()
+  router.push('/')
+}
 </script>

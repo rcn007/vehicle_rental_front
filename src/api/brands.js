@@ -19,10 +19,10 @@ export const createBrand = async (brandData) => {
 };
 
 // Update brand
-export const updateBrand = async (id, brandData) => {
-  const response = await api.put(`/brands/update/${id}`, brandData);
-  return response.data;
-};
+export const updateBrand = async (id, formData) => {
+  const response = await api.put(`/brands/update/${id}`, formData)
+  return response.data
+}
 
 // Delete brand
 export const deleteBrand = async (id) => {

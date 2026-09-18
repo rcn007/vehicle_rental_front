@@ -9,7 +9,7 @@
         <h1 class="text-3xl sm:text-3xl font-bold tracking-tight text-(--text)">
           Rental History
         </h1>
-        <p class="text-xl text-(--muted)">
+        <p class="text-xl text-(--text)">
           View completed rental transactions and rental performance.
         </p>
       </div>
@@ -79,7 +79,7 @@
           <div class="bg-(--surface) border border-(--border) rounded-2xl p-5 hover:border-(--muted) transition shadow-sm">
             <div class="flex items-start justify-between">
               <div>
-                <span class="text-(--muted) text-[15px] font-bold uppercase tracking-wider">
+                <span class="text-(--text) text-[15px] font-bold uppercase tracking-wider">
                   Total Rentals
                 </span>
                 <h2 class="text-2xl font-bold text-(--text) mt-2">
@@ -99,7 +99,7 @@
           <div class="bg-(--surface) border border-(--border) rounded-2xl p-5 hover:border-(--muted) transition shadow-sm">
             <div class="flex items-start justify-between">
               <div>
-                <span class="text-(--muted) text-[15px] font-bold uppercase tracking-wider">
+                <span class="text-(--text) text-[15px] font-bold uppercase tracking-wider">
                   Total Revenue
                 </span>
                 <h2 class="text-2xl font-bold text-(--text) mt-2">
@@ -119,7 +119,7 @@
           <div class="bg-(--surface) border border-(--border) rounded-2xl p-5 hover:border-(--muted) transition shadow-sm">
             <div class="flex items-start justify-between">
               <div>
-                <span class="text-(--muted) text-[15px] font-bold uppercase tracking-wider">
+                <span class="text-(--text) text-[15px] font-bold uppercase tracking-wider">
                   Average Duration
                 </span>
                 <h2 class="text-2xl font-bold text-(--text) mt-2">

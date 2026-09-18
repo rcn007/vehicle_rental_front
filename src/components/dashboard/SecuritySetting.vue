@@ -1,11 +1,11 @@
 <template>
-  <div class="grid grid-cols-1 lg:grid-cols-3 gap-6 text-(--text)">
+  <div class="grid grid-cols-1 lg:grid-cols-3 gap-6 text-(--text) p-3">
     
     <!-- Left Column: Settings & Password Forms -->
     <div class="lg:col-span-2 space-y-6">
 
       <!-- 2FA Card -->
-      <div :class="cardClasses">
+      <!-- <div :class="cardClasses">
         <div class="flex items-center justify-between">
           <div>
             <h2 class="text-base font-bold text-(--text) mb-1">Two-Factor Authentication</h2>
@@ -28,10 +28,10 @@
             ></div>
           </label>
         </div>
-      </div>
+      </div> -->
 
       <!-- Session Timeout Card -->
-      <div :class="cardClasses">
+      <!-- <div :class="cardClasses">
         <h2 class="text-base font-bold text-(--text) mb-1">Session Timeout</h2>
         <p class="text-xs text-(--muted) mb-4">
           Automatically sign out idle administrators.
@@ -60,7 +60,7 @@
             {{ saving ? "Saving..." : "Save Security Settings" }}
           </button>
         </div>
-      </div>
+      </div> -->
 
       <!-- Change Password Card -->
       <div :class="cardClasses">

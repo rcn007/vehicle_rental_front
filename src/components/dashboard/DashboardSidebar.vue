@@ -100,6 +100,7 @@
 
         <span
           class="truncate font-medium"
+           @click="logout"
           style="font-family: var(--font-body);"
         >
           Logout
@@ -115,6 +116,7 @@ import { onMounted, ref } from 'vue'
 import { getCustomizerSettings } from '../../api/customizer'
 
 defineEmits(['logout'])
+
 
 const siteName = ref('ChoulTv')
 const logoUrl = ref('')

@@ -490,3 +490,197 @@ onMounted(() => {
   fetchCustomizer()
 })
 </script>
+
+<style>
+/* =========================================================
+   PROFILE LINK
+========================================================= */
+
+.profile-link {
+  display: inline-flex;
+  align-items: center;
+  gap: 9px;
+  text-decoration: none;
+  color: inherit;
+  padding: 4px 8px 4px 4px;
+  border-radius: 999px;
+  transition:
+    background-color 0.2s ease,
+    transform 0.2s ease;
+}
+
+.profile-link:hover {
+  background: #f1f5f9;
+  transform: translateY(-1px);
+}
+
+
+/* =========================================================
+   DESKTOP PROFILE AVATAR
+========================================================= */
+
+.profile-avatar {
+  width: 38px;
+  height: 38px;
+  min-width: 38px;
+
+  border-radius: 50%;
+
+  object-fit: cover;
+  object-position: center;
+
+  display: block;
+
+  background: #e2e8f0;
+
+  border: 2px solid #ffffff;
+
+  box-shadow:
+    0 2px 6px rgba(15, 23, 42, 0.12),
+    0 0 0 1px rgba(148, 163, 184, 0.25);
+
+  transition:
+    transform 0.2s ease,
+    box-shadow 0.2s ease;
+}
+
+.profile-link:hover .profile-avatar {
+  transform: scale(1.06);
+
+  box-shadow:
+    0 4px 10px rgba(15, 23, 42, 0.16),
+    0 0 0 1px rgba(148, 163, 184, 0.35);
+}
+
+
+/* =========================================================
+   PROFILE FALLBACK
+========================================================= */
+
+.profile-avatar-fallback {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  font-size: 14px;
+  font-weight: 700;
+
+  color: #ffffff;
+
+  background: linear-gradient(
+    135deg,
+    #0f172a,
+    #334155
+  );
+
+  text-transform: uppercase;
+}
+
+
+/* =========================================================
+   PROFILE NAME
+========================================================= */
+
+.profile-name {
+  max-width: 120px;
+
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+
+  font-size: 14px;
+  font-weight: 600;
+
+  color: #0f172a;
+
+  line-height: 1;
+}
+
+
+/* =========================================================
+   MOBILE PROFILE
+========================================================= */
+
+.mobile-profile-link {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+
+  padding: 8px 10px;
+
+  border-radius: 12px;
+
+  text-decoration: none;
+  color: inherit;
+
+  transition:
+    background-color 0.2s ease,
+    transform 0.2s ease;
+}
+
+.mobile-profile-link:hover {
+  background: #f1f5f9;
+}
+
+.mobile-profile-avatar {
+  width: 40px;
+  height: 40px;
+  min-width: 40px;
+
+  border-radius: 50%;
+
+  object-fit: cover;
+  object-position: center;
+
+  display: block;
+
+  background: #e2e8f0;
+
+  border: 2px solid #ffffff;
+
+  box-shadow:
+    0 2px 7px rgba(15, 23, 42, 0.14),
+    0 0 0 1px rgba(148, 163, 184, 0.25);
+}
+
+
+/* =========================================================
+   MOBILE FALLBACK
+========================================================= */
+
+.mobile-profile-avatar-fallback {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  font-size: 14px;
+  font-weight: 700;
+
+  color: #ffffff;
+
+  background: linear-gradient(
+    135deg,
+    #0f172a,
+    #334155
+  );
+}
+
+
+/* =========================================================
+   MOBILE RESPONSIVE
+========================================================= */
+
+@media (max-width: 768px) {
+
+  .profile-avatar {
+    width: 36px;
+    height: 36px;
+    min-width: 36px;
+  }
+
+  .profile-name {
+    max-width: 100px;
+  }
+
+}
+</style>

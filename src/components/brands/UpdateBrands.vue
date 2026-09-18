@@ -58,10 +58,18 @@
             <input type="text" v-model="form.name" required class="w-full h-10 px-3.5 bg-gray-50 border border-gray-200 rounded-lg text-xs font-medium text-gray-900 focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-600">
           </div>
 
-          <div>
-            <label class="block text-xs font-bold uppercase tracking-wider text-gray-500 mb-1.5">Logo Image URL</label>
-            <input type="url" v-model="form.logo" class="w-full h-10 px-3.5 bg-gray-50 border border-gray-200 rounded-lg text-xs font-medium text-gray-900 focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-600">
-          </div>
+            <div>
+              <label class="block text-xs font-bold uppercase tracking-wider text-gray-500 mb-1.5">
+                Logo Image
+              </label>
+
+              <input
+                accept="image/*"
+                @change="handleLogoChange"
+                type="file"
+                class="w-full h-10 px-3.5 bg-gray-50 border border-gray-200 rounded-lg text-xs font-medium text-gray-900 focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-600"
+              >
+            </div>
 
           <div>
             <label class="block text-xs font-bold uppercase tracking-wider text-gray-500 mb-1.5">Description</label>
@@ -76,9 +84,14 @@
           <h2 class="text-base font-bold text-gray-900 border-b border-gray-100 pb-4">Logo Preview</h2>
 
           <div class="w-full h-32 bg-gray-50 border border-gray-200 rounded-lg flex items-center justify-center p-4">
-            <img v-if="form.logo" :src="form.logo" alt="Logo preview" class="max-h-full max-w-full object-contain" />
-            <div v-else class="text-center text-gray-400">
-              <i class="fa-solid fa-image text-2xl mb-1"></i>
+        <img
+            v-if="logoPreview"
+            :src="logoPreview"
+            alt="Logo preview"
+            class="max-h-full max-w-full object-contain"
+          />    
+                  <div v-else class="text-center text-gray-400">
+                            <i class="fa-solid fa-image text-2xl mb-1"></i>
               <p class="text-[11px]">No Logo Provided</p>
             </div>
           </div>
@@ -91,9 +104,7 @@
             </select>
           </div>
 
-          <button type="submit" :disabled="submitting" class="w-full h-10 rounded-lg text-xs font-bold uppercase tracking-wider text-white bg-blue-600 hover:bg-blue-700 transition-all shadow-xs cursor-pointer disabled:opacity-50">
-            Save Updates
-          </button>
+      
         </div>
       </div>
 
@@ -151,15 +162,41 @@ const fetchBrandDetails = async () => {
 const handleSave = async () => {
   try {
     submitting.value = true
-    await updateBrand(activeId.value, form.value)
+
+    const formData = new FormData()
+
+    formData.append('brandName', form.value.name)
+    formData.append('description', form.value.description)
+    formData.append('status', form.value.status)
+
+    if (form.value.logo instanceof File) {
+      formData.append('file', form.value.logo)
+    }
+
+    await updateBrand(activeId.value, formData)
+
     router.push('/admin/brands')
-  } catch (err) {
-    console.error('Failed to update brand:', err)
-    alert(err.response?.data?.message || err.response?.data?.msg || 'Failed to update brand.')
+  } catch (error) {
+    console.error('Update brand error:', error)
+    fetchError.value =
+      error.response?.data?.message || 'Failed to update brand.'
   } finally {
     submitting.value = false
   }
 }
+const logoPreview = computed(() => {
+  if (form.value.logo instanceof File) {
+    return URL.createObjectURL(form.value.logo)
+  }
 
+  return form.value.logo
+})
+const handleLogoChange = (event) => {
+  const file = event.target.files[0]
+
+  if (file) {
+    form.value.logo = file
+  }
+}
 onMounted(fetchBrandDetails)
 </script>

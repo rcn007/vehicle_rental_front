@@ -5,7 +5,7 @@
     <div class="flex flex-col md:flex-row md:items-center justify-between mb-8 gap-4">
       <div>
         <h1 class="text-3xl font-bold tracking-tight text-[var(--text)]">Users</h1>
-        <p class="text-xl text-[var(--muted)] mt-1">Manage administrators, operational staff, and registered customers</p>
+        <p class="text-xl text-[--text] mt-1">Manage administrators, operational staff, and registered customers</p>
       </div>
       
       <div class="flex items-center gap-3 shrink-0">

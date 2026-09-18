@@ -52,27 +52,7 @@
   >
     <div class="max-w-3xl py-20 sm:py-24 lg:py-28">
 
-      <!-- Availability Badge -->
-      <div
-        class="inline-flex items-center gap-2.5 px-4 py-2 rounded-full
-               bg-white/10 backdrop-blur-md
-               border border-white/15
-               text-xs sm:text-sm font-semibold
-               tracking-wide text-emerald-300
-               mb-7 shadow-lg shadow-black/10"
-      >
-        <span class="relative flex h-2.5 w-2.5">
-          <span
-            class="absolute inline-flex h-full w-full rounded-full
-                   bg-emerald-400 opacity-75 animate-ping"
-          />
-          <span
-            class="relative inline-flex rounded-full h-2.5 w-2.5 bg-emerald-500"
-          />
-        </span>
-
-        {{ availableVehicleCount }} Vehicles Available Now
-      </div>
+    
 
       <!-- Hero Title -->
       <h1

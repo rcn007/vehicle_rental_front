@@ -1,273 +1,444 @@
 <template>
-  <section class="min-h-screen bg-[#F4F6F9] py-8 px-4 sm:px-6 lg:px-8 text-slate-800 font-sans">
-    <div class="max-w-6xl mx-auto space-y-6">
-      
-      <!-- =====================================================
-           TOP NAVIGATION BAR
-      ====================================================== -->
-      <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4 bg-white px-6 py-4 rounded-2xl shadow-xs border border-slate-100">
-        <div class="flex items-center gap-4">
-          <button 
-            type="button" 
-            @click="goBack" 
-            class="text-slate-400 hover:text-slate-700 transition-colors cursor-pointer flex items-center gap-2 text-sm font-medium"
-          >
-            <i class="fa-solid fa-arrow-left text-base"></i>
-            <span>Back</span>
-          </button>
-          
-          <span class="text-xl font-bold text-slate-900">Car Details</span>
-
-          <!-- Status Badge -->
-          <span 
-            :class="[
-              'text-xs font-bold px-3 py-1 rounded-full uppercase tracking-wider',
-              vehicleStatusClass
-            ]"
-          >
-            {{ vehicleStatusText }}
-          </span>
-        </div>
-
-        <!-- Navigation Pills -->
-        <div class="flex items-center gap-2 sm:gap-3 text-sm font-semibold">
-          <button class="px-5 py-2 rounded-full bg-[#1E3A8A] text-white shadow-xs cursor-pointer">
-            Info and price
-          </button>
-          <button class="px-5 py-2 rounded-full text-slate-500 hover:bg-slate-100 transition-colors cursor-pointer">
-            Guest Ratings
-          </button>
-          <button class="px-5 py-2 rounded-full text-slate-500 hover:bg-slate-100 transition-colors cursor-pointer">
-            Location
-          </button>
-        </div>
-      </div>
+  <section class="min-h-screen bg-[var(--background)] py-6 px-4 sm:px-6 lg:px-8 text-[var(--text)] antialiased font-sans">
+    <div class="max-w-[1200px] mx-auto space-y-6">
 
       <!-- =====================================================
-           LOADING STATE
+            TOP NAVIGATION / BREADCRUMB
       ====================================================== -->
-      <div v-if="vehicleStore.loading" class="flex flex-col items-center justify-center py-24 text-slate-400 bg-white rounded-3xl border border-slate-100 shadow-xs">
-        <i class="fa-solid fa-circle-notch animate-spin text-4xl text-blue-600 mb-3"></i>
-        <p class="text-sm font-medium">Loading vehicle details...</p>
-      </div>
-
-      <!-- =====================================================
-           NOT FOUND STATE
-      ====================================================== -->
-      <div v-else-if="!vehicleStore.vehicle" class="flex flex-col items-center justify-center py-24 bg-white rounded-3xl border border-slate-100 text-center">
-        <div class="w-16 h-16 rounded-full bg-slate-100 flex items-center justify-center mb-4">
-          <i class="fa-solid fa-car text-2xl text-slate-400"></i>
-        </div>
-        <h2 class="text-xl font-bold text-slate-800">Vehicle Not Found</h2>
-        <p class="text-sm text-slate-500 mt-2">The vehicle you are looking for does not exist or has been removed.</p>
+      <nav class="flex items-center justify-between gap-4 py-2" aria-label="Booking progress">
         <button
           type="button"
           @click="goBack"
-          class="mt-6 px-5 py-2.5 rounded-xl bg-blue-600 hover:bg-blue-700 text-white text-sm font-semibold transition cursor-pointer"
+          class="inline-flex items-center gap-2 text-sm text-[var(--muted)] hover:text-[var(--text)] font-medium transition-colors cursor-pointer"
         >
-          <i class="fa-solid fa-arrow-left mr-2"></i>
-          Back to Vehicles
+          <i class="fa-solid fa-arrow-left text-xs"></i>
+          Back to fleet
+        </button>
+
+        <div class="hidden sm:flex items-center gap-3 text-xs tracking-widest text-[var(--muted)] uppercase font-semibold">
+          <span>SELECT VEHICLE</span>
+          <span class="w-6 h-[1px] bg-[var(--border)]"></span>
+          <b class="text-[var(--text)]">RESERVATION</b>
+          <span class="w-6 h-[1px] bg-[var(--border)]"></span>
+          <span>PAYMENT</span>
+        </div>
+      </nav>
+
+      <!-- =====================================================
+            LOADING STATE
+      ====================================================== -->
+      <div
+        v-if="vehicleStore.loading"
+        class="bg-[var(--surface)] border border-[var(--border)] rounded-2xl p-16 text-center shadow-sm"
+        role="status"
+      >
+        <i class="fa-solid fa-circle-notch fa-spin text-4xl text-[var(--accent)]"></i>
+        <h1 class="text-xl font-bold mt-4 text-[var(--text)]">Loading your vehicle...</h1>
+        <p class="text-sm text-[var(--secondary)] mt-1">Please wait while we load the vehicle details.</p>
+      </div>
+
+      <!-- =====================================================
+            VEHICLE NOT FOUND
+      ====================================================== -->
+      <div
+        v-else-if="
+          !vehicle ||
+          vehicleStore.error ||
+          !Number.isInteger(vehicleId) ||
+          vehicleId <= 0
+        "
+        class="bg-[var(--surface)] border border-[var(--border)] rounded-2xl p-16 text-center shadow-sm space-y-4"
+      >
+        <div class="w-16 h-16 bg-[var(--background)] rounded-full flex items-center justify-center mx-auto text-[var(--muted)] text-2xl">
+          <i class="fa-solid fa-car"></i>
+        </div>
+
+        <h1 class="text-2xl font-black text-[var(--text)]">Vehicle unavailable</h1>
+
+        <p class="text-sm text-[var(--secondary)] max-w-md mx-auto">
+          We could not load this vehicle. Please return to the fleet and try again.
+        </p>
+
+        <button
+          type="button"
+          @click="goBack"
+          class="inline-flex items-center gap-2 px-5 py-2.5 bg-[#141226] hover:bg-[#1E1B3A] text-white text-xs font-bold rounded-lg transition-all shadow-sm cursor-pointer"
+        >
+          <i class="fa-solid fa-arrow-left"></i>
+          Back to vehicles
         </button>
       </div>
 
       <!-- =====================================================
-           MAIN VEHICLE DETAILS CARD
+            MAIN CONTENT
       ====================================================== -->
-      <div v-else class="bg-white rounded-3xl p-6 sm:p-8 shadow-xs border border-slate-100">
-        <div class="grid grid-cols-1 lg:grid-cols-12 gap-8 items-center">
-          
-          <!-- Vehicle Image Display -->
-          <div class="lg:col-span-5 flex flex-col items-center">
-            <div class="relative w-full aspect-[4/3] flex items-center justify-center bg-slate-50/50 rounded-2xl p-4 overflow-hidden">
+      <div v-else class="grid grid-cols-1 lg:grid-cols-12 gap-6 items-start">
+
+        <!-- ===================================================
+              LEFT MAIN SECTION
+        ==================================================== -->
+        <div class="lg:col-span-8 space-y-6">
+
+          <!-- VEHICLE OVERVIEW CARD -->
+          <article class="bg-[var(--surface)] border border-[var(--border)] rounded-xl overflow-hidden shadow-sm grid grid-cols-1 md:grid-cols-12">
+            
+            <!-- Image Panel -->
+            <div class="md:col-span-5 bg-[var(--background)] relative min-h-[220px] flex items-center justify-center p-6">
+
+
               <img
-                :src="vehicleImage"
+                :key="mainImage"
+                :src="mainImage"
                 :alt="vehicleName"
-                class="w-full h-full object-contain max-h-[300px] hover:scale-105 transition-transform duration-300"
                 @error="handleImageError"
+                class="w-full h-44 object-contain mix-blend-multiply hover:scale-105 transition-transform duration-300"
               />
             </div>
-          </div>
 
-          <!-- Info & Actions Panel -->
-          <div class="lg:col-span-7 space-y-6">
-            
-            <!-- Header Title & Redesigned Pricing/Action Card -->
-            <div class="flex flex-col sm:flex-row sm:items-stretch justify-between gap-6 border-b border-slate-100 pb-6">
-              
-              <!-- Vehicle Header Details -->
-              <div class="flex-1">
-                <h1 class="text-2xl sm:text-3xl font-extrabold text-slate-900 leading-tight">
+            <!-- Vehicle Info -->
+            <div class="md:col-span-7 p-6 flex flex-col justify-between">
+              <div>
+                <div class="flex justify-between items-center gap-2 text-xs font-extrabold tracking-wider uppercase text-[var(--muted)]">
+                  <span>{{ vehicleBrand }} COLLECTION</span>
+                  <span class="bg-[var(--background)] text-[var(--text)] px-2 py-1 rounded text-[10px] font-bold">
+                    {{ vehicleCategory }}
+                  </span>
+                </div>
+
+                <h1 class="text-2xl font-black text-[var(--text)] mt-2">
                   {{ vehicleName }}
                 </h1>
-                <p class="text-sm text-slate-500 mt-1 flex items-center gap-1.5 font-medium">
-                  <i class="fa-solid fa-location-dot text-blue-600"></i>
-                  {{ vehicleBrand }} • {{ vehicleCategory }}
-                </p>
 
-                <!-- Rating Badge -->
-                <div class="flex items-center gap-3 mt-4">
-                  <div class="flex items-center gap-1.5 bg-[#1E3A8A] text-white px-3 py-1 rounded-lg font-bold text-sm shadow-xs">
-                    <span>4.9</span>
-                    <i class="fa-solid fa-star text-amber-300 text-xs"></i>
-                  </div>
-                  <div>
-                    <span class="font-bold text-slate-800 text-sm block leading-none">Excellent</span>
-                    <span class="text-xs text-slate-400">275 Reviews</span>
-                  </div>
-                  <div class="flex text-amber-400 text-xs gap-0.5 ml-1">
-                    <i class="fa-solid fa-star"></i>
-                    <i class="fa-solid fa-star"></i>
-                    <i class="fa-solid fa-star"></i>
-                    <i class="fa-solid fa-star"></i>
-                    <i class="fa-solid fa-star"></i>
-                  </div>
-                </div>
+                <p class="text-xs text-[var(--secondary)] mt-2 leading-relaxed">
+                  {{
+                    vehicle.description ||
+                    'Your next journey, thoughtfully arranged. Choose your rental dates and make this vehicle part of your plans.'
+                  }}
+                </p>
               </div>
 
-              <!-- Redesigned Interactive Booking Card -->
-              <div class="bg-gradient-to-br from-slate-900 via-slate-800 to-slate-900 text-white p-5 rounded-2xl shadow-xl flex flex-col justify-between shrink-0 min-w-[240px] border border-slate-700/50 relative overflow-hidden group">
-                <!-- Background Accent Glow -->
-                <div class="absolute -right-8 -top-8 w-24 h-24 bg-blue-500/10 rounded-full blur-xl group-hover:bg-blue-500/20 transition-all duration-500"></div>
-
-                <div>
-                  <div class="flex items-center justify-between mb-2">
-                    <span class="bg-gradient-to-r from-amber-400 to-rose-400 text-slate-950 font-black text-[10px] uppercase px-2 py-0.5 rounded-full tracking-wider shadow-xs">
-                      20% OFF
-                    </span>
-                    <span class="text-xs text-slate-400 line-through font-medium">Save $129</span>
-                  </div>
-
-                  <div class="flex items-baseline gap-1.5 my-1">
-                    <span class="text-3xl font-black text-white tracking-tight">${{ vehiclePrice }}</span>
-                    <span class="text-xs text-slate-400 font-medium">/ day</span>
-                  </div>
+              <!-- Specifications Grid -->
+              <div class="grid grid-cols-2 sm:grid-cols-4 gap-2 pt-4 mt-4 border-t border-[var(--border)]">
+                <div class="bg-[var(--background)] p-2 rounded-lg text-center flex flex-col items-center justify-center gap-1">
+                  <i class="fa-solid fa-gears text-sm text-[var(--muted)]"></i>
+                  <strong class="text-[11px] font-bold text-[var(--text)] truncate max-w-full">{{ transmission }}</strong>
                 </div>
 
-                <div class="mt-4">
-                              <!-- Active Booking Button -->
-            <div class="vehicle-actions">
+                <div class="bg-[var(--background)] p-2 rounded-lg text-center flex flex-col items-center justify-center gap-1">
+                  <i class="fa-solid fa-gas-pump text-sm text-[var(--muted)]"></i>
+                  <strong class="text-[11px] font-bold text-[var(--text)] truncate max-w-full">{{ fuelType }}</strong>
+                </div>
+
+                <div class="bg-[var(--background)] p-2 rounded-lg text-center flex flex-col items-center justify-center gap-1">
+                  <i class="fa-solid fa-users text-sm text-[var(--muted)]"></i>
+                  <strong class="text-[11px] font-bold text-[var(--text)] truncate max-w-full">{{ seats }} seats</strong>
+                </div>
+
+                <div class="bg-[var(--background)] p-2 rounded-lg text-center flex flex-col items-center justify-center gap-1">
+                  <i class="fa-solid fa-shield-halved text-sm text-[var(--muted)]"></i>
+                  <strong class="text-[11px] font-bold text-[var(--text)] truncate max-w-full">{{ vehicleCategory }}</strong>
+                </div>
+              </div>
+            </div>
+          </article>
 
 
+          <!-- RENTAL SCHEDULE PANEL -->
+          <section class="bg-[var(--surface)] border border-[var(--border)] rounded-xl p-6 shadow-sm space-y-5">
+            <div class="flex items-center justify-between flex-wrap gap-2">
+              <h2 class="text-lg font-bold text-[var(--text)] flex items-center gap-2">
+                <i class="fa-regular fa-calendar text-[var(--muted)]"></i>
+                Rental Schedule & Routing
+              </h2>
 
-                    <RouterLink
-                      :to="`/booking/${vehicle.id}`"
-                      class="btn btn-primary"
-                    >
-                      Book Now
-                    </RouterLink>
+              <span class="px-3 py-1 bg-blue-500/10 text-blue-600 text-xs font-bold rounded-full">
+                {{ rentalDays }} days selected
+              </span>
+            </div>
 
-                  </div>
+            <!-- Date Pickers Grid -->
+            <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+              <!-- Pickup -->
+              <div class="bg-[var(--background)] p-4 rounded-xl border border-[var(--border)] space-y-2">
+                <h3 class="text-xs font-bold text-[var(--text)] flex items-center gap-2">
+                  <span class="w-2 h-2 rounded-full bg-[#10B981]"></span>
+                  Pick-up timeline
+                </h3>
 
-                  <p class="text-[11px] text-slate-400 text-center mt-2 font-medium flex items-center justify-center gap-1">
-                    <i class="fa-solid fa-shield-halved text-emerald-400 text-[10px]"></i>
-                    Free cancellation up to 24h
+                <label for="pickup-date" class="block text-xs font-semibold text-[var(--muted)]">
+                  Pick-up date
+                </label>
+
+                <input
+                  id="pickup-date"
+                  v-model="form.pickupDate"
+                  type="date"
+                  :min="today"
+                  required
+                  class="w-full p-2.5 bg-[var(--surface)] border border-[var(--border)] rounded-lg text-xs font-bold text-[var(--text)] focus:outline-none focus:border-[var(--accent)] transition-all"
+                  :aria-invalid="!!scheduleError"
+                />
+              </div>
+
+              <!-- Return -->
+              <div class="bg-[var(--background)] p-4 rounded-xl border border-[var(--border)] space-y-2">
+                <h3 class="text-xs font-bold text-[var(--text)] flex items-center gap-2">
+                  <span class="w-2 h-2 rounded-full bg-gray-900"></span>
+                  Return timeline
+                </h3>
+
+                <label for="return-date" class="block text-xs font-semibold text-[var(--muted)]">
+                  Return date
+                </label>
+
+                <input
+                  id="return-date"
+                  v-model="form.returnDate"
+                  type="date"
+                  :min="form.pickupDate || today"
+                  required
+                  class="w-full p-2.5 bg-[var(--surface)] border border-[var(--border)] rounded-lg text-xs font-bold text-[var(--text)] focus:outline-none focus:border-[var(--accent)] transition-all"
+                  :aria-invalid="!!scheduleError"
+                />
+              </div>
+            </div>
+
+            <!-- Alerts -->
+            <p v-if="scheduleError" class="text-xs font-bold text-[var(--danger)] flex items-center gap-1.5" role="alert">
+              <i class="fa-solid fa-circle-exclamation"></i>
+              {{ scheduleError }}
+            </p>
+
+            <p v-else class="text-xs font-bold text-[#10B981] flex items-center gap-1.5">
+              <i class="fa-solid fa-check"></i>
+              {{ rentalDays }} days to make the most of your journey
+            </p>
+
+            <!-- Station Info -->
+            <div class="space-y-1.5">
+              <span class="block text-xs font-semibold text-[var(--muted)]">
+                Pick-up station & branch
+              </span>
+
+              <div class="bg-[var(--background)] p-3.5 rounded-lg border border-[var(--border)] text-xs font-bold text-[var(--text)] flex items-center gap-2.5">
+                <i class="fa-solid fa-location-dot text-[#10B981]"></i>
+                {{ pickupStation }}
+              </div>
+            </div>
+
+            <p class="text-xs text-[var(--secondary)] flex items-start gap-2 leading-relaxed">
+              <i class="fa-solid fa-circle-info mt-0.5 text-[var(--muted)]"></i>
+              Confirm handover times and return arrangements with our rental team.
+            </p>
+          </section>
+
+
+          <!-- DRIVER DETAILS PANEL -->
+          <section class="bg-[var(--surface)] border border-[var(--border)] rounded-xl p-6 shadow-sm space-y-5">
+            <div class="flex items-center justify-between flex-wrap gap-2">
+              <h2 class="text-lg font-bold text-[var(--text)] flex items-center gap-2">
+                <i class="fa-regular fa-user text-[var(--muted)]"></i>
+                Driver Details
+              </h2>
+
+              <span class="px-3 py-1 bg-emerald-500/10 text-[#10B981] text-xs font-bold rounded-full">
+                {{ authStore.isAuthenticated ? 'Customer profile' : 'Guest profile' }}
+              </span>
+            </div>
+
+            <div class="bg-[var(--background)] p-4 rounded-xl border border-[var(--border)] flex items-center justify-between gap-4 flex-wrap sm:flex-nowrap">
+              <div class="flex items-center gap-3">
+                <span class="w-10 h-10 rounded-full bg-black text-white font-bold text-xs flex items-center justify-center shrink-0">
+                  {{ initials }}
+                </span>
+
+                <div class="space-y-0.5">
+                  <h3 class="text-xs font-bold text-[var(--text)]">
+                    {{ customerName }}
+                  </h3>
+
+                  <p class="text-xs text-[var(--muted)] truncate">
+                    {{ authStore.user?.email || 'Sign in to complete your reservation' }}
                   </p>
                 </div>
               </div>
 
+              <RouterLink
+                :to="
+                  authStore.isAuthenticated
+                    ? '/profile'
+                    : { name: 'login', query: { redirect: route.fullPath } }
+                "
+                class="px-3 py-1.5 bg-[var(--surface)] hover:bg-[var(--border)] text-[var(--text)] text-xs font-bold rounded-md border border-[var(--border)] transition-all whitespace-nowrap"
+              >
+                {{ authStore.isAuthenticated ? 'Edit details' : 'Sign in' }}
+              </RouterLink>
             </div>
 
-            <!-- Popular Service Specifications Bar -->
-            <div>
-              <h3 class="text-xs font-bold uppercase tracking-wider text-slate-400 mb-3">Popular Service</h3>
-              <div class="flex flex-wrap items-center gap-6 text-sm text-slate-600 font-medium">
-                <div class="flex items-center gap-2">
-                  <i class="fa-solid fa-square-parking text-slate-400 text-base"></i>
-                  <span>Parking</span>
-                </div>
-                <div class="flex items-center gap-2">
-                  <i class="fa-solid fa-chair text-slate-400 text-base"></i>
-                  <span>{{ seats }} Seats</span>
-                </div>
-                <div class="flex items-center gap-2">
-                  <i class="fa-solid fa-fan text-slate-400 text-base"></i>
-                  <span>{{ transmission }}</span>
-                </div>
-                <div class="flex items-center gap-2">
-                  <i class="fa-solid fa-gas-pump text-slate-400 text-base"></i>
-                  <span>{{ fuelType }}</span>
-                </div>
+            <div class="grid grid-cols-1 sm:grid-cols-2 gap-4 pt-2">
+              <div class="flex items-center gap-3">
+                <i class="fa-solid fa-shield-halved text-xl text-[#10B981] shrink-0"></i>
+                <p class="text-xs leading-tight">
+                  <strong class="block font-bold text-[var(--text)]">Bring your driving license</strong>
+                  <span class="text-[var(--muted)]">A valid license is required at pickup.</span>
+                </p>
+              </div>
+
+              <div class="flex items-center gap-3">
+                <i class="fa-solid fa-check text-xl text-[#10B981] shrink-0"></i>
+                <p class="text-xs leading-tight">
+                  <strong class="block font-bold text-[var(--text)]">Ready for the road</strong>
+                  <span class="text-[var(--muted)]">Review your details before continuing.</span>
+                </p>
               </div>
             </div>
+          </section>
 
-            <!-- Included Coverage Checkboxes -->
-            <div class="pt-4 border-t border-slate-100">
-              <div class="flex flex-wrap items-center gap-4 text-xs font-bold text-slate-700">
-                <div class="flex items-center gap-2 bg-slate-50 px-3 py-2 rounded-lg border border-slate-200/60">
-                  <i class="fa-solid fa-square-check text-blue-600 text-sm"></i>
-                  <span>Amendments</span>
-                </div>
-                <div class="flex items-center gap-2 bg-slate-50 px-3 py-2 rounded-lg border border-slate-200/60">
-                  <i class="fa-solid fa-square-check text-blue-600 text-sm"></i>
-                  <span>Theft Protection</span>
-                </div>
-                <div class="flex items-center gap-2 bg-slate-50 px-3 py-2 rounded-lg border border-slate-200/60">
-                  <i class="fa-solid fa-square-check text-blue-600 text-sm"></i>
-                  <span>Collision Damage Waiver</span>
-                </div>
-              </div>
-            </div>
-
-          </div>
         </div>
-      </div>
 
-      <!-- =====================================================
-           SUPPLIER LOCATION CARD
-      ====================================================== -->
-      <div v-if="vehicleStore.vehicle" class="bg-white rounded-3xl p-6 sm:p-8 shadow-xs border border-slate-100">
-        <h2 class="text-xl font-extrabold text-slate-900 mb-6">Supplier Location</h2>
 
-        <div class="grid grid-cols-1 lg:grid-cols-12 gap-8 items-center">
-          
-          <!-- Location Info Column -->
-          <div class="lg:col-span-7 space-y-6">
-            <!-- Pick Up & Drop Off -->
-            <div class="flex items-start gap-4">
-              <div class="w-10 h-10 rounded-full bg-slate-100 flex items-center justify-center shrink-0 text-slate-500">
-                <i class="fa-solid fa-car text-sm"></i>
+        <!-- ===================================================
+              RIGHT SIDEBAR
+        ==================================================== -->
+        <aside class="lg:col-span-4 space-y-4 lg:sticky lg:top-6">
+
+          <section class="bg-[var(--surface)] border border-[var(--border)] rounded-xl overflow-hidden shadow-sm">
+            
+            <!-- Header -->
+            <header class="bg-[#141226] text-white p-5 flex items-center justify-between gap-3">
+              <div class="flex items-center gap-3">
+                <i class="fa-solid fa-receipt text-xl"></i>
+                <h2 class="text-base font-extrabold leading-tight">
+                  Reservation<br />Summary
+                </h2>
               </div>
+
+              <span class="text-right text-xs font-extrabold tracking-wider text-gray-400">
+                <b class="block text-white text-sm">2 / 4</b> STEPS
+              </span>
+            </header>
+
+            <!-- Vehicle Mini Banner -->
+            <div class="p-4 bg-[var(--background)] border-b border-[var(--border)] flex items-center gap-3">
+          <img
+            :key="mainImage"
+            :src="mainImage"
+            :alt="vehicleName"
+            @error="handleImageError"
+            class="w-full h-44 object-contain mix-blend-multiply hover:scale-105 transition-transform duration-300"
+          />
+
               <div>
-                <h4 class="font-bold text-slate-900 text-sm">Pick Up & Drop Off</h4>
-                <p class="text-xs font-semibold text-slate-600 mt-0.5">Alamo - Main Branch</p>
-                <p class="text-xs text-slate-400 mt-0.5">Rental Lounge Vertical Circle, Ground Floor, Central Terminal</p>
+                <h3 class="text-xs font-bold text-[var(--text)]">
+                  {{ vehicleName }}
+                </h3>
+                <p class="text-[11px] text-[var(--muted)]">
+                  {{ vehicleCategory }} &bull; {{ rentalDays }} days
+                </p>
               </div>
             </div>
 
-            <!-- Opening Hours -->
-            <div class="flex items-start gap-4">
-              <div class="w-10 h-10 rounded-full bg-slate-100 flex items-center justify-center shrink-0 text-slate-500">
-                <i class="fa-regular fa-clock text-sm"></i>
-              </div>
-              <div>
-                <h4 class="font-bold text-slate-900 text-sm">Opening hours</h4>
-                <p class="text-xs text-slate-500 mt-0.5">Monday - Friday</p>
-                <p class="text-xs font-semibold text-slate-700">6:00 AM - 12:00 PM</p>
-              </div>
-            </div>
-          </div>
+            <!-- Price Breakdown Body -->
+            <div class="p-5 space-y-4">
+              <dl class="space-y-3 text-xs">
+                <div class="flex justify-between gap-2">
+                  <dt class="text-[var(--muted)]">Daily rate</dt>
+                  <dd class="font-bold text-[var(--text)]">{{ money(vehiclePrice) }}</dd>
+                </div>
 
-          <!-- Map Preview Column -->
-          <div class="lg:col-span-5">
-            <div class="relative w-full h-48 bg-slate-100 rounded-2xl overflow-hidden border border-slate-200/80 flex flex-col justify-end p-4 group">
-              <!-- Grid Background Pattern Mockup -->
-              <div class="absolute inset-0 bg-[radial-gradient(#cbd5e1_1px,transparent_1px)] [background-size:16px_16px] opacity-70"></div>
+                <div class="flex justify-between gap-2">
+                  <dt class="text-[var(--muted)]">Rental duration</dt>
+                  <dd class="font-bold text-[var(--text)]">{{ rentalDays }} days</dd>
+                </div>
 
-              <!-- Pin Marker -->
-              <div class="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 flex flex-col items-center">
-                <div class="w-9 h-9 rounded-full bg-[#0066FF] text-white flex items-center justify-center shadow-lg border-2 border-white">
-                  <i class="fa-solid fa-car text-xs"></i>
+                <div class="flex justify-between gap-2">
+                  <dt class="text-[var(--muted)]">Vehicle status</dt>
+                  <dd class="font-bold" :class="vehicleStatus === 'AVAILABLE' ? 'text-[#10B981]' : 'text-[var(--muted)]'">
+                    {{ vehicleStatusText }}
+                  </dd>
+                </div>
+              </dl>
+
+              <!-- Total Box -->
+              <div class="pt-4 border-t border-[var(--border)] flex items-center justify-between gap-2">
+                <div>
+                  <h3 class="text-xs font-bold text-[var(--text)]">Rental total</h3>
+                  <p class="text-[11px] text-[var(--muted)]">
+                    {{ money(vehiclePrice) }} &times; {{ rentalDays }} days
+                  </p>
+                </div>
+
+                <div class="text-right">
+                  <strong class="text-2xl font-black text-[var(--text)] block leading-none">
+                    {{ money(total) }}
+                  </strong>
+                  <span class="text-[10px] font-bold text-[var(--muted)] tracking-wider uppercase">USD CURRENCY</span>
                 </div>
               </div>
 
-              <!-- Map Overlay Button -->
-              <button class="relative z-10 w-full py-2.5 bg-white hover:bg-slate-50 text-slate-800 font-bold text-xs rounded-xl shadow-md border border-slate-200 transition-colors uppercase tracking-wider text-center cursor-pointer">
-                SHOW ON MAP
+              <!-- Note -->
+              <div class="bg-[var(--background)] p-2.5 rounded-md text-center text-xs font-medium text-[var(--secondary)] flex items-center justify-center gap-1.5 border border-[var(--border)]">
+                <i class="fa-solid fa-shield-halved text-[#10B981]"></i>
+                Review your booking before payment
+              </div>
+
+              <!-- Action Button -->
+              <button
+                type="button"
+                class="w-full py-3.5 px-4 bg-[#141226] hover:bg-[#1E1B3A] text-white text-xs font-bold rounded-lg flex items-center justify-center gap-2 transition-all shadow-sm cursor-pointer disabled:opacity-40 disabled:cursor-not-allowed"
+                :disabled="!canBook || bookingStore.loading"
+                @click="createBooking()"
+              >
+                {{ bookingStore.loading ? 'Creating reservation...' : 'Continue to Payment' }}
+                <i class="fa-solid fa-arrow-right text-[10px]"></i>
+              </button>
+
+              <!-- Error Messages -->
+              <p v-if="vehicleStatus !== 'AVAILABLE'" class="text-xs font-bold text-[var(--danger)] text-center">
+                This vehicle is currently unavailable for booking.
+              </p>
+
+              <p v-else-if="Number(vehiclePrice) <= 0" class="text-xs font-bold text-[var(--danger)] text-center">
+                Contact our team to confirm the rental rate.
+              </p>
+
+              <button
+                type="button"
+                class="w-full pt-2 text-center text-xs font-bold text-[var(--muted)] hover:text-[var(--text)] transition-colors cursor-pointer flex items-center justify-center gap-1.5"
+                @click="goBack"
+              >
+                <i class="fa-solid fa-arrow-left text-[10px]"></i>
+                Back to vehicle selection
               </button>
             </div>
-          </div>
 
-        </div>
+            <!-- Footer -->
+            <div class="p-4 bg-[var(--background)] border-t border-[var(--border)] flex items-start gap-2.5 text-xs text-[var(--secondary)]">
+              <i class="fa-solid fa-circle-info text-[#10B981] mt-0.5 shrink-0"></i>
+              <p class="leading-relaxed">
+                <strong class="font-bold text-[var(--text)] block">A little planning, a better journey.</strong>
+                Confirm rental terms and any additional charges with the team before payment.
+              </p>
+            </div>
+          </section>
+
+          <!-- Support Banner -->
+          <RouterLink
+            to="/contact"
+            class="bg-[var(--surface)] hover:bg-[var(--background)] border border-[var(--border)] p-4 rounded-xl flex items-center gap-3 transition-colors text-[var(--text)] shadow-sm"
+          >
+            <i class="fa-solid fa-headphones text-xl text-[var(--muted)]"></i>
+
+            <div class="flex-1">
+              <strong class="block text-xs font-bold text-[var(--text)]">Need a hand with your booking?</strong>
+              <small class="text-xs text-[var(--muted)]">Our team is here to help</small>
+            </div>
+
+            <i class="fa-solid fa-arrow-right text-xs text-[var(--muted)]"></i>
+          </RouterLink>
+
+        </aside>
+
       </div>
 
     </div>
@@ -275,8 +446,17 @@
 </template>
 
 <script setup>
-import { computed, onMounted, ref } from 'vue'
-import { useRoute, useRouter } from 'vue-router'
+import {
+  computed,
+  onMounted,
+  reactive,
+  ref
+} from 'vue'
+
+import {
+  useRoute,
+  useRouter
+} from 'vue-router'
 
 // Stores
 import { useVehicleStore } from '../stores/Vehicle'
@@ -284,13 +464,9 @@ import { useBookingStore } from '../stores/Booking'
 import { useAuthStore } from '../stores/Auth'
 
 // Assets & API
-import BookingForm from '../components/BookingForm.vue'
 import heroImage from '../assets/hero.png'
 import { getVehiclesImage } from '../api/vehicle.js'
 
-// =========================================================
-// ROUTER & STORES
-// =========================================================
 const route = useRoute()
 const router = useRouter()
 
@@ -298,14 +474,51 @@ const vehicleStore = useVehicleStore()
 const bookingStore = useBookingStore()
 const authStore = useAuthStore()
 
-// =========================================================
-// REACTIVE STATE
-// =========================================================
 const vehicleImages = ref([])
 
-// =========================================================
-// BASIC VEHICLE COMPUTEDS
-// =========================================================
+const mainImage = computed(() => {
+  const image = vehicle.value?.mainImage
+
+  if (!image) {
+    return heroImage
+  }
+
+  if (
+    image.startsWith('http://') ||
+    image.startsWith('https://') ||
+    image.startsWith('data:')
+  ) {
+    return image
+  }
+
+  return `http://localhost:8080${
+    image.startsWith('/') ? image : `/${image}`
+  }`
+})
+/* =========================================================
+   DATE HELPERS
+========================================================= */
+function localDate(offset = 0) {
+  const date = new Date()
+  date.setDate(date.getDate() + offset)
+
+  return [
+    date.getFullYear(),
+    String(date.getMonth() + 1).padStart(2, '0'),
+    String(date.getDate()).padStart(2, '0')
+  ].join('-')
+}
+
+const today = localDate()
+
+const form = reactive({
+  pickupDate: localDate(1),
+  returnDate: localDate(4)
+})
+
+/* =========================================================
+   COMPUTED VEHICLE VALUES
+========================================================= */
 const vehicleId = computed(() => Number(route.params.vehicleId))
 
 const vehicle = computed(() => vehicleStore.vehicle)
@@ -318,26 +531,22 @@ const vehicleName = computed(() => {
 const vehicleBrand = computed(() => {
   const v = vehicle.value
   if (!v) return 'Vehicle'
-
   const brand = v.brand
   if (typeof brand === 'string') return brand
   if (brand && typeof brand === 'object') {
     return brand.brandName || brand.name || brand.brand_name || brand.make || 'Vehicle'
   }
-
   return v.brandName || v.brand_name || v.make || 'Vehicle'
 })
 
 const vehicleCategory = computed(() => {
   const v = vehicle.value
   if (!v) return 'Rental'
-
   const category = v.category
   if (typeof category === 'string') return category
   if (category && typeof category === 'object') {
     return category.categoryName || category.name || category.category_name || category.type || 'Rental'
   }
-
   return v.categoryName || v.category_name || v.type || 'Rental'
 })
 
@@ -361,12 +570,7 @@ const seats = computed(() => {
   return v?.seats ?? v?.seat ?? v?.numberOfSeats ?? 4
 })
 
-// =========================================================
-// VEHICLE STATUS COMPUTEDS
-// =========================================================
-const vehicleStatus = computed(() => {
-  return String(vehicle.value?.status || '').toUpperCase()
-})
+const vehicleStatus = computed(() => String(vehicle.value?.status || '').toUpperCase())
 
 const vehicleStatusText = computed(() => {
   switch (vehicleStatus.value) {
@@ -378,36 +582,53 @@ const vehicleStatusText = computed(() => {
   }
 })
 
-const vehicleStatusClass = computed(() => {
-  switch (vehicleStatus.value) {
-    case 'AVAILABLE': return 'bg-emerald-100 text-emerald-700'
-    case 'RENTED': return 'bg-red-100 text-red-700'
-    case 'MAINTENANCE': return 'bg-amber-100 text-amber-700'
-    case 'RESERVED': return 'bg-blue-100 text-blue-700'
-    default: return 'bg-slate-100 text-slate-700'
-  }
+const rentalDays = computed(() => {
+  if (!form.pickupDate || !form.returnDate) return 0
+  const pickup = Date.parse(form.pickupDate)
+  const returnDate = Date.parse(form.returnDate)
+  const days = (returnDate - pickup) / 86400000
+  return Number.isFinite(days) ? Math.max(0, Math.ceil(days)) : 0
 })
 
-const isLambo = computed(() => {
-  return vehicleName.value.toLowerCase() === 'lamborghini aventador'
+const scheduleError = computed(() => {
+  if (!form.pickupDate || !form.returnDate) return 'Choose both rental dates.'
+  if (form.pickupDate < today) return 'Pickup date cannot be in the past.'
+  if (rentalDays.value < 1) return 'Return date must be after pickup date.'
+  return ''
 })
 
-// =========================================================
-// IMAGE RESOLUTION & HELPERS
-// =========================================================
+const total = computed(() => Math.max(0, Number(vehiclePrice.value) || 0) * rentalDays.value)
+
+const canBook = computed(() => {
+  return !scheduleError.value && vehicleStatus.value === 'AVAILABLE' && Number(vehiclePrice.value) > 0
+})
+
+const money = (value) => {
+  return new Intl.NumberFormat('en-US', { style: 'currency', currency: 'USD' }).format(Number(value) || 0)
+}
+
+const customerName = computed(() => {
+  return authStore.user?.name || authStore.user?.fullName || authStore.user?.username || 'Guest driver'
+})
+
+const initials = computed(() => {
+  return customerName.value.split(/\s+/).slice(0, 2).map(part => part[0]).join('').toUpperCase()
+})
+
+const pickupStation = computed(() => {
+  const location = vehicle.value?.location
+  if (typeof location === 'string') return location
+  return location?.name || location?.address || 'Contact our team to arrange your pickup'
+})
+
+/* =========================================================
+   IMAGE FORMATTERS
+========================================================= */
 function formatImageUrl(rawPath) {
   if (!rawPath || typeof rawPath !== 'string') return null
   const path = rawPath.trim()
   if (!path) return null
-
-  if (
-    path.startsWith('http://') ||
-    path.startsWith('https://') ||
-    path.startsWith('data:')
-  ) {
-    return path
-  }
-
+  if (path.startsWith('http://') || path.startsWith('https://') || path.startsWith('data:')) return path
   const cleanPath = path.startsWith('/') ? path : `/${path}`
   return `http://localhost:8080${cleanPath}`
 }
@@ -416,32 +637,24 @@ const vehicleImage = computed(() => {
   const currentVehicle = vehicle.value
   if (!currentVehicle) return heroImage
 
-  // 1. Check vehicle.vehicleImages array
   if (Array.isArray(currentVehicle.vehicleImages) && currentVehicle.vehicleImages.length > 0) {
-    const imgObj = currentVehicle.vehicleImages[0]
-    const raw = typeof imgObj === 'string'
-      ? imgObj
-      : (imgObj?.image || imgObj?.imageUrl || imgObj?.url || imgObj?.path || imgObj?.imagePath)
-
+    const imageObject = currentVehicle.vehicleImages[0]
+    const raw = typeof imageObject === 'string' ? imageObject : (imageObject?.image || imageObject?.imageUrl || imageObject?.url || imageObject?.path || imageObject?.imagePath)
     const formatted = formatImageUrl(raw)
     if (formatted) return formatted
   }
 
-  // 2. Check direct image properties
   const directPath = currentVehicle.image || currentVehicle.imageUrl || currentVehicle.imagePath
   if (typeof directPath === 'string' && directPath.trim()) {
     const formatted = formatImageUrl(directPath)
     if (formatted) return formatted
   }
 
-  // 3. Search fetched vehicleImages list by vehicle ID
   if (Array.isArray(vehicleImages.value) && vehicleImages.value.length > 0) {
     const currentVehicleId = Number(currentVehicle.id)
-    const matchById = vehicleImages.value.find((img) => {
-      const imgVehicleId = Number(
-        img.vehicle_id ?? img.vehicleId ?? img.vehicle?.id ?? img.vehicle?.vehicleId
-      )
-      return imgVehicleId && imgVehicleId === currentVehicleId
+    const matchById = vehicleImages.value.find(image => {
+      const imageVehicleId = Number(image.vehicle_id ?? image.vehicleId ?? image.vehicle?.id ?? image.vehicle?.vehicleId)
+      return imageVehicleId && imageVehicleId === currentVehicleId
     })
 
     if (matchById) {
@@ -449,62 +662,39 @@ const vehicleImage = computed(() => {
       const formatted = formatImageUrl(raw)
       if (formatted) return formatted
     }
-
-    // 4. Search fetched vehicleImages list by vehicle Name
-    const currentVehicleName = (
-      currentVehicle.name || `${currentVehicle.brandName || ''} ${currentVehicle.model || ''}`
-    ).trim().toLowerCase()
-
-    const matchByName = vehicleImages.value.find((img) => {
-      const imgVehicleName = String(img.vehicle_name ?? img.vehicleName ?? img.name ?? '').trim().toLowerCase()
-      return imgVehicleName && imgVehicleName === currentVehicleName
-    })
-
-    if (matchByName) {
-      const raw = matchByName.image || matchByName.imageUrl || matchByName.url || matchByName.path || matchByName.imagePath
-      const formatted = formatImageUrl(raw)
-      if (formatted) return formatted
-    }
   }
 
-  // 5. Default Fallback
   return heroImage
 })
 
 function handleImageError(event) {
-  console.error('Vehicle detail image failed to load:', event.target.src)
-  if (event.target.dataset.fallback === 'true') return
+  if (!event?.target || event.target.dataset.fallback === 'true') return
   event.target.dataset.fallback = 'true'
   event.target.src = heroImage
 }
 
-// =========================================================
-// API ACTIONS
-// =========================================================
 async function fetchVehicleImages() {
   try {
     const response = await getVehiclesImage()
     const data = response?.data ?? response
-    vehicleImages.value = Array.isArray(data)
-      ? data
-      : Array.isArray(data?.data)
-        ? data.data
-        : []
+    vehicleImages.value = Array.isArray(data) ? data : (Array.isArray(data?.data) ? data.data : [])
   } catch (error) {
     console.error('Failed to fetch vehicle images:', error)
     vehicleImages.value = []
   }
 }
 
-async function createBooking(data = {}) {
+/* =========================================================
+   CREATE BOOKING
+========================================================= */
+async function createBooking() {
+  if (!canBook.value || bookingStore.loading) return
+
   try {
-    // Get logged-in user from Pinia
     let userId = Number(authStore.user?.id)
 
-    // Fallback: restore user from localStorage
     if (!userId) {
       const storedUser = localStorage.getItem('user')
-
       if (storedUser) {
         try {
           const parsedUser = JSON.parse(storedUser)
@@ -515,59 +705,29 @@ async function createBooking(data = {}) {
       }
     }
 
-    // Check login
     if (!Number.isInteger(userId) || userId <= 0) {
       alert('Please login before booking a vehicle.')
-      router.push('/login')
+      router.push({ name: 'login', query: { redirect: route.fullPath } })
       return
     }
 
-    // Get vehicle ID
     const id = vehicleId.value
+    if (!Number.isInteger(id) || id <= 0) throw new Error('Invalid vehicle.')
 
-    if (!Number.isInteger(id) || id <= 0) {
-      throw new Error('Invalid vehicle.')
-    }
-
-    console.log('Creating booking with:', {
-      userId,
-      vehicleId: id
-    })
-
-    // Create booking
     const booking = await bookingStore.createBooking({
       userId,
       vehicleId: id,
-      pickupDate:
-        data.pickupDate ||
-        new Date().toISOString().split('T')[0],
-      returnDate:
-        data.returnDate ||
-        new Date(Date.now() + 86400000)
-          .toISOString()
-          .split('T')[0]
+      pickupDate: form.pickupDate,
+      returnDate: form.returnDate
     })
 
-    console.log('Booking response:', booking)
-
-    // Get booking ID
     const bookingId = booking?.id || booking?.bookingId
+    if (!bookingId) throw new Error('Booking was created without an id.')
 
-    if (!bookingId) {
-      throw new Error('Booking was created without an id.')
-    }
-
-    // Go to payment page
     router.push(`/payment/${bookingId}`)
-
   } catch (error) {
     console.error('Create booking error:', error)
-
-    alert(
-      error.response?.data?.message ||
-      error.message ||
-      'Failed to create booking'
-    )
+    alert(error?.response?.data?.message || error?.message || 'Failed to create booking')
   }
 }
 
@@ -575,9 +735,9 @@ function goBack() {
   router.back()
 }
 
-// =========================================================
-// LIFECYCLE HOOKS
-// =========================================================
+/* =========================================================
+   ON MOUNT
+========================================================= */
 onMounted(async () => {
   if (!Number.isInteger(vehicleId.value) || vehicleId.value <= 0) {
     console.error('Invalid vehicle ID:', route.params.vehicleId)

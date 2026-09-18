@@ -153,13 +153,23 @@
     </form>
   </main>
 </template>
-
 <script setup>
 import { ref, computed, onMounted } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
-import { getVehicleById, updateVehicle } from '../../api/vehicle'
+import {
+  getVehicleById,
+  updateVehicle,
+  getBrand,
+  getCategory
+} from '../../api/vehicle'
 
-const props = defineProps({ id: { type: [String, Number], default: null } })
+const props = defineProps({
+  id: {
+    type: [String, Number],
+    default: null
+  }
+})
+
 const route = useRoute()
 const router = useRouter()
 
@@ -168,6 +178,12 @@ const activeId = computed(() => props.id || route.params.id)
 const loading = ref(true)
 const submitting = ref(false)
 const fetchError = ref(null)
+
+const brands = ref([])
+const categories = ref([])
+
+const loadingBrands = ref(false)
+const loadingCategories = ref(false)
 
 const form = ref({
   name: '',
@@ -183,54 +199,288 @@ const form = ref({
   image: ''
 })
 
-const handleBack = () => router.push('/admin/vehicles')
+/* =========================================================
+   BACK
+========================================================= */
+
+const handleBack = () => {
+  router.push('/admin/vehicles')
+}
+
+/* =========================================================
+   FETCH BRANDS
+========================================================= */
+
+const fetchBrands = async () => {
+  try {
+    loadingBrands.value = true
+
+    const response = await getBrand()
+
+    console.log('Brands response:', response)
+
+    brands.value =
+      Array.isArray(response?.data)
+        ? response.data
+        : Array.isArray(response)
+          ? response
+          : []
+
+    console.log('Brands:', brands.value)
+
+  } catch (err) {
+    console.error('Failed to load brands:', err)
+    brands.value = []
+  } finally {
+    loadingBrands.value = false
+  }
+}
+
+/* =========================================================
+   FETCH CATEGORIES
+========================================================= */
+
+const fetchCategories = async () => {
+  try {
+    loadingCategories.value = true
+
+    const response = await getCategory()
+
+    console.log('Categories response:', response)
+
+    categories.value =
+      Array.isArray(response?.data)
+        ? response.data
+        : Array.isArray(response)
+          ? response
+          : []
+
+    console.log('Categories:', categories.value)
+
+  } catch (err) {
+    console.error('Failed to load categories:', err)
+    categories.value = []
+  } finally {
+    loadingCategories.value = false
+  }
+}
+
+/* =========================================================
+   FETCH VEHICLE
+========================================================= */
 
 const fetchVehicleDetails = async () => {
-  if (!activeId.value) return
+  if (!activeId.value) {
+    fetchError.value = 'Vehicle ID is missing.'
+    loading.value = false
+    return
+  }
+
   try {
     loading.value = true
     fetchError.value = null
-    const res = await getVehicleById(activeId.value)
-    const data = res?.data || res || {}
+
+    console.log(
+      'Fetching vehicle:',
+      activeId.value
+    )
+
+    const response =
+      await getVehicleById(activeId.value)
+
+    console.log(
+      'Vehicle response:',
+      response
+    )
+
+    /*
+     * Your API response:
+     *
+     * {
+     *   msg: "...",
+     *   status: 200,
+     *   data: {
+     *      id: 1,
+     *      category_name: "Sedan",
+     *      brand_name: "Toyota",
+     *      name: "Toyota Camry 2.5V",
+     *      mainImage: "...",
+     *      model: "Camry",
+     *      year: 2024,
+     *      plate_number: "2CD-1234",
+     *      transmission: "Automatic",
+     *      fuel_type: "Gasoline",
+     *      seat: 5,
+     *      pricePerDay: 55.00,
+     *      status: "AVAILABLE"
+     *   }
+     * }
+     */
+
+    const data = response?.data || {}
+
+    console.log(
+      'Vehicle data:',
+      data
+    )
+
+    /*
+     * Map backend fields -> frontend form fields
+     */
 
     form.value = {
       name: data.name || '',
-      brand: data.brand?.name || data.brand || '',
-      category: data.category?.name || data.category || '',
-      licensePlate: data.licensePlate || '',
-      year: data.year || 2023,
-      transmission: data.transmission || 'Automatic',
-      fuelType: data.fuelType || 'Gasoline',
-      seats: data.seats || 5,
-      dailyRate: data.dailyRate ?? data.pricePerDay ?? 0,
-      status: data.status || 'AVAILABLE',
-      image: data.image || ''
+
+      brand: data.brand_name || '',
+
+      category: data.category_name || '',
+
+      licensePlate:
+        data.plate_number || '',
+
+      year:
+        Number(data.year || 2023),
+
+      transmission:
+        data.transmission || 'Automatic',
+
+      fuelType:
+        data.fuel_type || 'Gasoline',
+
+      seats:
+        Number(data.seat || 5),
+
+      dailyRate:
+        Number(data.pricePerDay ?? 0),
+
+      status:
+        data.status || 'AVAILABLE',
+
+      image:
+        data.mainImage || ''
     }
+
+    console.log(
+      'Form after vehicle loading:',
+      form.value
+    )
+
   } catch (err) {
-    console.error('Failed to load vehicle:', err)
-    fetchError.value = err.response?.data?.message || err.response?.data?.msg || 'Failed to load vehicle details.'
+    console.error(
+      'Failed to load vehicle:',
+      err
+    )
+
+    fetchError.value =
+      err.response?.data?.message ||
+      err.response?.data?.msg ||
+      err.response?.data?.error ||
+      err.message ||
+      'Failed to load vehicle details.'
+
   } finally {
     loading.value = false
   }
 }
 
+/* =========================================================
+   UPDATE VEHICLE
+========================================================= */
+
 const handleSave = async () => {
+  if (!activeId.value) {
+    alert('Vehicle ID is missing.')
+    return
+  }
+
   try {
     submitting.value = true
+
     const payload = {
-      ...form.value,
-      dailyRate: Number(form.value.dailyRate),
-      pricePerDay: Number(form.value.dailyRate)
+      name: form.value.name,
+
+      brand: form.value.brand,
+
+      category: form.value.category,
+
+      licensePlate:
+        form.value.licensePlate,
+
+      year:
+        Number(form.value.year),
+
+      transmission:
+        form.value.transmission,
+
+      fuelType:
+        form.value.fuelType,
+
+      seats:
+        Number(form.value.seats),
+
+      dailyRate:
+        Number(form.value.dailyRate),
+
+      pricePerDay:
+        Number(form.value.dailyRate),
+
+      status:
+        form.value.status,
+
+      image:
+        form.value.image
     }
-    await updateVehicle(activeId.value, payload)
+
+    console.log(
+      'Update vehicle payload:',
+      payload
+    )
+
+    const response =
+      await updateVehicle(
+        activeId.value,
+        payload
+      )
+
+    console.log(
+      'Update vehicle response:',
+      response
+    )
+
+    alert(
+      'Vehicle updated successfully.'
+    )
+
     router.push('/admin/vehicles')
+
   } catch (err) {
-    console.error('Failed to update vehicle:', err)
-    alert(err.response?.data?.message || err.response?.data?.msg || 'Failed to update vehicle.')
+    console.error(
+      'Failed to update vehicle:',
+      err
+    )
+
+    alert(
+      err.response?.data?.message ||
+      err.response?.data?.msg ||
+      err.response?.data?.error ||
+      err.message ||
+      'Failed to update vehicle.'
+    )
+
   } finally {
     submitting.value = false
   }
 }
 
-onMounted(fetchVehicleDetails)
+/* =========================================================
+   INITIAL LOAD
+========================================================= */
+
+onMounted(async () => {
+  await Promise.all([
+    fetchVehicleDetails(),
+    fetchBrands(),
+    fetchCategories()
+  ])
+})
 </script>

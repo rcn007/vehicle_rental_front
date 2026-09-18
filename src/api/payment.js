@@ -22,9 +22,17 @@ export const getPaymentById = async (id) => {
 };
 
 // Get payment by booking ID
+// Get payment by booking ID
 export const getPaymentByBooking = async (bookingId) => {
-  const response = await api.get(`/payments/booking/${bookingId}`);
-  return response.data;
+  try {
+    const response = await api.get(`/payments/booking/${bookingId}`);
+    return response.data;
+  } catch (error) {
+    if (error.response && error.response.status === 404) {
+      return null; // Normal state for unpaid bookings
+    }
+    throw error;
+  }
 };
 
 // Create payment
@@ -47,7 +55,11 @@ export const deletePayment = async (id) => {
 
 // Create Bakong Payment (QR Code)
 export const createBakongPayment = async (bakongData) => {
-  const response = await api.post("/payments/bakong/create", bakongData);
+  const response = await api.post(
+    "/payments/bakong/scan-qr",
+    bakongData
+  );
+
   return response.data;
 };
 
@@ -81,8 +93,12 @@ export const createPaymentMethod = async (methodData) => {
 };
 
 // Update payment method
-export const updatePaymentMethod = async (id, methodData) => {
-  const response = await api.put(`/paymentMethods/${id}`, methodData);
+export const updatePaymentMethod = async (id, paymentMethodData) => {
+  const response = await api.put(
+    `/paymentMethods/${id}`,
+    paymentMethodData
+  );
+
   return extractData(response);
 };
 
@@ -91,3 +107,4 @@ export const deletePaymentMethod = async (id) => {
   const response = await api.delete(`/paymentMethods/${id}`);
   return response.data;
 };
+

@@ -5,7 +5,7 @@
     <div class="flex flex-col md:flex-row md:items-center justify-between mb-8 gap-4">
       <div>
         <h1 class="text-3xl font-bold tracking-tight text-[var(--text)]">Brands</h1>
-        <p class="text-xl text-[var(--muted)] mt-1">Manage manufacturer profiles and brand distribution</p>
+        <p class="text-xl text-[--text)] mt-1">Manage manufacturer profiles and brand distribution</p>
       </div>
       
       <div class="flex items-center gap-3 w-full md:w-auto">
@@ -47,7 +47,7 @@
         <div>
           <span class="text-[var(--text)] text-[15px] font-bold uppercase tracking-wider">Active Brands</span>
           <div class="mt-2 text-2xl font-extrabold text-[var(--text)]">{{ activeBrandsCount }}</div>
-          <p class="text-[11px] text-[var(--accent)] font-bold mt-0.5 inline-flex items-center gap-1">
+          <p class="text-[11px] text-(--success) font-bold mt-0.5 inline-flex items-center gap-1">
             <i class="fa-solid fa-circle-check text-[10px]"></i> {{ activeRatio }}% Operational ratio
           </p>
         </div>
@@ -61,7 +61,7 @@
         <div>
           <span class="text-[var(--text)] text-[15px] font-bold uppercase tracking-wider">Largest Share</span>
           <div class="mt-2 text-2xl font-extrabold text-[var(--text)]">{{ topBrand.name }}</div>
-          <p class="text-[11px] text-[var(--muted)] mt-0.5 font-medium">{{ topBrand.count }} Fleet Vehicles ({{ topBrand.percentage }}%)</p>
+          <p class="text-[11px] text-(--success) mt-0.5 font-medium">{{ topBrand.count }} Fleet Vehicles ({{ topBrand.percentage }}%)</p>
         </div>
         <div class="w-10 h-10 rounded-lg bg-[var(--background)] text-[var(--accent)] flex items-center justify-center text-sm border border-[var(--border)]">
           <i class="fa-solid fa-car"></i>
@@ -241,6 +241,7 @@ import { ref, computed, watch, onMounted } from 'vue'
 import { useRouter } from 'vue-router'
 import { getBrands, deleteBrand } from '../api/brands'
 
+
 const router = useRouter()
 
 const brands = ref([])
@@ -259,7 +260,7 @@ const itemsPerPage = ref(10)
 /* Navigation */
 const navigateToAdd = () => router.push('/admin/brands/create')
 const navigateToDetail = (id) => router.push(`/admin/brands/${id}`)
-const navigateToEdit = (id) => router.push(`/admin/brands/edit/${id}`)
+const navigateToEdit = (id) => router.push(`/admin/brands/update/${id}`)
 
 /* Fetch Data */
 const fetchBrands = async () => {

@@ -4,7 +4,7 @@
     <header class="flex flex-col lg:flex-row lg:items-center justify-between mb-8 gap-4 pb-6 border-b border-slate-200/80 print:hidden">
       <div>
         <h1 class="text-2xl sm:text-3xl font-bold tracking-tight text-slate-900">Rental Analytics Report</h1>
-        <p class="text-sm text-slate-500 mt-1">Overview of fleet performance, booking metrics, and revenue trends</p>
+        <p class="text-xl text-[--text] mt-1">Overview of fleet performance, booking metrics, and revenue trends</p>
       </div>
 
       <div class="flex flex-wrap items-center gap-2.5">

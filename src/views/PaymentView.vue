@@ -117,7 +117,6 @@
               <strong>Quick Steps</strong>
             </div>
 
-
             <div class="quick-steps-list">
               <div>
                 <Smartphone :size="20" />
@@ -233,7 +232,6 @@
       </div>
     </div>
 
-
     <div v-if="showSuccessModal" class="payment-success-overlay" role="dialog" aria-modal="true">
       <div class="payment-success-modal">
         <div class="payment-success-visual" aria-hidden="true">
@@ -302,11 +300,20 @@
 </template>
 
 <script setup>
-import { computed, onMounted, onUnmounted, ref } from 'vue'
+import {
+  computed,
+  onMounted,
+  onUnmounted,
+  ref,
+} from 'vue'
+
 import { useRoute, useRouter } from 'vue-router'
+
 import QRCode from 'qrcode'
 
 import {
+  ArrowRight,
+  BadgeCheck,
   Banknote,
   CalendarDays,
   Check,
@@ -328,51 +335,35 @@ import {
 } from '@lucide/vue'
 
 import { useBookingStore } from '../stores/Booking'
+import { usePaymentStore } from '../stores/Payment'
 
-import {
-  getPaymentMethods,
-  getPaymentByBooking,
-  createPayment,
-  createBakongPayment,
-  checkBakongPaymentStatus,
-} from '../api/payment'
-
-// If these images exist in your project, uncomment these imports
 // import heroImage from '../assets/hero.png'
 // import abaLogo from '../assets/ABA.webp'
 // import acledaLogo from '../assets/ACELEDA.jpg'
 // import bakongLogo from '../assets/Bakong.png'
 
-
-// ============================================================================
-// ROUTER
-// ============================================================================
-
 const route = useRoute()
 const router = useRouter()
 
-
-// ============================================================================
-// BOOKING
-// ============================================================================
-
 const bookingStore = useBookingStore()
+const paymentStore = usePaymentStore()
 
-
-// ============================================================================
-// PAYMENT STATE
-// ============================================================================
+/*
+|--------------------------------------------------------------------------
+| Payment state
+|--------------------------------------------------------------------------
+*/
 
 const amount = ref(0)
 
-const paymentMethodId = ref('')
-const cashPaymentMethodId = ref('')
+const bakongPaymentId = ref(null)
 
-const paymentMethods = ref([])
+const paymentMethodId = ref('')
 
 const selectedMethod = ref('qr')
 
 const showSuccessModal = ref(false)
+
 const paymentCompleted = ref(false)
 
 const bookingIdCopied = ref(false)
@@ -380,119 +371,106 @@ const bookingIdCopied = ref(false)
 const qrSecondsLeft = ref(585)
 
 const bakongQrImage = ref('')
+
 const bakongReference = ref('')
-const bakongPaymentId = ref(null)
 
 const paymentStatus = ref('waiting')
+
 const paymentError = ref('')
 
 const completedBankKey = ref('')
 
 const loadingPaymentDetails = ref(true)
-const paymentLoading = ref(false)
+
+const qrWasWaitingForCurrentSession = ref(false)
+
+const selectedBankKey = ref('bakong')
 
 let qrTimer = null
 let copiedTimer = null
 let paymentPoller = null
 let paymentAudioContext = null
 
-
-// ============================================================================
-// BANKS
-// ============================================================================
-
-const selectedBankKey = ref('bakong')
+/*
+|--------------------------------------------------------------------------
+| Banks
+|--------------------------------------------------------------------------
+*/
 
 const banks = [
   {
     key: 'bakong',
     name: 'Bakong',
     className: 'bakong',
-    logo: bakongLogo,
+    logo: 'https://play-lh.googleusercontent.com/Q27JPO0Plka8m3_-h2yw3Xu22Wedt3NJcxl1NPgMlaI6VRNcmSEPArvAcmnK1_TpmMBUlTsxjS1ycy0rRDFrmA=s0-br30',
   },
   {
     key: 'aba',
     name: 'ABA Bank',
     className: 'aba',
-    logo: abaLogo,
+    logo: 'https://i.pinimg.com/736x/e2/33/f5/e233f5b0c5a358449398f202b03f063a.jpg',
   },
   {
     key: 'acleda',
     name: 'ACLEDA Bank',
     className: 'acleda',
-    logo: acledaLogo,
+    logo: 'https://www.acledabank.com.kh/kh/assets/download_material/download-logo-blue.jpg',
   },
 ]
 
-
-// ============================================================================
-// COMPUTED
-// ============================================================================
+/*
+|--------------------------------------------------------------------------
+| Computed
+|--------------------------------------------------------------------------
+*/
 
 const selectedBank = computed(
   () =>
     banks.find(
-      (bank) => bank.key === selectedBankKey.value
+      (bank) =>
+        bank.key === selectedBankKey.value
     ) || banks[0]
 )
 
 const successBank = computed(
   () =>
     banks.find(
-      (bank) => bank.key === completedBankKey.value
+      (bank) =>
+        bank.key === completedBankKey.value
     ) || selectedBank.value
 )
 
-
-// ============================================================================
-// BOOKING SUMMARY
-// ============================================================================
-
-function formatDate(dateValue) {
-  if (!dateValue) {
-    return '-'
-  }
-
-  const date = new Date(`${dateValue}T00:00:00`)
-
-  if (Number.isNaN(date.getTime())) {
-    return '-'
-  }
-
-  return date.toLocaleDateString('en-US', {
-    month: 'short',
-    day: '2-digit',
-    year: 'numeric',
-  })
-}
-
-
 const bookingSummary = computed(() => {
-  const booking = bookingStore.booking || {}
+  const booking =
+    bookingStore.booking || {}
 
   return {
     vehicleName:
       booking.vehicleName ||
-      booking.vehicle?.vehicleName ||
-      'Vehicle',
+      'BMW 5 Series',
 
+    /*
+     * heroImage was commented out,
+     * so don't reference it here.
+     */
     image:
       booking.vehicleImage ||
       booking.image ||
-      booking.vehicle?.image ||
-      heroImage,
+      '',
 
-    pickupDate: formatDate(
-      booking.pickupDate
-    ),
+    pickupDate:
+      formatDate(
+        booking.pickupDate
+      ),
 
     pickupTime:
       booking.pickupTime ||
       '10:00 AM',
 
-    returnDate: formatDate(
-      booking.returnDate
-    ),
+    returnDate:
+      formatDate(
+        booking.returnDate
+      ),
 
     returnTime:
       booking.returnTime ||
@@ -505,33 +483,27 @@ const bookingSummary = computed(() => {
   }
 })
 
+const bookingCode = computed(
+  () =>
+    `#DEBKG${route.params.bookingId}`
+)
 
-// ============================================================================
-// PAYMENT COMPUTED
-// ============================================================================
+const formattedAmount = computed(
+  () =>
+    Number(
+      amount.value || 0
+    ).toFixed(2)
+)
 
-const bookingCode = computed(() => {
-  return `#DEBKG${route.params.bookingId}`
-})
+const activeQrImage = computed(
+  () => bakongQrImage.value
+)
 
-
-const formattedAmount = computed(() => {
-  return Number(amount.value || 0).toFixed(2)
-})
-
-
-const activeQrImage = computed(() => {
-  return bakongQrImage.value
-})
-
-
-const isQrExpired = computed(() => {
-  return (
+const isQrExpired = computed(
+  () =>
     qrSecondsLeft.value <= 0 &&
     !paymentCompleted.value
-  )
-})
-
+)
 
 const qrTimeLeft = computed(() => {
   const minutes = Math.floor(
@@ -541,49 +513,101 @@ const qrTimeLeft = computed(() => {
   const seconds =
     qrSecondsLeft.value % 60
 
-  return `${String(minutes).padStart(2, '0')}:${String(
-    seconds
-  ).padStart(2, '0')}`
+  return `${String(minutes).padStart(
+    2,
+    '0'
+  )}:${String(seconds).padStart(
+    2,
+    '0'
+  )}`
 })
 
+const paymentStatusText =
+  computed(() => {
+    if (paymentCompleted.value) {
+      return 'Payment confirmed'
+    }
 
-const paymentStatusText = computed(() => {
-  if (paymentCompleted.value) {
-    return 'Payment confirmed'
+    if (
+      paymentStatus.value ===
+      'checking'
+    ) {
+      return 'Checking Bakong payment...'
+    }
+
+    if (isQrExpired.value) {
+      return 'Generate a new QR to continue'
+    }
+
+    return `Waiting for ${selectedBank.value.name} payment...`
+  })
+
+const paymentMethodLabel =
+  computed(() => {
+    if (
+      selectedMethod.value ===
+      'cash'
+    ) {
+      return 'Cash Payment'
+    }
+
+    if (
+      successBank.value.key ===
+      'aba'
+    ) {
+      return 'ABA Bank'
+    }
+
+    if (
+      successBank.value.key ===
+      'acleda'
+    ) {
+      return 'ACLEDA Bank'
+    }
+
+    return 'Bakong KHQR'
+  })
+
+const backToBookingLink =
+  computed(() => {
+    const vehicleId =
+      bookingStore.booking?.vehicleId
+
+    return vehicleId
+      ? `/booking/${vehicleId}`
+      : '/vehicles'
+  })
+
+/*
+|--------------------------------------------------------------------------
+| Date
+|--------------------------------------------------------------------------
+*/
+
+function formatDate(dateValue) {
+  if (!dateValue) {
+    return '-'
   }
 
-  if (paymentStatus.value === 'checking') {
-    return 'Checking Bakong payment...'
-  }
+  const date = new Date(
+    `${dateValue}T00:00:00`
+  )
 
-  if (isQrExpired.value) {
-    return 'Generate a new QR to continue'
-  }
+  return date.toLocaleDateString(
+    'en-US',
+    {
+      month: 'short',
+      day: '2-digit',
+      year: 'numeric',
+    }
+  )
+}
 
-  return `Waiting for ${selectedBank.value.name} payment...`
-})
-
-
-const paymentMethodLabel = computed(() => {
-  if (selectedMethod.value === 'cash') {
-    return 'Cash Payment'
-  }
-
-  if (successBank.value.key === 'aba') {
-    return 'ABA Bank'
-  }
-
-  if (successBank.value.key === 'acleda') {
-    return 'ACLEDA Bank'
-  }
-
-  return 'Bakong KHQR'
-})
-
-
-// ============================================================================
-// QR TIMER
-// ============================================================================
+/*
+|--------------------------------------------------------------------------
+| QR timer
+|--------------------------------------------------------------------------
+*/
 
 function startQrTimer() {
   if (qrTimer) {
@@ -591,11 +615,17 @@ function startQrTimer() {
   }
 
   qrTimer = setInterval(() => {
-    if (qrSecondsLeft.value <= 0) {
+    if (
+      qrSecondsLeft.value <= 0
+    ) {
       clearInterval(qrTimer)
+
       qrTimer = null
 
       stopPaymentPolling()
+
+      paymentStatus.value =
+        'expired'
 
       return
     }
@@ -604,11 +634,11 @@ function startQrTimer() {
   }, 1000)
 }
 
-
 function resetQrTimer() {
-  if (paymentCompleted.value) {
-    expireQrCode()
-    return
+  if (qrTimer) {
+    clearInterval(qrTimer)
+
+    qrTimer = null
   }
 
   qrSecondsLeft.value = 585
@@ -616,133 +646,234 @@ function resetQrTimer() {
   startQrTimer()
 }
 
-
-function expireQrCode() {
-  if (qrTimer) {
-    clearInterval(qrTimer)
-    qrTimer = null
-  }
-
-  qrSecondsLeft.value = 0
-}
-
-
 function stopPaymentPolling() {
   if (paymentPoller) {
     clearInterval(paymentPoller)
+
     paymentPoller = null
   }
 }
 
+function expireQrCode() {
+  if (qrTimer) {
+    clearInterval(qrTimer)
 
-// ============================================================================
-// PAYMENT METHOD SELECTION
-// ============================================================================
+    qrTimer = null
+  }
 
-function selectPaymentMethod(method) {
+  qrSecondsLeft.value = 0
+
+  stopPaymentPolling()
+
+  if (!paymentCompleted.value) {
+    paymentStatus.value =
+      'expired'
+  }
+}
+
+/*
+|--------------------------------------------------------------------------
+| Payment method selection
+|--------------------------------------------------------------------------
+*/
+
+function selectPaymentMethod(
+  method
+) {
   unlockPaymentAudio()
 
-  selectedMethod.value = method
+  if (
+    paymentCompleted.value
+  ) {
+    paymentCompleted.value =
+      false
 
-  if (paymentCompleted.value) {
-    expireQrCode()
-    return
+    showSuccessModal.value =
+      false
   }
+
+  selectedMethod.value =
+    method
+
+  paymentError.value = ''
 
   if (method === 'qr') {
     initializeBakongPayment()
   } else {
     stopPaymentPolling()
+
+    if (qrTimer) {
+      clearInterval(qrTimer)
+
+      qrTimer = null
+    }
+
+    paymentStatus.value =
+      'waiting'
   }
 }
 
+/*
+|--------------------------------------------------------------------------
+| Bank selection
+|--------------------------------------------------------------------------
+*/
 
 function selectBank(bankKey) {
   unlockPaymentAudio()
 
-  selectedBankKey.value = bankKey
+  if (
+    paymentCompleted.value
+  ) {
+    paymentCompleted.value =
+      false
 
-  if (paymentCompleted.value) {
-    expireQrCode()
-    return
+    showSuccessModal.value =
+      false
   }
 
-  if (selectedMethod.value === 'qr') {
+  selectedBankKey.value =
+    bankKey
+
+  paymentError.value = ''
+
+  /*
+   * The current backend creates
+   * Bakong KHQR.
+   *
+   * ABA / ACLEDA selection is
+   * currently UI selection only.
+   */
+  if (
+    selectedMethod.value ===
+    'qr'
+  ) {
     initializeBakongPayment()
   }
 }
 
+/*
+|--------------------------------------------------------------------------
+| Normalize payment status
+|--------------------------------------------------------------------------
+*/
 
-// ============================================================================
-// PAYMENT STATUS HELPERS
-// ============================================================================
-
-function normalizePaymentStatus(status) {
+function normalizePaymentStatus(
+  status
+) {
   return String(
     status?.status ||
-    status?.paymentStatus ||
-    status?.data?.status ||
-    status?.data?.paymentStatus ||
-    status ||
-    ''
+      status?.paymentStatus ||
+      status ||
+      ''
   ).toLowerCase()
 }
 
+/*
+|--------------------------------------------------------------------------
+| Bakong temporary messages
+|--------------------------------------------------------------------------
+*/
 
-function isTransientBakongMessage(message) {
+function isTransientBakongMessage(
+  message
+) {
   return /transaction\s+could\s+not\s+be\s+found|transaction\s+not\s+found|not\s+available\s+yet|bakong\s+api\s+token\s+is\s+(missing|invalid|expired)/i.test(
     String(message || '')
   )
 }
 
+/*
+|--------------------------------------------------------------------------
+| Generate QR image
+|--------------------------------------------------------------------------
+*/
 
-// ============================================================================
-// QR IMAGE
-// ============================================================================
-
-async function createQrImageUrl(qrText) {
+async function createQrImageUrl(
+  qrText
+) {
   if (!qrText) {
     return ''
   }
 
-  return QRCode.toDataURL(qrText, {
-    errorCorrectionLevel: 'M',
-    margin: 2,
-    scale: 8,
-    type: 'image/png',
+  try {
+    return await QRCode.toDataURL(
+      qrText,
+      {
+        errorCorrectionLevel: 'M',
+        margin: 2,
+        scale: 8,
+        type: 'image/png',
+        color: {
+          dark: '#000000',
+          light: '#ffffff',
+        },
+      }
+    )
+  } catch (error) {
+    console.error(
+      'Failed to generate QR image:',
+      error
+    )
 
-    color: {
-      dark: '#000000',
-      light: '#ffffff',
-    },
-  })
+    return ''
+  }
 }
 
+/*
+|--------------------------------------------------------------------------
+| Error message
+|--------------------------------------------------------------------------
+*/
 
-// ============================================================================
-// PAYMENT ERROR
-// ============================================================================
-
-function getPaymentErrorMessage(error) {
-  const errorBody = error?.response?.data
+function getPaymentErrorMessage(
+  error
+) {
+  const errorBody =
+    error?.response?.data
 
   const backendMessage =
     errorBody?.message ||
     errorBody?.error ||
-    errorBody?.data?.message ||
-    (typeof errorBody === 'string'
+    (typeof errorBody ===
+    'string'
       ? errorBody
       : '')
 
+  /*
+   * No HTTP response.
+   * This can mean backend/network/CORS/etc.
+   */
   if (!error?.response) {
-    return 'Backend is not running on http://localhost:8080. Start the Spring Boot server, then generate the QR again.'
+    console.error(
+      'Bakong network error:',
+      error
+    )
+
+    if (
+      error?.code ===
+      'ERR_NETWORK'
+    ) {
+      return 'Cannot connect to the backend at http://localhost:8080. Please make sure Spring Boot is running.'
+    }
+
+    return (
+      error?.message ||
+      'Could not connect to the backend.'
+    )
   }
 
-  if (error.response.status === 401) {
+  if (
+    error.response.status ===
+    401
+  ) {
     return 'Please sign in again before making this payment.'
   }
 
-  if (error.response.status === 403) {
+  if (
+    error.response.status ===
+    403
+  ) {
     if (
       /test qr is disabled/i.test(
         backendMessage
@@ -757,21 +888,43 @@ function getPaymentErrorMessage(error) {
     )
   }
 
+  if (
+    error.response.status ===
+    404
+  ) {
+    return (
+      backendMessage ||
+      'Payment endpoint or payment was not found.'
+    )
+  }
+
+  if (
+    error.response.status ===
+    400
+  ) {
+    return (
+      backendMessage ||
+      'Invalid payment information.'
+    )
+  }
+
   return (
     backendMessage ||
-    'Could not process payment. Please try again.'
+    'Could not process Bakong payment. Please try again.'
   )
 }
 
-
-// ============================================================================
-// FIND STORED BOOKING AMOUNT
-// ============================================================================
+/*
+|--------------------------------------------------------------------------
+| Find stored booking amount
+|--------------------------------------------------------------------------
+*/
 
 function findStoredBookingAmount() {
-  const bookingId = String(
-    route.params.bookingId
-  )
+  const bookingId =
+    String(
+      route.params.bookingId
+    )
 
   const existingBooking =
     bookingStore.booking
@@ -779,12 +932,13 @@ function findStoredBookingAmount() {
   if (
     String(
       existingBooking?.id ||
-      existingBooking?.bookingId ||
-      ''
+        existingBooking?.bookingId ||
+        ''
     ) === bookingId
   ) {
     return Number(
-      existingBooking?.totalPrice || 0
+      existingBooking?.totalPrice ||
+        0
     )
   }
 
@@ -793,54 +947,61 @@ function findStoredBookingAmount() {
       (booking) =>
         String(
           booking.id ||
-          booking.bookingId ||
-          ''
+            booking.bookingId ||
+            ''
         ) === bookingId
     )
 
   if (listedBooking) {
     return Number(
-      listedBooking.totalPrice || 0
+      listedBooking.totalPrice ||
+        0
     )
   }
 
   try {
-    const demoBookings = JSON.parse(
-      localStorage.getItem(
-        'frontendDemoBookings'
-      ) || '[]'
-    )
+    const demoBookings =
+      JSON.parse(
+        localStorage.getItem(
+          'frontendDemoBookings'
+        ) || '[]'
+      )
 
     const demoBooking =
       demoBookings.find(
         (booking) =>
           String(
             booking.id ||
-            booking.bookingId ||
-            ''
+              booking.bookingId ||
+              ''
           ) === bookingId
       )
 
     return Number(
-      demoBooking?.totalPrice || 0
+      demoBooking?.totalPrice ||
+        0
     )
   } catch {
     return 0
   }
 }
 
-
-// ============================================================================
-// LOAD BOOKING AMOUNT
-// ============================================================================
+/*
+|--------------------------------------------------------------------------
+| Load payment amount
+|--------------------------------------------------------------------------
+*/
 
 async function loadPaymentAmount() {
-  const routeAmount = Number(
-    route.query.amount || 0
-  )
+  const routeAmount =
+    Number(
+      route.query.amount || 0
+    )
 
   if (routeAmount > 0) {
-    amount.value = routeAmount
+    amount.value =
+      routeAmount
+
     return
   }
 
@@ -851,9 +1012,7 @@ async function loadPaymentAmount() {
       )
 
     amount.value = Number(
-      booking?.totalPrice ||
-      booking?.data?.totalPrice ||
-      0
+      booking?.totalPrice || 0
     )
   } catch (error) {
     console.error(
@@ -865,89 +1024,20 @@ async function loadPaymentAmount() {
       findStoredBookingAmount()
   }
 
-  if (Number(amount.value) <= 0) {
+  if (
+    Number(amount.value) <=
+    0
+  ) {
     amount.value =
       findStoredBookingAmount()
   }
 }
 
-
-// ============================================================================
-// LOAD PAYMENT METHODS
-// ============================================================================
-
-async function loadPaymentMethods() {
-  try {
-    const methods =
-      await getPaymentMethods()
-
-    paymentMethods.value =
-      Array.isArray(methods)
-        ? methods
-        : methods?.data || []
-
-    console.log(
-      'Payment methods:',
-      paymentMethods.value
-    )
-
-    const bakongMethod =
-      paymentMethods.value.find(
-        (method) =>
-          String(
-            method.methodName ||
-            method.paymentMethodName ||
-            method.name ||
-            ''
-          )
-            .toLowerCase()
-            .includes('bakong')
-      )
-
-    const cashMethod =
-      paymentMethods.value.find(
-        (method) =>
-          String(
-            method.methodName ||
-            method.paymentMethodName ||
-            method.name ||
-            ''
-          )
-            .toLowerCase()
-            .includes('cash')
-      )
-
-    paymentMethodId.value =
-      bakongMethod?.id || ''
-
-    cashPaymentMethodId.value =
-      cashMethod?.id || ''
-
-    console.log(
-      'Bakong payment method:',
-      bakongMethod
-    )
-
-    console.log(
-      'Cash payment method:',
-      cashMethod
-    )
-  } catch (error) {
-    console.error(
-      'Failed to fetch payment methods:',
-      error
-    )
-
-    paymentError.value =
-      error?.response?.data?.message ||
-      'Failed to load payment methods.'
-  }
-}
-
-
-// ============================================================================
-// AUDIO
-// ============================================================================
+/*
+|--------------------------------------------------------------------------
+| Audio
+|--------------------------------------------------------------------------
+*/
 
 function unlockPaymentAudio() {
   const AudioContext =
@@ -972,7 +1062,6 @@ function unlockPaymentAudio() {
     paymentAudioContext = null
   }
 }
-
 
 function playPaymentSuccessVoice() {
   const AudioContext =
@@ -1012,12 +1101,14 @@ function playPaymentSuccessVoice() {
 
     gain.gain.exponentialRampToValueAtTime(
       0.18,
-      audioContext.currentTime + 0.02
+      audioContext.currentTime +
+        0.02
     )
 
     gain.gain.exponentialRampToValueAtTime(
       0.001,
-      audioContext.currentTime + 0.45
+      audioContext.currentTime +
+        0.45
     )
 
     ;[660, 880, 1100].forEach(
@@ -1051,232 +1142,139 @@ function playPaymentSuccessVoice() {
   }
 }
 
-
-// ============================================================================
-// COMPLETE QR PAYMENT
-// ============================================================================
+/*
+|--------------------------------------------------------------------------
+| Complete QR payment
+|--------------------------------------------------------------------------
+*/
 
 function completeQrPayment() {
-  paymentCompleted.value = true
+  paymentCompleted.value =
+    true
 
   completedBankKey.value =
     selectedBankKey.value
 
-  paymentStatus.value = 'paid'
+  paymentStatus.value =
+    'paid'
+
   paymentError.value = ''
 
   stopPaymentPolling()
-  expireQrCode()
 
-  showSuccessModal.value = true
+  if (qrTimer) {
+    clearInterval(qrTimer)
+
+    qrTimer = null
+  }
+
+  qrSecondsLeft.value = 0
+
+  showSuccessModal.value =
+    true
 
   playPaymentSuccessVoice()
 }
 
+/*
+|--------------------------------------------------------------------------
+| Use Bakong session
+|--------------------------------------------------------------------------
+|
+| IMPORTANT:
+| paymentId is saved here.
+|
+| bookingId != paymentId
+| md5 != paymentId
+|
+*/
 
-// ============================================================================
-// USE BAKONG SESSION
-// ============================================================================
-
-async function useBakongSession(session) {
-  console.log(
-    'Bakong session:',
-    session
-  )
-
-  const data =
-    session?.data || session || {}
-
-  // ----------------------------------------------------------
-  // Payment ID
-  // ----------------------------------------------------------
-
-  bakongPaymentId.value =
-    data?.paymentId ||
-    data?.paymentID ||
-    data?.id ||
-    data?.payment?.id ||
-    null
-
-  // ----------------------------------------------------------
-  // QR text
-  // ----------------------------------------------------------
-
+async function useBakongSession(
+  session
+) {
   const qrText =
-    data?.qr ||
-    data?.qrCode ||
-    data?.qrText ||
-    data?.khqr ||
-    data?.khqrCode ||
-    data?.qrString ||
-    ''
-
-  // ----------------------------------------------------------
-  // QR image
-  // ----------------------------------------------------------
+    session?.qr || ''
 
   bakongQrImage.value =
-    data?.qrImage ||
-    data?.qrImageUrl ||
-    data?.qrUrl ||
-    data?.khqrImage ||
-    data?.image ||
+    session?.qrImage ||
+    session?.qrImageUrl ||
+    session?.qrUrl ||
+    session?.khqrImage ||
+    session?.image ||
+    (await createQrImageUrl(
+      qrText
+    )) ||
     ''
-
-  if (
-    !bakongQrImage.value &&
-    qrText
-  ) {
-    bakongQrImage.value =
-      await createQrImageUrl(
-        qrText
-      )
-  }
-
-  // ----------------------------------------------------------
-  // Reference
-  // ----------------------------------------------------------
 
   bakongReference.value =
-    data?.md5 ||
-    data?.reference ||
-    data?.paymentReference ||
-    data?.transactionId ||
+    session?.md5 ||
+    session?.reference ||
+    session?.paymentReference ||
     ''
 
-  // ----------------------------------------------------------
-  // Expiration
-  // ----------------------------------------------------------
+  /*
+   * THIS IS THE IMPORTANT FIX.
+   */
+  bakongPaymentId.value =
+    session?.paymentId ||
+    session?.id ||
+    null
+
+  console.log(
+    'Bakong payment session:',
+    {
+      paymentId:
+        bakongPaymentId.value,
+
+      md5:
+        bakongReference.value,
+
+      bookingId:
+        route.params.bookingId,
+    }
+  )
 
   if (
-    Number(data?.expiresInSeconds) > 0
+    !bakongPaymentId.value
+  ) {
+    console.warn(
+      'Bakong response does not contain paymentId:',
+      session
+    )
+
+    paymentError.value =
+      'Bakong payment was created, but the payment ID was not returned by the backend.'
+  }
+
+  if (
+    Number(
+      session?.expiresInSeconds
+    ) > 0
   ) {
     qrSecondsLeft.value =
       Number(
-        data.expiresInSeconds
+        session.expiresInSeconds
       )
 
     startQrTimer()
   }
-
-  console.log(
-    'Bakong payment ID:',
-    bakongPaymentId.value
-  )
-
-  console.log(
-    'Bakong reference:',
-    bakongReference.value
-  )
-
-  console.log(
-    'Bakong QR image:',
-    bakongQrImage.value
-  )
 }
 
+/*
+|--------------------------------------------------------------------------
+| Check Bakong payment status
+|--------------------------------------------------------------------------
+|
+| IMPORTANT:
+| Backend endpoint:
+|
+| GET /api/payments/bakong/{paymentId}/status
+|
+| So we MUST send paymentId.
+|--------------------------------------------------------------------------
+*/
 
-// ============================================================================
-// CREATE BAKONG PAYMENT
-// ============================================================================
-
-async function initializeBakongPayment() {
-  if (
-    paymentCompleted.value ||
-    selectedMethod.value !== 'qr' ||
-    loadingPaymentDetails.value
-  ) {
-    return
-  }
-
-  paymentStatus.value = 'waiting'
-  paymentError.value = ''
-
-  bakongQrImage.value = ''
-  bakongReference.value = ''
-  bakongPaymentId.value = null
-
-  if (Number(amount.value) <= 0) {
-    paymentError.value =
-      'Payment amount is missing. Please open payment from your booking again.'
-
-    stopPaymentPolling()
-    expireQrCode()
-
-    return
-  }
-
-  if (!paymentMethodId.value) {
-    paymentError.value =
-      'Bakong payment method was not found.'
-
-    stopPaymentPolling()
-    return
-  }
-
-  resetQrTimer()
-
-  try {
-    const session =
-      await createBakongPayment({
-        bookingId: Number(
-          route.params.bookingId
-        ),
-
-        amount: Number(
-          amount.value
-        ),
-
-        currency: 'USD',
-
-        paymentMethodId:
-          Number(
-            paymentMethodId.value
-          ),
-      })
-
-    console.log(
-      'Create Bakong payment response:',
-      session
-    )
-
-    await useBakongSession(
-      session
-    )
-  } catch (error) {
-    console.error(
-      'Bakong QR creation failed:',
-      error
-    )
-
-    paymentError.value =
-      getPaymentErrorMessage(
-        error
-      )
-
-    stopPaymentPolling()
-
-    return
-  }
-
-  if (!bakongPaymentId.value) {
-    paymentError.value =
-      'Bakong payment was created, but payment ID was not returned by the backend.'
-
-    stopPaymentPolling()
-
-    return
-  }
-
-  startPaymentPolling()
-}
-
-
-// ============================================================================
-// CHECK BAKONG PAYMENT STATUS
-// ============================================================================
-
-async function checkBakongPaymentStatusDirect() {
+async function checkBakongPaymentStatus() {
   if (
     paymentCompleted.value ||
     selectedMethod.value !== 'qr' ||
@@ -1285,15 +1283,33 @@ async function checkBakongPaymentStatusDirect() {
     return
   }
 
-  if (!bakongPaymentId.value) {
+  /*
+   * Do NOT use:
+   *
+   * route.params.bookingId
+   *
+   * Do NOT use:
+   *
+   * bakongReference.value
+   *
+   * We need PAYMENT ID.
+   */
+  if (
+    !bakongPaymentId.value
+  ) {
+    console.warn(
+      'Bakong payment ID is missing. Cannot check payment status.'
+    )
+
     return
   }
 
   try {
-    paymentStatus.value = 'checking'
+    paymentStatus.value =
+      'checking'
 
     const status =
-      await checkBakongPaymentStatus(
+      await paymentStore.checkBakongPaymentStatus(
         bakongPaymentId.value
       )
 
@@ -1307,6 +1323,9 @@ async function checkBakongPaymentStatusDirect() {
         status
       )
 
+    /*
+     * Successful payment
+     */
     if (
       [
         'paid',
@@ -1319,9 +1338,13 @@ async function checkBakongPaymentStatusDirect() {
       )
     ) {
       completeQrPayment()
+
       return
     }
 
+    /*
+     * Failed / expired payment
+     */
     if (
       [
         'expired',
@@ -1339,10 +1362,11 @@ async function checkBakongPaymentStatusDirect() {
       return
     }
 
+    /*
+     * Still waiting
+     */
     const message =
-      status?.message ||
-      status?.data?.message ||
-      ''
+      status?.message || ''
 
     paymentError.value =
       isTransientBakongMessage(
@@ -1350,6 +1374,9 @@ async function checkBakongPaymentStatusDirect() {
       )
         ? ''
         : message || ''
+
+    qrWasWaitingForCurrentSession.value =
+      true
 
     paymentStatus.value =
       'waiting'
@@ -1359,72 +1386,73 @@ async function checkBakongPaymentStatusDirect() {
       error
     )
 
+    paymentError.value =
+      getPaymentErrorMessage(
+        error
+      )
+
     paymentStatus.value =
       'waiting'
-
-    // Do not immediately show an error for
-    // temporary Bakong API failures.
-    const message =
-      error?.response?.data?.message ||
-      error?.response?.data?.error ||
-      ''
-
-    if (
-      !isTransientBakongMessage(
-        message
-      )
-    ) {
-      paymentError.value =
-        message || ''
-    }
   }
 }
 
-
-// ============================================================================
-// START PAYMENT POLLING
-// ============================================================================
+/*
+|--------------------------------------------------------------------------
+| Start payment polling
+|--------------------------------------------------------------------------
+*/
 
 function startPaymentPolling() {
   stopPaymentPolling()
 
-  checkBakongPaymentStatusDirect()
+  /*
+   * Check immediately.
+   */
+  checkBakongPaymentStatus()
 
+  /*
+   * Then check every 5 seconds.
+   */
   paymentPoller =
     setInterval(
-      checkBakongPaymentStatusDirect,
+      checkBakongPaymentStatus,
       5000
     )
 }
 
+/*
+|--------------------------------------------------------------------------
+| Load existing payment status
+|--------------------------------------------------------------------------
+|
+| Use stored PAYMENT ID.
+| Do NOT use bookingId.
+|--------------------------------------------------------------------------
+*/
 
-// ============================================================================
-// LOAD EXISTING PAYMENT
-// ============================================================================
-
-async function loadExistingPayment() {
+async function loadExistingPaymentStatus() {
   try {
-    const response =
-      await getPaymentByBooking(
-        Number(
-          route.params.bookingId
-        )
+    const lastPayment =
+      JSON.parse(
+        localStorage.getItem(
+          'lastBakongScanPayment'
+        ) || '{}'
       )
 
-    console.log(
-      'Existing payment:',
-      response
-    )
-
-    const payment =
-      response?.data ||
-      response ||
-      {}
+    if (
+      !lastPayment.paymentId
+    ) {
+      return false
+    }
 
     const status =
+      await paymentStore.checkBakongPaymentStatus(
+        lastPayment.paymentId
+      )
+
+    const normalizedStatus =
       normalizePaymentStatus(
-        payment?.status ||
-        payment?.paymentStatus
+        status
       )
 
     if (
@@ -1434,106 +1462,237 @@ async function loadExistingPayment() {
         'successful',
         'completed',
         'confirmed',
-      ].includes(status)
+      ].includes(
+        normalizedStatus
+      )
     ) {
-      paymentCompleted.value =
-        true
-
-      completedBankKey.value =
-        payment?.bank ||
-        payment?.selectedBank ||
-        selectedBankKey.value
-
-      showSuccessModal.value =
-        false
-
       return true
     }
-
-    return false
   } catch (error) {
-    console.log(
-      'No existing payment found:',
+    console.error(
+      'Failed to load existing payment status:',
       error
     )
 
     return false
   }
+
+  return false
 }
 
+/*
+|--------------------------------------------------------------------------
+| Initialize Bakong payment
+|--------------------------------------------------------------------------
+*/
 
-// ============================================================================
-// COPY BOOKING ID
-// ============================================================================
-
-async function copyBookingId() {
-  try {
-    await navigator.clipboard.writeText(
-      bookingCode.value
-    )
-
-    bookingIdCopied.value =
-      true
-
-    if (copiedTimer) {
-      clearTimeout(
-        copiedTimer
-      )
-    }
-
-    copiedTimer =
-      setTimeout(() => {
-        bookingIdCopied.value =
-          false
-
-        copiedTimer = null
-      }, 1400)
-  } catch {
-    alert(
-      'Could not copy booking ID'
-    )
-  }
-}
-
-
-// ============================================================================
-// CONFIRM CASH PAYMENT
-// ============================================================================
-
-async function confirmPayment() {
+async function initializeBakongPayment() {
   if (
-    paymentCompleted.value ||
-    paymentLoading.value
+    selectedMethod.value !==
+    'qr'
   ) {
     return
   }
 
-  if (!cashPaymentMethodId.value) {
-    alert(
-      'Cash payment method was not found.'
-    )
+  if (
+    loadingPaymentDetails.value
+  ) {
+    return
+  }
+
+  /*
+   * If user chooses another bank
+   * while current payment is completed,
+   * allow a new payment session.
+   */
+  if (
+    paymentCompleted.value
+  ) {
+    paymentCompleted.value =
+      false
+
+    showSuccessModal.value =
+      false
+  }
+
+  /*
+   * Stop old polling.
+   */
+  stopPaymentPolling()
+
+  /*
+   * Reset current session.
+   */
+  paymentStatus.value =
+    'waiting'
+
+  paymentError.value = ''
+
+  bakongPaymentId.value =
+    null
+
+  bakongQrImage.value = ''
+
+  bakongReference.value = ''
+
+  qrWasWaitingForCurrentSession.value =
+    false
+
+  if (
+    Number(amount.value) <=
+    0
+  ) {
+    paymentError.value =
+      'Payment amount is missing. Please open payment from your booking again.'
+
+    expireQrCode()
 
     return
   }
 
+  if (
+    !paymentMethodId.value
+  ) {
+    paymentError.value =
+      'Bakong payment method is not available.'
+
+    return
+  }
+
+  resetQrTimer()
+
   try {
-    paymentLoading.value = true
-
-    await createPayment({
-      bookingId: Number(
+    const bookingId =
+      Number(
         route.params.bookingId
-      ),
+      )
 
-      paymentMethodId: Number(
-        cashPaymentMethodId.value
-      ),
+    const selectedPaymentMethodId =
+      Number(
+        paymentMethodId.value
+      )
 
-      amount: Number(
-        amount.value
-      ),
+    const paymentAmount =
+      Number(amount.value)
 
-      paymentType: 'Cash',
-    })
+    console.log(
+      'Creating Bakong payment:',
+      {
+        bookingId,
+        paymentMethodId:
+          selectedPaymentMethodId,
+        amount:
+          paymentAmount,
+        currency: 'USD',
+      }
+    )
+
+    const session =
+      await paymentStore.createBakongQr(
+        {
+          bookingId,
+
+          paymentMethodId:
+            selectedPaymentMethodId,
+
+          amount:
+            paymentAmount,
+
+          currency: 'USD',
+        }
+      )
+
+    console.log(
+      'Bakong payment session received:',
+      session
+    )
+
+    await useBakongSession(
+      session
+    )
+  } catch (error) {
+    console.error(
+      'Failed to initialize Bakong payment:',
+      error
+    )
+
+    paymentError.value =
+      getPaymentErrorMessage(
+        error
+      )
+
+    stopPaymentPolling()
+
+    return
+  }
+
+  /*
+   * Only start polling if
+   * paymentId exists.
+   */
+  if (
+    bakongPaymentId.value
+  ) {
+    startPaymentPolling()
+  } else {
+    console.warn(
+      'Payment created but paymentId is missing. Polling was not started.'
+    )
+  }
+}
+
+/*
+|--------------------------------------------------------------------------
+| Confirm payment
+|--------------------------------------------------------------------------
+*/
+
+async function confirmPayment() {
+  if (
+    paymentCompleted.value ||
+    paymentStore.loading
+  ) {
+    return
+  }
+
+  /*
+   * Bakong QR payment is confirmed
+   * automatically by polling.
+   */
+  if (
+    selectedMethod.value ===
+    'qr'
+  ) {
+    paymentError.value =
+      'Please scan the Bakong KHQR. The payment will be confirmed automatically after Bakong confirms it.'
+
+    return
+  }
+
+  /*
+   * Cash payment
+   */
+  try {
+    await paymentStore.createPayment(
+      {
+        bookingId:
+          Number(
+            route.params.bookingId
+          ),
+
+        paymentMethodId:
+          Number(
+            paymentMethodId.value ||
+              1
+          ),
+
+        amount:
+          amount.value,
+
+        paymentType:
+          'Cash',
+      }
+    )
 
     paymentCompleted.value =
       true
@@ -1544,60 +1703,110 @@ async function confirmPayment() {
     paymentStatus.value =
       'paid'
 
-    expireQrCode()
-    stopPaymentPolling()
-
     showSuccessModal.value =
       true
+
+    playPaymentSuccessVoice()
   } catch (error) {
     console.error(
       'Cash payment failed:',
       error
     )
 
-    alert(
-      error?.response?.data?.message ||
-      error?.response?.data?.error ||
-      'Payment failed'
-    )
-  } finally {
-    paymentLoading.value =
-      false
+    paymentError.value =
+      getPaymentErrorMessage(
+        error
+      )
   }
 }
 
-
-// ============================================================================
-// PAY
-// ============================================================================
+/*
+|--------------------------------------------------------------------------
+| Pay button
+|--------------------------------------------------------------------------
+*/
 
 function pay() {
   confirmPayment()
 }
 
+/*
+|--------------------------------------------------------------------------
+| Copy booking ID
+|--------------------------------------------------------------------------
+*/
 
-// ============================================================================
-// PAGE INITIALIZATION
-// ============================================================================
+async function copyBookingId() {
+  try {
+    await navigator.clipboard.writeText(
+      String(
+        route.params.bookingId
+      )
+    )
+
+    bookingIdCopied.value =
+      true
+
+    if (copiedTimer) {
+      clearTimeout(copiedTimer)
+    }
+
+    copiedTimer = setTimeout(() => {
+      bookingIdCopied.value =
+        false
+    }, 2000)
+  } catch (error) {
+    console.error(
+      'Failed to copy booking ID:',
+      error
+    )
+  }
+}
+
+/*
+|--------------------------------------------------------------------------
+| Mounted
+|--------------------------------------------------------------------------
+*/
 
 onMounted(async () => {
   try {
-    // 1. Get payment methods
-    await loadPaymentMethods()
+    const methods =
+      await paymentStore.fetchPaymentMethods()
 
-    // 2. Get booking amount
+    console.log(
+      'Payment methods:',
+      methods
+    )
+
+    const bakongMethod =
+      methods.find(
+        (method) =>
+          String(
+            method.methodName ||
+              method.paymentMethodName ||
+              ''
+          )
+            .toLowerCase()
+            .includes(
+              'bakong'
+            )
+      )
+
+    paymentMethodId.value =
+      bakongMethod?.id ||
+      methods[0]?.id ||
+      ''
+
+    console.log(
+      'Selected Bakong payment method ID:',
+      paymentMethodId.value
+    )
+
     await loadPaymentAmount()
-
-    // 3. Check if this booking already has payment
-    const alreadyPaid =
-      await loadExistingPayment()
-
-    if (alreadyPaid) {
-      return
-    }
   } catch (error) {
     console.error(
-      'Failed to load payment page:',
+      'Failed to initialize payment page:',
       error
     )
   } finally {
@@ -1605,29 +1814,41 @@ onMounted(async () => {
       false
   }
 
-  // 4. Automatically generate Bakong QR
-  if (
-    selectedMethod.value === 'qr' &&
-    !paymentCompleted.value
-  ) {
-    initializeBakongPayment()
-  }
+  await initializeBakongPayment()
 })
 
-
-// ============================================================================
-// CLEANUP
-// ============================================================================
+/*
+|--------------------------------------------------------------------------
+| Unmounted
+|--------------------------------------------------------------------------
+*/
 
 onUnmounted(() => {
   if (qrTimer) {
     clearInterval(qrTimer)
+
+    qrTimer = null
   }
 
   if (copiedTimer) {
     clearTimeout(copiedTimer)
+
+    copiedTimer = null
   }
 
   stopPaymentPolling()
+
+  if (
+    paymentAudioContext
+  ) {
+    try {
+      paymentAudioContext.close()
+    } catch {
+      // Ignore audio cleanup errors.
+    }
+
+    paymentAudioContext =
+      null
+  }
 })
 </script>

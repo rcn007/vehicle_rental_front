@@ -43,8 +43,12 @@ export const getVehicles = async () => {
 };
 
 // Delete booking
-// Delete booking
+
 export const deleteBooking = async (id) => {
   const response = await api.delete(`/bookings/${id}`)
   return response.data
+}
+
+export const getMyBookings = () => {
+  return api.get('/bookings/my')
 }

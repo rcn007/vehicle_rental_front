@@ -19,11 +19,46 @@ export const createUser = async (userData) => {
 };
 
 // Update user profile
-export const updateUser = async (id, userData) => {
-  const response = await api.put(`/users/update/${id}`, userData);
+// Update user profile
+export const updateUser = async (id, userData, profileImage = null) => {
+  const formData = new FormData();
+
+  if (userData.name !== undefined) {
+    formData.append("name", userData.name);
+  }
+
+  if (userData.email !== undefined) {
+    formData.append("email", userData.email);
+  }
+
+  if (userData.phone !== undefined) {
+    formData.append("phone", userData.phone);
+  }
+
+  if (userData.gender !== undefined) {
+    formData.append("gender", userData.gender);
+  }
+
+  if (userData.role !== undefined) {
+    formData.append("role", userData.role);
+  }
+
+  if (userData.status !== undefined) {
+    formData.append("status", userData.status);
+  }
+
+  // Add profile image only when user selected a new image
+  if (profileImage instanceof File) {
+    formData.append("file", profileImage);
+  }
+
+  const response = await api.put(
+    `/users/update/${id}`,
+    formData
+  );
+
   return response.data;
 };
-
 // Delete user
 export const deleteUser = async (id) => {
   const response = await api.delete(`/users/delete/${id}`);

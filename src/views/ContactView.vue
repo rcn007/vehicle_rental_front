@@ -120,6 +120,19 @@
                 ><strong>Monday - Sunday<br />8:00 AM - 8:00 PM</strong></span
               >
             </div>
+             <div class="flex items-center gap-3 relative z-10 flex-wrap">
+        
+
+          <a
+            href="https://t.me/my_vehicle_rental_bot"
+            target="_blank"
+            rel="noopener noreferrer"
+            class="px-5 py-3 text-white text-xl font-extrabold rounded-[var(--radius-lg)] border-blue-400 border-1 transition-all flex items-center gap-2.5 "
+          >
+            <i class="fa-brands fa-telegram text-xl text-blue-400"></i>
+            Telegram
+          </a>
+        </div>
           </div>
 
           <div class="contact-socials">

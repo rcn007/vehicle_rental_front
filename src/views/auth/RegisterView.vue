@@ -60,7 +60,7 @@
           <label>Password</label>
           <div class="password-field">
             <input
-              v-model="form.password"
+              v-model="form.pwd"
               :type="showPassword ? 'text' : 'password'"
               placeholder="Enter Your Password"
               required
@@ -101,7 +101,7 @@ const router = useRouter()
 const form = reactive({
   name: '',
   email: '',
-  password: '',
+  pwd: '',
   phoneNumber: ''
 })
 
@@ -112,7 +112,7 @@ async function register() {
     await auth.register({
       name: form.name,
       email: form.email,
-      password: form.password,
+      pwd: form.pwd,
       phoneNumber: form.phoneNumber
     })
 

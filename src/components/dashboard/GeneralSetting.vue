@@ -396,7 +396,7 @@ onMounted(async () => {
 
     if (resData) {
       form.value = {
-        siteName: resData.title || 'Precision Auto',
+        siteName: resData.websiteName || 'ChaulTv',
         websiteTitle: resData.title || 'Precision Auto - Premium Vehicle Rentals',
         description:
           resData.description ||
@@ -424,10 +424,7 @@ const saveSettings = async () => {
     const formData = new FormData()
 
     // TEXT FIELDS
-    formData.append(
-      'title',
-      form.value.websiteTitle || form.value.siteName || ''
-    )
+    formData.append('websiteName', form.value.siteName || '')
     formData.append('description', form.value.description || '')
     formData.append('buttonText', 'Explore Fleet')
     formData.append('buttonLink', '/vehicles')
@@ -451,13 +448,22 @@ const saveSettings = async () => {
     const updatedData = res?.data || res
 
     // UPDATE FRONTEND FROM RESPONSE
-    if (updatedData) {
-      form.value.siteName = updatedData.title || form.value.siteName
-      form.value.websiteTitle = updatedData.title || form.value.websiteTitle
-      form.value.description = updatedData.description || form.value.description
-      form.value.logoUrl = updatedData.logo || form.value.logoUrl
-      form.value.heroBannerUrl = updatedData.heroImage || form.value.heroBannerUrl
-    }
+   if (updatedData) {
+  form.value.siteName =
+    updatedData.websiteName || form.value.siteName
+
+  form.value.websiteTitle =
+    updatedData.title || form.value.websiteTitle
+
+  form.value.description =
+    updatedData.description || form.value.description
+
+  form.value.logoUrl =
+    updatedData.logo || form.value.logoUrl
+
+  form.value.heroBannerUrl =
+    updatedData.heroImage || form.value.heroBannerUrl
+}
 
     // CLEAR SELECTED FILE REFS
     logoFile.value = null

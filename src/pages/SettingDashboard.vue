@@ -1,16 +1,16 @@
 <template>
-  <main class="p-6 min-h-[calc(100vh-64px)] bg-(--background)">
+  <main class="p-6 md:p-8 min-h-[calc(100vh-64px)] bg-(--background)">
     
     <!-- Page Header -->
     <div class="mb-6">
       <h1 class="text-3xl font-bold tracking-tight text-[--text]">Settings</h1>
-      <p class="text-[--texttext-xl mt-1">Manage your vehicle rental website and system preferences.</p>
+      <p class="text-[--text] text-xl mt-1">Manage your vehicle rental website and system preferences.</p>
     </div>
 
     <!-- Sub-Tab Navigation Bar -->
     <div class="flex items-center gap-6 border-b border-[#D3DAEF] mb-6">
       <button 
-        v-for="tab in ['General', 'Notification', 'Payment', 'Security']" 
+        v-for="tab in ['General', 'Security']" 
         :key="tab"
         @click="activeSubTab = tab"
         :class="[
@@ -31,8 +31,8 @@
 <script setup>
 import { ref, computed } from 'vue'
 import GeneralSetting from '../components/dashboard/GeneralSetting.vue'
-import NotificationSetting from '../components/dashboard/NotificationSetting.vue'
-import PaymentSetting from '../components/dashboard/PaymentSetting.vue'
+// import NotificationSetting from '../components/dashboard/NotificationSetting.vue'
+// import PaymentSetting from '../components/dashboard/PaymentSetting.vue'
 import SecuritySetting from '../components/dashboard/SecuritySetting.vue'
 
 
@@ -42,8 +42,8 @@ const activeSubTab = ref('General')
 const currentSubView = computed(() => {
   switch (activeSubTab.value) {
     case 'General': return GeneralSetting
-    case 'Notification': return NotificationSetting
-    case 'Payment': return PaymentSetting
+    // case 'Notification': return NotificationSetting
+    // case 'Payment': return PaymentSetting
     case 'Security': return SecuritySetting
     default: return GeneralSetting
   }

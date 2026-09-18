@@ -146,10 +146,51 @@ export const useAuthStore = defineStore('auth', {
     // ================================
     // Google Login
     // ================================
-    googleLogin() {
-      googleLoginApi()
-    },
+// ================================
+// Google Login
+// ================================
+loginWithGoogle() {
+  googleLoginApi()
+},
 
+// ================================
+// Handle Google Callback
+// ================================
+handleGoogleCallback() {
+  const params = new URLSearchParams(window.location.search)
+
+  const token = params.get('token')
+  const error = params.get('error')
+
+  if (error) {
+    this.error = 'Google login failed. Please try again.'
+    return false
+  }
+
+  if (!token) {
+    this.error = 'Google login token not found.'
+    return false
+  }
+
+  const user = {
+    id: params.get('id') ? Number(params.get('id')) : null,
+    name: params.get('name'),
+    email: params.get('email'),
+    role: params.get('role')
+  }
+
+  // Save token
+  this.token = token
+  localStorage.setItem('token', token)
+
+  // Save user
+  this.user = user
+  localStorage.setItem('user', JSON.stringify(user))
+
+  console.log('Google user:', user)
+
+  return true
+},
     // ================================
     // Logout
     // ================================

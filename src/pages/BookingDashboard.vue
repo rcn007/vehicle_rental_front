@@ -23,8 +23,8 @@
           class="inline-flex items-center justify-center gap-2 h-10 px-4 rounded-[11px] text-sm font-semibold text-white bg-[#0f172a] hover:text-gray-100 transition-all shadow-sm shadow-blue-500/10 active:scale-95 cursor-pointer"
         >
           <i class="fa-solid fa-plus text-xs text-white"></i>
-          <span class="text-white  hover:text-gray-100 "
-          style="color: var(--text);">New Booking</span>
+          <span class="text-white hover:text-gray-200 "
+         ">New Booking</span>
         </router-link>
       </div>
     </div>
@@ -352,7 +352,7 @@
 
               <!-- Actions -->
               <td class="py-3.5 px-4 text-right">
-                <div class="flex items-center justify-end gap-1.5">
+                <div class="flex items-center gap-1.5">
                   <!-- View -->
                   <router-link
                     :to="`/admin/bookings/${booking.id}`"
@@ -642,19 +642,22 @@ const cancelledRate = computed(() =>
 */
 
 const filteredBookings = computed(() => {
-  let result = bookings.value
+  let result = [...bookings.value]
 
   if (searchQuery.value.trim()) {
     const search = searchQuery.value.toLowerCase().trim()
 
     result = result.filter(booking => {
       const bookingId = String(booking.id || '').toLowerCase()
+
       const customerName = String(
         booking.user?.name || booking.userName || ''
       ).toLowerCase()
+
       const customerEmail = String(
         booking.user?.email || booking.userEmail || ''
       ).toLowerCase()
+
       const vehicleName = String(
         booking.vehicle?.name || booking.vehicleName || ''
       ).toLowerCase()
@@ -676,9 +679,11 @@ const filteredBookings = computed(() => {
     )
   }
 
+  // Newest booking first
+  result.sort((a, b) => Number(b.id) - Number(a.id))
+
   return result
 })
-
 /*
 |--------------------------------------------------------------------------
 | Helper Functions

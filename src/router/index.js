@@ -107,6 +107,15 @@ const routes = [
       }
     },
     {
+      path: 'booking/detail-booking/:bookingId',
+      name: 'detail_booking',
+      component: MyBookingsView,
+      meta: {
+        requiresAuth: true,
+        roles: ['CLIENT']
+      }
+    },
+    {
       path: 'rental-history',
       name: 'rental-history',
       component: RentalHistoryView,
@@ -355,23 +364,42 @@ router.beforeEach((to) => {
   const token = localStorage.getItem('token')
   const user = JSON.parse(localStorage.getItem('user') || 'null')
 
+  // =========================
+  // Check authentication
+  // =========================
   if (to.meta.requiresAuth && !token) {
     return {
       name: 'login',
-      query: { redirect: to.fullPath }
+      query: {
+        redirect: to.fullPath
+      }
     }
   }
 
-  if (to.meta.requiresAdmin) {
-    const roles = Array.isArray(user?.roles) ? user.roles : [user?.role]
-    const isAdmin = roles.some((role) =>
-      ['ADMIN', 'ROLE_ADMIN'].includes(String(role).toUpperCase())
+  // =========================
+  // Check role
+  // =========================
+  if (to.meta.roles) {
+    const allowedRoles = to.meta.roles
+
+    const userRoles = Array.isArray(user?.roles)
+      ? user.roles
+      : user?.role
+        ? [user.role]
+        : []
+
+    const hasPermission = userRoles.some((role) =>
+      allowedRoles.includes(String(role).toUpperCase())
     )
 
-    if (!isAdmin) {
-      return { name: 'home' }
+    if (!hasPermission) {
+      return {
+        name: 'home'
+      }
     }
   }
+
+  return true
 })
 
 export default router
