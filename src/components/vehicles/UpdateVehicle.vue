@@ -65,17 +65,47 @@
 
             <div>
               <label class="block text-xs font-bold uppercase tracking-wider text-gray-500 mb-1.5">Brand</label>
-              <input type="text" v-model="form.brand" required class="w-full h-10 px-3.5 bg-gray-50 border border-gray-200 rounded-lg text-xs font-medium text-gray-900 focus:outline-none">
-            </div>
+              <select
+  v-model="form.brand_id"
+  required
+  class="w-full h-10 px-3.5 bg-gray-50 border border-gray-200 rounded-lg text-xs font-semibold text-gray-900 focus:outline-none"
+>
+  <option :value="null" disabled>
+    Select Brand
+  </option>
+
+  <option
+    v-for="brand in brands"
+    :key="brand.id"
+    :value="brand.id"
+  >
+    {{ brand.name }}
+  </option>
+</select> </div>
 
             <div>
               <label class="block text-xs font-bold uppercase tracking-wider text-gray-500 mb-1.5">Category</label>
-              <input type="text" v-model="form.category" required class="w-full h-10 px-3.5 bg-gray-50 border border-gray-200 rounded-lg text-xs font-medium text-gray-900 focus:outline-none">
-            </div>
+             <select
+  v-model="form.category_id"
+  required
+  class="w-full h-10 px-3.5 bg-gray-50 border border-gray-200 rounded-lg text-xs font-semibold text-gray-900 focus:outline-none"
+>
+  <option :value="null" disabled>
+    Select Category
+  </option>
+
+  <option
+    v-for="category in categories"
+    :key="category.id"
+    :value="category.id"
+  >
+    {{ category.name }}
+  </option>
+</select>     </div>
 
             <div>
               <label class="block text-xs font-bold uppercase tracking-wider text-gray-500 mb-1.5">License Plate</label>
-              <input type="text" v-model="form.licensePlate" required class="w-full h-10 px-3.5 bg-gray-50 border border-gray-200 rounded-lg text-xs font-medium text-gray-900 focus:outline-none">
+              <input type="text" v-model="form.plate_number" required class="w-full h-10 px-3.5 bg-gray-50 border border-gray-200 rounded-lg text-xs font-medium text-gray-900 focus:outline-none">
             </div>
 
             <div>
@@ -102,7 +132,7 @@
 
             <div>
               <label class="block text-xs font-bold uppercase tracking-wider text-gray-500 mb-1.5">Fuel Type</label>
-              <select v-model="form.fuelType" class="w-full h-10 px-3.5 bg-gray-50 border border-gray-200 rounded-lg text-xs font-semibold text-gray-900">
+              <select v-model="form.fuel_type" class="w-full h-10 px-3.5 bg-gray-50 border border-gray-200 rounded-lg text-xs font-semibold text-gray-900">
                 <option value="Gasoline">Gasoline</option>
                 <option value="Diesel">Diesel</option>
                 <option value="Hybrid">Hybrid</option>
@@ -112,7 +142,7 @@
 
             <div>
               <label class="block text-xs font-bold uppercase tracking-wider text-gray-500 mb-1.5">Seats</label>
-              <input type="number" v-model.number="form.seats" min="1" class="w-full h-10 px-3.5 bg-gray-50 border border-gray-200 rounded-lg text-xs font-medium text-gray-900">
+              <input type="number" v-model.number="form.seat" min="1" class="w-full h-10 px-3.5 bg-gray-50 border border-gray-200 rounded-lg text-xs font-medium text-gray-900">
             </div>
           </div>
         </div>
@@ -126,7 +156,7 @@
 
           <div>
             <label class="block text-xs font-bold uppercase tracking-wider text-gray-500 mb-1.5">Daily Rate ($)</label>
-            <input type="number" step="0.01" v-model.number="form.dailyRate" required class="w-full h-10 px-3.5 bg-gray-50 border border-gray-200 rounded-lg text-xs font-bold text-gray-900">
+            <input type="number" step="0.01" v-model.number="form.pricePerDay" required class="w-full h-10 px-3.5 bg-gray-50 border border-gray-200 rounded-lg text-xs font-bold text-gray-900">
           </div>
 
           <div>
@@ -187,15 +217,17 @@ const loadingCategories = ref(false)
 
 const form = ref({
   name: '',
-  brand: '',
-  category: '',
-  licensePlate: '',
-  year: 2023,
+  brand_id: null,
+  category_id: null,
+  model: '',
+  year: 2024,
+  plate_number: '',
   transmission: 'Automatic',
-  fuelType: 'Gasoline',
-  seats: 5,
-  dailyRate: 0,
+  fuel_type: 'Gasoline',
+  seat: 5,
+  pricePerDay: 0,
   status: 'AVAILABLE',
+  description: '',
   image: ''
 })
 
@@ -219,12 +251,15 @@ const fetchBrands = async () => {
 
     console.log('Brands response:', response)
 
-    brands.value =
-      Array.isArray(response?.data)
-        ? response.data
-        : Array.isArray(response)
-          ? response
-          : []
+    const data =
+      response?.data?.data ||
+      response?.data ||
+      response ||
+      []
+
+    brands.value = Array.isArray(data)
+      ? data
+      : []
 
     console.log('Brands:', brands.value)
 
@@ -248,12 +283,15 @@ const fetchCategories = async () => {
 
     console.log('Categories response:', response)
 
-    categories.value =
-      Array.isArray(response?.data)
-        ? response.data
-        : Array.isArray(response)
-          ? response
-          : []
+    const data =
+      response?.data?.data ||
+      response?.data ||
+      response ||
+      []
+
+    categories.value = Array.isArray(data)
+      ? data
+      : []
 
     console.log('Categories:', categories.value)
 
@@ -280,96 +318,84 @@ const fetchVehicleDetails = async () => {
     loading.value = true
     fetchError.value = null
 
-    console.log(
-      'Fetching vehicle:',
-      activeId.value
-    )
+    const response = await getVehicleById(activeId.value)
 
-    const response =
-      await getVehicleById(activeId.value)
+    console.log('Vehicle response:', response)
 
-    console.log(
-      'Vehicle response:',
-      response
-    )
+    const data =
+      response?.data?.data ||
+      response?.data ||
+      response ||
+      {}
 
-    /*
-     * Your API response:
-     *
-     * {
-     *   msg: "...",
-     *   status: 200,
-     *   data: {
-     *      id: 1,
-     *      category_name: "Sedan",
-     *      brand_name: "Toyota",
-     *      name: "Toyota Camry 2.5V",
-     *      mainImage: "...",
-     *      model: "Camry",
-     *      year: 2024,
-     *      plate_number: "2CD-1234",
-     *      transmission: "Automatic",
-     *      fuel_type: "Gasoline",
-     *      seat: 5,
-     *      pricePerDay: 55.00,
-     *      status: "AVAILABLE"
-     *   }
-     * }
-     */
-
-    const data = response?.data || {}
-
-    console.log(
-      'Vehicle data:',
-      data
-    )
-
-    /*
-     * Map backend fields -> frontend form fields
-     */
+    console.log('Vehicle data:', data)
 
     form.value = {
       name: data.name || '',
 
-      brand: data.brand_name || '',
+      brand_id:
+        data.brand_id ??
+        data.brandId ??
+        null,
 
-      category: data.category_name || '',
+      category_id:
+        data.category_id ??
+        data.categoryId ??
+        null,
 
-      licensePlate:
-        data.plate_number || '',
+      model:
+        data.model || '',
 
       year:
-        Number(data.year || 2023),
+        Number(data.year || 2024),
+
+      plate_number:
+        data.plate_number ||
+        data.licensePlate ||
+        '',
 
       transmission:
-        data.transmission || 'Automatic',
+        data.transmission ||
+        'Automatic',
 
-      fuelType:
-        data.fuel_type || 'Gasoline',
+      fuel_type:
+        data.fuel_type ||
+        data.fuelType ||
+        'Gasoline',
 
-      seats:
-        Number(data.seat || 5),
+      seat:
+        Number(
+          data.seat ??
+          data.seats ??
+          5
+        ),
 
-      dailyRate:
-        Number(data.pricePerDay ?? 0),
+      pricePerDay:
+        Number(
+          data.pricePerDay ??
+          data.dailyRate ??
+          0
+        ),
 
       status:
-        data.status || 'AVAILABLE',
+        data.status ||
+        'AVAILABLE',
+
+      description:
+        data.description || '',
 
       image:
-        data.mainImage || ''
+        data.mainImage ||
+        data.image ||
+        ''
     }
 
-    console.log(
-      'Form after vehicle loading:',
-      form.value
-    )
+    console.log('Brand ID:', form.value.brand_id)
+    console.log('Category ID:', form.value.category_id)
+    console.log('Form:', form.value)
 
   } catch (err) {
-    console.error(
-      'Failed to load vehicle:',
-      err
-    )
+    console.error('Failed to load vehicle:', err)
 
     fetchError.value =
       err.response?.data?.message ||
@@ -384,6 +410,18 @@ const fetchVehicleDetails = async () => {
 }
 
 /* =========================================================
+   IMAGE CHANGE
+========================================================= */
+
+const handleImageChange = (event) => {
+  const file = event.target.files?.[0]
+
+  if (file) {
+    form.value.image = file
+  }
+}
+
+/* =========================================================
    UPDATE VEHICLE
 ========================================================= */
 
@@ -393,63 +431,112 @@ const handleSave = async () => {
     return
   }
 
+  if (!form.value.brand_id) {
+    alert('Brand ID is missing. Please select a brand.')
+    return
+  }
+
+  if (!form.value.category_id) {
+    alert('Category ID is missing. Please select a category.')
+    return
+  }
+
   try {
     submitting.value = true
 
-    const payload = {
-      name: form.value.name,
+    const formData = new FormData()
 
-      brand: form.value.brand,
-
-      category: form.value.category,
-
-      licensePlate:
-        form.value.licensePlate,
-
-      year:
-        Number(form.value.year),
-
-      transmission:
-        form.value.transmission,
-
-      fuelType:
-        form.value.fuelType,
-
-      seats:
-        Number(form.value.seats),
-
-      dailyRate:
-        Number(form.value.dailyRate),
-
-      pricePerDay:
-        Number(form.value.dailyRate),
-
-      status:
-        form.value.status,
-
-      image:
-        form.value.image
-    }
-
-    console.log(
-      'Update vehicle payload:',
-      payload
+    formData.append(
+      'name',
+      form.value.name
     )
 
-    const response =
-      await updateVehicle(
-        activeId.value,
-        payload
+    formData.append(
+      'brand_id',
+      String(form.value.brand_id)
+    )
+
+    formData.append(
+      'category_id',
+      String(form.value.category_id)
+    )
+
+    formData.append(
+      'model',
+      form.value.model || ''
+    )
+
+    formData.append(
+      'year',
+      String(form.value.year)
+    )
+
+    formData.append(
+      'plate_number',
+      form.value.plate_number
+    )
+
+    formData.append(
+      'transmission',
+      form.value.transmission
+    )
+
+    formData.append(
+      'fuel_type',
+      form.value.fuel_type
+    )
+
+    formData.append(
+      'seat',
+      String(form.value.seat)
+    )
+
+    formData.append(
+      'pricePerDay',
+      String(form.value.pricePerDay)
+    )
+
+    formData.append(
+      'status',
+      form.value.status
+    )
+
+    formData.append(
+      'description',
+      form.value.description || ''
+    )
+
+    if (form.value.image instanceof File) {
+      formData.append(
+        'mainImage',
+        form.value.image
       )
+    }
+
+    console.log('========== UPDATE VEHICLE ==========')
+    console.log('Vehicle ID:', activeId.value)
+
+    for (const [key, value] of formData.entries()) {
+      console.log(
+        key,
+        ':',
+        value instanceof File
+          ? value.name
+          : value
+      )
+    }
+
+    const response = await updateVehicle(
+      activeId.value,
+      formData
+    )
 
     console.log(
-      'Update vehicle response:',
+      'Update response:',
       response
     )
 
-    alert(
-      'Vehicle updated successfully.'
-    )
+    alert('Vehicle updated successfully.')
 
     router.push('/admin/vehicles')
 
@@ -457,6 +544,11 @@ const handleSave = async () => {
     console.error(
       'Failed to update vehicle:',
       err
+    )
+
+    console.error(
+      'Backend response:',
+      err.response?.data
     )
 
     alert(

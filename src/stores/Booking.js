@@ -24,19 +24,19 @@ export const useBookingStore = defineStore('booking', {
       }
     },
 
-    async fetchBookings() {
-      this.loading = true
+async fetchBookings() {
+  this.loading = true
 
-      try {
-        const response = await api.get('/bookings')
+  try {
+    const response = await api.get('/bookings/my')
 
-        this.bookings = response.data?.data || response.data || []
+    this.bookings = response.data?.data || response.data || []
 
-        return this.bookings
-      } finally {
-        this.loading = false
-      }
-    },
+    return this.bookings
+  } finally {
+    this.loading = false
+  }
+},
 
     async fetchBooking(id) {
       const response = await api.get(`/bookings/${id}`)
@@ -46,7 +46,7 @@ export const useBookingStore = defineStore('booking', {
       return this.booking
     },
 
-    async cancelBooking(id) {
+    async deleteBooking(id) {
       const response = await api.put(`/bookings/${id}/cancel`)
       return response.data
     },

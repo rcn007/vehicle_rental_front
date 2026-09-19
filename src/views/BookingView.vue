@@ -16,7 +16,8 @@
       <div class="absolute top-1/3 -right-32 w-96 h-96 bg-orange-600/10 rounded-full blur-[120px]"></div>
     </div>
 
-    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10"
+    style="font-family: var(--font-heading);">
       <!-- CLEAN INTEGRATED HEADER BAR -->
       <div class="mb-8 space-y-6">
         <div class="flex items-center justify-between">
@@ -35,22 +36,10 @@
                   : 'border-slate-200 bg-white text-slate-600 shadow-xs'
               ]"
             >
-              <i class="fa-solid fa-arrow-left text-[11px]"></i>
+              <i class="fa-solid fa-arrow-left text-xs"></i>
             </span>
             <span>Back to Fleet</span>
           </button>
-
-          <div
-            :class="[
-              'inline-flex items-center gap-1.5 px-3 py-1 rounded-full border text-[11px] font-bold uppercase tracking-wider',
-              isLambo
-                ? 'border-emerald-500/20 bg-emerald-500/10 text-emerald-400'
-                : 'border-emerald-200 bg-emerald-50/80 text-emerald-700'
-            ]"
-          >
-            <i class="fa-solid fa-shield-halved text-xs"></i>
-            <span>Secure Reservation</span>
-          </div>
         </div>
 
         <div class="flex flex-col lg:flex-row lg:items-end justify-between gap-6 pb-2">
@@ -60,56 +49,15 @@
             </h1>
             <p
               :class="[
-                'mt-1.5 text-xs sm:text-sm font-medium max-w-xl',
-                isLambo ? 'text-slate-400' : 'text-slate-500'
+                'mt-1.5 text-xl sm:text-xl font-medium max-w-full',
+                isLambo ? 'text-slate-900' : 'text-slate-900'
               ]"
             >
               Select your rental period and confirm booking details before proceeding to checkout.
             </p>
           </div>
 
-          <div
-            :class="[
-              'flex items-center gap-2 sm:gap-3 p-2 rounded-2xl border shrink-0',
-              isLambo
-                ? 'bg-slate-900/60 border-slate-800/80 backdrop-blur-md'
-                : 'bg-white border-slate-200/80 shadow-xs'
-            ]"
-          >
-            <div class="flex items-center gap-2 px-3 py-1.5 rounded-xl bg-slate-100/10">
-              <span
-                :class="[
-                  'w-6 h-6 rounded-lg flex items-center justify-center text-[10px] font-bold',
-                  isLambo ? 'bg-amber-500 text-black' : 'bg-blue-600 text-white'
-                ]"
-              >1</span>
-              <span class="text-xs font-bold">Vehicle</span>
-            </div>
 
-            <i class="fa-solid fa-chevron-right text-[10px] text-slate-400"></i>
-
-            <div class="flex items-center gap-2 px-3 py-1.5 rounded-xl">
-              <span
-                :class="[
-                  'w-6 h-6 rounded-lg flex items-center justify-center text-[10px] font-bold',
-                  isLambo ? 'bg-amber-500 text-black' : 'bg-blue-600 text-white'
-                ]"
-              >2</span>
-              <span class="text-xs font-bold">Details</span>
-            </div>
-
-            <i class="fa-solid fa-chevron-right text-[10px] text-slate-400"></i>
-
-            <div class="flex items-center gap-2 px-3 py-1.5 text-slate-400 opacity-60">
-              <span
-                :class="[
-                  'w-6 h-6 rounded-lg border flex items-center justify-center text-[10px] font-bold',
-                  isLambo ? 'border-slate-700' : 'border-slate-300'
-                ]"
-              >3</span>
-              <span class="text-xs font-medium">Payment</span>
-            </div>
-          </div>
         </div>
       </div>
 
@@ -156,13 +104,6 @@
 
             <div class="absolute inset-0 bg-gradient-to-t from-slate-950/90 via-slate-950/20 to-transparent pointer-events-none"></div>
 
-            <div class="absolute top-4 left-4">
-              <span class="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-emerald-500/90 backdrop-blur-md text-white text-[11px] font-bold shadow-xs">
-                <span class="w-1.5 h-1.5 bg-white rounded-full animate-pulse"></span>
-                Ready for Pickup
-              </span>
-            </div>
-
             <div class="absolute bottom-5 left-6 right-6 text-white">
               <p class="text-[10px] uppercase tracking-widest text-slate-400 font-bold mb-0.5">
                 Selected Vehicle
@@ -176,41 +117,33 @@
           <div class="p-6 sm:p-7 space-y-6">
             <div class="flex items-center justify-between pb-6 border-b border-slate-100 dark:border-slate-800/80">
               <div>
-                <p class="text-[11px] uppercase tracking-wider font-bold text-slate-400">
+                <p class="text-xl uppercase tracking-tight font-bold text-slate-900" 
+                style="font-family: var(--font-heading);">
                   Daily Rate
                 </p>
-                <div class="flex items-baseline gap-1 mt-0.5">
+                <div class="flex items-baseline gap-1 mt-5">
                   <span
                     :class="[
-                      'text-3xl font-extrabold tracking-tight',
-                      isLambo ? 'text-amber-400' : 'text-blue-600'
+                      'text-5xl font-extrabold tracking-tight',
+                      isLambo ? 'text-slate-900' : 'text-slate-900'
                     ]"
-                  >
+                  style="font-family: var(--font-heading);">
                     ${{ vehicleStore.vehicle.pricePerDay || vehicleStore.vehicle.price || 0 }}
                   </span>
-                  <span class="text-xs text-slate-400 font-medium">/ day</span>
+                  <span class="text-2xl text-slate-900 font-medium">/ day</span>
                 </div>
               </div>
 
-              <div
-                :class="[
-                  'flex items-center gap-2 px-3 py-1.5 rounded-xl border text-xs font-semibold',
-                  isLambo
-                    ? 'bg-slate-800/50 border-slate-700 text-slate-300'
-                    : 'bg-slate-50 border-slate-200/60 text-slate-600'
-                ]"
-              >
-                <i class="fa-solid fa-circle-check text-emerald-500 text-xs"></i>
-                <span>Best Price Guaranteed</span>
-              </div>
+            
             </div>
 
             <div>
-              <p class="text-[11px] uppercase tracking-wider font-bold text-slate-400 mb-3">
+              <p class="text-3xl uppercase tracking-wider font-bold text-slate-900 mb-3"
+              style="font-family: var(--font-heading);">
                 Key Features
               </p>
 
-              <div class="grid grid-cols-3 gap-3">
+              <div class="grid grid-cols-3 gap-3" style="font-family: var(--font-heading);">
                 <div
                   :class="[
                     'p-3.5 rounded-2xl border flex flex-col justify-between',
@@ -258,7 +191,8 @@
               </div>
             </div>
 
-            <div class="pt-2 flex flex-wrap items-center gap-y-2 gap-x-6 text-xs text-slate-500">
+            <div class="pt-2 flex flex-wrap items-center gap-y-2 gap-x-6 text-xs text-slate-500"
+            style="font-family: var(--font-heading);">
               <div class="flex items-center gap-2">
                 <i class="fa-solid fa-check text-emerald-500"></i>
                 <span>Free Cancellation</span>
@@ -283,7 +217,7 @@
               ? 'bg-slate-900/80 border-slate-800 backdrop-blur-xl shadow-2xl'
               : 'bg-white border-slate-200/80 shadow-xs'
           ]"
-        >
+        style="font-family: var(--font-heading);">
           <div class="flex items-center justify-between gap-4 pb-5 mb-6 border-b border-slate-100 dark:border-slate-800">
             <div class="flex items-center gap-3">
               <div
@@ -295,8 +229,8 @@
                 <i class="fa-regular fa-calendar-check text-base"></i>
               </div>
               <div>
-                <h3 class="font-extrabold text-base">Rental Dates</h3>
-                <p class="text-xs text-slate-400">Select pickup & return schedules</p>
+                <h3 class="font-extrabold text-2xl">Rental Dates</h3>
+                <p class="text-xs text-slate-800">Select pickup & return schedules</p>
               </div>
             </div>
           </div>
@@ -306,10 +240,10 @@
             :class="['form-card', { 'lambo-form': isLambo }]"
             @submit.prevent="submitBooking"
           >
-            <h2>Book Vehicle</h2>
+          
 
             <div class="form-group">
-              <label>Pickup Date</label>
+              <h3>Pickup Date</h3>
               <input
                 v-model="form.pickupDate"
                 type="date"
@@ -318,7 +252,7 @@
             </div>
 
             <div class="form-group">
-              <label>Return Date</label>
+              <h3>Return Date</h3>
               <input
                 v-model="form.returnDate"
                 type="date"
@@ -327,38 +261,25 @@
             </div>
 
             <div class="booking-summary">
-              <span>Total Days</span>
+              <h3>Total Days</h3>
               <strong>{{ totalDays }}</strong>
             </div>
 
             <div class="booking-summary">
-              <span>Total Price</span>
+              <h3>Total Price</h3>
               <strong>${{ totalPrice }}</strong>
             </div>
 
             <button
               type="submit"
-              class="btn btn-primary btn-full"
+              class=" bg-slate-900 rounded-3xl h-13 text-white hover:bg-slate-700"
               :disabled="bookingLoading"
-            >
+            style="font-family: var(--font-heading);">
               {{ bookingLoading ? 'Booking...' : 'Confirm Booking' }}
             </button>
           </form>
 
-          <div
-            :class="[
-              'mt-6 p-4 rounded-2xl border flex items-start gap-3',
-              isLambo
-                ? 'bg-slate-800/30 border-slate-800 text-slate-400'
-                : 'bg-slate-50 border-slate-100 text-slate-600'
-            ]"
-          >
-            <i class="fa-solid fa-shield-halved text-blue-500 text-sm mt-0.5 shrink-0"></i>
-            <div class="text-xs leading-relaxed">
-              <span class="font-bold block text-slate-900 dark:text-slate-200">No payment collected yet</span>
-              <p class="mt-0.5 text-slate-400">Review schedule and lock in vehicle availability before advancing to checkout.</p>
-            </div>
-          </div>
+
         </div>
       </div>
 

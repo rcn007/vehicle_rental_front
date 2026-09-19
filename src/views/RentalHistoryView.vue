@@ -23,9 +23,9 @@
           <div class="flex items-center gap-2">
             <button type="button" class="px-3 py-2 rounded-lg bg-white border border-[#E2E8F0] text-[#334155] text-xs font-semibold shadow-sm flex items-center gap-2 hover:bg-[#F8FAFC] transition">
               <i class="fa-regular fa-calendar text-[#64748B]"></i>
-              Tax Year 2026
+              Tax Year {{ selectedYear === 'all' ? '2026' : selectedYear }}
             </button>
-            <button type="button" class="px-3.5 py-2 rounded-lg bg-[#0F172A] text-white text-xs font-bold shadow-sm flex items-center gap-2 hover:bg-[#1E293B] transition">
+            <button type="button" @click="downloadAnnualStatement" class="px-3.5 py-2 rounded-lg bg-[#0F172A] text-white text-xs font-bold shadow-sm flex items-center gap-2 hover:bg-[#1E293B] transition">
               <i class="fa-solid fa-print text-[11px]"></i>
               Download Annual Statement
             </button>
@@ -62,10 +62,10 @@
           <div>
             <div class="flex items-baseline justify-between">
               <span class="text-2xl font-black text-[#0F172A] leading-none">{{ completedCount }}</span>
-              <span class="text-[10px] font-bold text-[#10B981]">91.6% SUCCESS</span>
+              <span class="text-[10px] font-bold text-[#10B981]">{{ completedPercentage }}% SUCCESS</span>
             </div>
             <div class="w-full bg-[#E2E8F0] h-1.5 rounded-full mt-2 overflow-hidden">
-              <div class="bg-[#10B981] h-full rounded-full" style="width: 91.6%"></div>
+              <div class="bg-[#10B981] h-full rounded-full transition-all duration-300" :style="{ width: `${completedPercentage}%` }"></div>
             </div>
           </div>
         </div>
@@ -80,7 +80,7 @@
           </div>
           <div>
             <div class="text-2xl font-black text-[#0F172A] leading-none">{{ summary.totalDays }} Days</div>
-            <div class="text-[10px] text-[#64748B] mt-1 font-medium">Avg. 3.2 days per booking</div>
+            <div class="text-[10px] text-[#64748B] mt-1 font-medium">Avg. {{ averageDays }} days per booking</div>
           </div>
         </div>
 
@@ -125,7 +125,7 @@
               @click="activeTab = tab"
               :class="[
                 activeTab === tab ? 'bg-[#0F172A] text-white shadow-sm' : 'text-[#64748B] hover:text-[#0F172A]',
-                'px-3 py-1 rounded-md text-[11px] font-bold transition'
+                'px-3 py-1 rounded-md text-[11px] font-bold transition cursor-pointer'
               ]"
             >
               {{ tab }} <span class="opacity-70">({{ getTabCount(tab) }})</span>
@@ -134,7 +134,8 @@
 
           <!-- YEAR SELECT -->
           <select v-model="selectedYear" class="bg-[#F8FAFC] border border-[#E2E8F0] rounded-lg px-3 py-1.5 text-xs font-semibold text-[#334155] focus:outline-none cursor-pointer">
-            <option value="2026">2026 (All Year)</option>
+            <option value="all">All Years</option>
+            <option value="2026">2026</option>
             <option value="2025">2025</option>
           </select>
 
@@ -186,7 +187,7 @@
 
             <div class="text-[#94A3B8] font-medium text-[10px] flex items-center gap-1">
               <i class="fa-solid fa-shield-halved text-[9px]"></i>
-              <span>{{ isCancelled(booking.status) ? 'Cancelled 48h prior • Zero penalty' : 'Telemetry Log: Closed 14:02 GMT+1' }}</span>
+              <span>{{ isCancelled(booking.status) ? 'Cancelled 48h prior • Zero penalty' : 'Telemetry Log: Closed Verified' }}</span>
             </div>
           </div>
 
@@ -196,19 +197,20 @@
             <div class="flex flex-col sm:flex-row items-center gap-4 flex-1">
               <div class="w-full sm:w-48 h-28 bg-[#F1F5F9] rounded-lg border border-[#E2E8F0] flex items-center justify-center p-2 relative shrink-0 overflow-hidden">
                 <img
-                  :src="booking.image || '/src/assets/hero.png'"
+                  :src="getVehicleImageUrl(booking.image)"
                   :alt="booking.vehicleName"
+                  @error="handleImageError"
                   class="max-h-full max-w-full object-contain drop-shadow-sm"
                 />
                 <span class="absolute bottom-1.5 left-1.5 text-[8px] font-extrabold uppercase bg-white/90 backdrop-blur-sm text-[#475569] px-1.5 py-0.5 rounded border border-[#E2E8F0]">
-                  {{ isCancelled(booking.status) ? 'Voided Schedule' : 'Hybrid' }}
+                  {{ isCancelled(booking.status) ? 'Voided Schedule' : (booking.fuelType || 'Executive') }}
                 </span>
               </div>
 
               <div class="space-y-2 flex-1 w-full">
                 <div>
                   <span class="text-[9px] font-bold text-[#94A3B8] uppercase tracking-wider">
-                    Executive Sedan • 2024
+                    {{ booking.brand }} • {{ booking.transmission }}
                   </span>
                   <h2 class="text-base font-black text-[#0F172A] leading-tight">
                     {{ booking.vehicleName }}
@@ -217,14 +219,14 @@
 
                 <!-- SPEC ATTRIBUTES -->
                 <div v-if="!isCancelled(booking.status)" class="flex flex-wrap items-center gap-3 text-[10px] text-[#64748B] font-medium">
-                  <span class="flex items-center gap-1"><i class="fa-solid fa-gears text-[#94A3B8]"></i> Automatic e-CVT</span>
-                  <span class="flex items-center gap-1"><i class="fa-solid fa-user-group text-[#94A3B8]"></i> 5 Seats</span>
-                  <span class="flex items-center gap-1 text-[#10B981] font-semibold"><i class="fa-solid fa-leaf text-[#10B981]"></i> 4.4L / 100km</span>
+                  <span class="flex items-center gap-1"><i class="fa-solid fa-gears text-[#94A3B8]"></i> {{ booking.transmission }}</span>
+                  <span class="flex items-center gap-1"><i class="fa-solid fa-user-group text-[#94A3B8]"></i> {{ booking.seats }} Seats</span>
+                  <span v-if="booking.fuelType" class="flex items-center gap-1 text-[#10B981] font-semibold"><i class="fa-solid fa-leaf text-[#10B981]"></i> {{ booking.fuelType }}</span>
                 </div>
 
                 <!-- CANCELLED NOTE -->
                 <div v-else class="text-[10px] text-[#64748B] bg-[#F8FAFC] p-2 rounded-lg border border-[#E2E8F0]">
-                  <p class="font-semibold text-[#334155]">Full refund of ${{ booking.totalPrice }}.00 processed to Visa **** 4242</p>
+                  <p class="font-semibold text-[#334155]">Full refund of ${{ Number(booking.totalPrice).toFixed(2) }} processed</p>
                   <p class="text-[9px] text-[#94A3B8] mt-0.5">Standard cancellation waiver honored under Platinum VIP mobility privileges.</p>
                 </div>
 
@@ -233,15 +235,15 @@
                   <div class="flex items-center gap-2">
                     <i class="fa-regular fa-calendar-check text-[#0F172A]"></i>
                     <div>
-                      <span class="font-bold text-[#0F172A] block">{{ booking.pickupDate }} → {{ booking.returnDate }}</span>
-                      <span class="text-[#94A3B8] text-[9px]">{{ booking.totalDays || 3 }} consecutive days</span>
+                      <span class="font-bold text-[#0F172A] block">{{ formatDate(booking.pickupDate) }} → {{ formatDate(booking.returnDate) }}</span>
+                      <span class="text-[#94A3B8] text-[9px]">{{ booking.totalDays || 1 }} consecutive days</span>
                     </div>
                   </div>
                   <div class="flex items-center gap-2">
                     <i class="fa-solid fa-location-dot text-[#0F172A]"></i>
                     <div>
-                      <span class="font-bold text-[#0F172A] block">Airport Terminal 2 Hub</span>
-                      <span class="text-[#94A3B8] text-[9px]">Bay 14 • Keycard Dropoff</span>
+                      <span class="font-bold text-[#0F172A] block">Main Concierge Hub</span>
+                      <span class="text-[#94A3B8] text-[9px]">Keycard Terminal</span>
                     </div>
                   </div>
                 </div>
@@ -267,7 +269,8 @@
                 <button
                   v-if="!isCancelled(booking.status)"
                   type="button"
-                  class="p-2 rounded-lg border border-[#E2E8F0] text-[#475569] hover:bg-[#F8FAFC] text-xs transition"
+                  @click="downloadReceipt(booking.id)"
+                  class="p-2 rounded-lg border border-[#E2E8F0] text-[#475569] hover:bg-[#F8FAFC] text-xs transition cursor-pointer"
                   title="Download Statement"
                 >
                   <i class="fa-solid fa-receipt"></i>
@@ -276,15 +279,17 @@
                 <button
                   v-if="!isCancelled(booking.status)"
                   type="button"
-                  class="px-3 py-1.5 rounded-lg bg-[#F1F5F9] text-[#334155] text-xs font-bold hover:bg-[#E2E8F0] transition"
+                  @click="rebookVehicle(booking)"
+                  class="px-3 py-1.5 rounded-lg bg-[#F1F5F9] text-[#334155] text-xs font-bold hover:bg-[#E2E8F0] transition cursor-pointer"
                 >
                   Book Again
                 </button>
 
                 <button
                   type="button"
+                  @click="viewDetails(booking.id)"
                   :class="isCancelled(booking.status) ? 'bg-[#F1F5F9] text-[#475569] hover:bg-[#E2E8F0]' : 'bg-[#0F172A] text-white hover:bg-[#1E293B]'"
-                  class="px-3.5 py-1.5 rounded-lg text-xs font-bold transition flex items-center gap-1"
+                  class="px-3.5 py-1.5 rounded-lg text-xs font-bold transition flex items-center gap-1 cursor-pointer"
                 >
                   <span>{{ isCancelled(booking.status) ? 'Refund Receipt' : 'Details' }}</span>
                   <i class="fa-solid fa-chevron-right text-[9px]"></i>
@@ -296,14 +301,12 @@
 
         <!-- PAGINATION CONTROLS -->
         <div v-if="filteredBookings.length > 0" class="bg-white border border-[#E2E8F0] rounded-xl p-3 flex flex-col sm:flex-row items-center justify-between gap-3 text-xs shadow-sm">
-          <!-- ITEMS SUMMARY -->
           <div class="text-[#64748B] text-[11px] font-medium">
             Showing <span class="font-bold text-[#0F172A]">{{ startIndex + 1 }}</span>
             to <span class="font-bold text-[#0F172A]">{{ endIndex }}</span>
             of <span class="font-bold text-[#0F172A]">{{ filteredBookings.length }}</span> rentals
           </div>
 
-          <!-- PAGE NAVIGATION & PER PAGE SELECT -->
           <div class="flex items-center gap-3">
             <div class="flex items-center gap-1">
               <span class="text-[11px] text-[#64748B] font-medium">Per page:</span>
@@ -318,7 +321,7 @@
               <button
                 @click="currentPage--"
                 :disabled="currentPage === 1"
-                class="p-1.5 rounded-lg border border-[#E2E8F0] text-[#0F172A] hover:bg-[#F8FAFC] disabled:opacity-40 disabled:hover:bg-transparent transition"
+                class="p-1.5 rounded-lg border border-[#E2E8F0] text-[#0F172A] hover:bg-[#F8FAFC] disabled:opacity-40 disabled:hover:bg-transparent transition cursor-pointer"
               >
                 <i class="fa-solid fa-chevron-left text-[10px]"></i>
               </button>
@@ -329,7 +332,7 @@
                 @click="currentPage = page"
                 :class="[
                   currentPage === page ? 'bg-[#0F172A] text-white shadow-sm' : 'text-[#64748B] hover:bg-[#F8FAFC]',
-                  'w-7 h-7 rounded-lg text-xs font-bold transition flex items-center justify-center'
+                  'w-7 h-7 rounded-lg text-xs font-bold transition flex items-center justify-center cursor-pointer'
                 ]"
               >
                 {{ page }}
@@ -338,7 +341,7 @@
               <button
                 @click="currentPage++"
                 :disabled="currentPage === totalPages || totalPages === 0"
-                class="p-1.5 rounded-lg border border-[#E2E8F0] text-[#0F172A] hover:bg-[#F8FAFC] disabled:opacity-40 disabled:hover:bg-transparent transition"
+                class="p-1.5 rounded-lg border border-[#E2E8F0] text-[#0F172A] hover:bg-[#F8FAFC] disabled:opacity-40 disabled:hover:bg-transparent transition cursor-pointer"
               >
                 <i class="fa-solid fa-chevron-right text-[10px]"></i>
               </button>
@@ -353,154 +356,184 @@
 
 <script setup>
 import { ref, computed, watch, onMounted } from 'vue'
+import { useRouter } from 'vue-router'
 import { useBookingStore } from '../stores/Booking'
-import audiA4Image from '../assets/Audi A4 Premium.jpg'
-import toyotaRav4Image from '../assets/Toyota RAV4 Hybrid.jpg'
 
+const router = useRouter()
 const bookingStore = useBookingStore()
 
 const activeTab = ref('All')
 const searchQuery = ref('')
-const selectedYear = ref('2026')
+const selectedYear = ref('all')
 const sortBy = ref('recent')
 
-// Pagination state
+// Pagination
 const currentPage = ref(1)
 const itemsPerPage = ref(3)
 
-const fallbackBookings = [
-  {
-    id: '00041',
-    vehicleName: 'Toyota Camry 2.5V',
-    brand: 'Toyota',
-    pickupDate: 'Jun 10, 2026',
-    returnDate: 'Jun 13, 2026',
-    paymentMethod: 'Paid in Full',
-    totalPrice: 165,
-    totalDays: 3,
-    status: 'Completed',
-    image: toyotaRav4Image
-  },
-  {
-    id: '00038',
-    vehicleName: 'Toyota Camry 2.5V',
-    brand: 'Toyota',
-    pickupDate: 'May 02, 2026',
-    returnDate: 'May 06, 2026',
-    paymentMethod: 'Visa 8820',
-    totalPrice: 220,
-    totalDays: 4,
-    status: 'Completed',
-    image: audiA4Image
-  },
-  {
-    id: '00031',
-    vehicleName: 'Toyota Camry 2.5V',
-    brand: 'Toyota',
-    pickupDate: 'Apr 14, 2026',
-    returnDate: 'Apr 16, 2026',
-    paymentMethod: 'Visa 4242',
-    totalPrice: 110,
-    totalDays: 2,
-    status: 'Cancelled',
-    image: toyotaRav4Image
-  }
-]
+const placeholderImage = 'https://images.unsplash.com/photo-1621007947382-bb3c3994e3fb?auto=format&fit=crop&w=800&q=80'
 
-const apiBookings = computed(() =>
-  bookingStore.bookings.map((booking) => ({
-    id: booking.id,
-    vehicleName: booking.vehicleName || 'Vehicle Rental',
-    brand: booking.brand || booking.vehicleBrand || 'Vehicle',
-    pickupDate: booking.pickupDate || 'Jun 10, 2026',
-    returnDate: booking.returnDate || 'Jun 13, 2026',
-    paymentMethod: booking.paymentMethod || 'Visa 8820',
-    totalPrice: booking.totalPrice || 165,
-    totalDays: booking.totalDays || 3,
-    status: booking.status || 'Completed',
-    image: booking.vehicleImage || booking.image || '/src/assets/hero.png'
-  }))
-)
+const normalizeStatus = (status) => String(status || '').trim().toUpperCase()
+const isCancelled = (status) => normalizeStatus(status) === 'CANCELLED'
+const isCompleted = (status) => ['COMPLETED', 'FINISHED', 'RETURNED'].includes(normalizeStatus(status))
 
-const displayBookings = computed(() =>
-  apiBookings.value.length ? apiBookings.value : fallbackBookings
-)
+const formatDate = (date) => {
+  if (!date) return '-'
+  const parsedDate = new Date(date)
+  if (Number.isNaN(parsedDate.getTime())) return date
+  return parsedDate.toLocaleDateString('en-US', {
+    month: 'short',
+    day: '2-digit',
+    year: 'numeric'
+  })
+}
 
-const isCancelled = (status) => String(status).toLowerCase().includes('cancel')
+const getBookingYear = (booking) => {
+  const date = booking.pickupDate || booking.createdAt
+  if (!date) return null
+  const parsedDate = new Date(date)
+  if (Number.isNaN(parsedDate.getTime())) return null
+  return String(parsedDate.getFullYear())
+}
 
-const completedCount = computed(() =>
-  displayBookings.value.filter(b => !isCancelled(b.status)).length
-)
+const getVehicleImageUrl = (rawPath) => {
+  if (!rawPath || typeof rawPath !== 'string') return placeholderImage
+  const path = rawPath.trim()
+  if (path.startsWith('http://') || path.startsWith('https://') || path.startsWith('data:')) return path
+  const cleanPath = path.startsWith('/') ? path : `/${path}`
+  return `http://localhost:8080${cleanPath}`
+}
+
+const handleImageError = (event) => {
+  if (event.target.dataset.fallback === 'true') return
+  event.target.dataset.fallback = 'true'
+  event.target.src = placeholderImage
+}
+
+const apiBookings = computed(() => {
+  return (bookingStore.bookings || []).map((booking) => {
+    const totalPrice = Number(booking.totalPrice ?? booking.total_price ?? 0)
+    const totalDays = Number(booking.totalDays ?? booking.total_days ?? 0)
+    const vehicleId = booking.vehicleId || booking.vehicle?.id
+
+    return {
+      id: booking.id,
+      vehicleId,
+      vehicleName: booking.vehicleName || booking.vehicle?.name || 'Vehicle Rental',
+      brand: booking.brand || booking.vehicleBrand || booking.vehicle?.brand?.brandName || 'Executive Fleet',
+      pickupDate: booking.pickupDate || booking.pickup_date || null,
+      returnDate: booking.returnDate || booking.return_date || null,
+      paymentMethod: booking.paymentMethod || booking.payment?.paymentMethod || booking.payment?.method || 'Card',
+      totalPrice,
+      totalDays,
+      status: booking.status || 'UNKNOWN',
+      image: booking.vehicleImage || booking.image || booking.vehicle?.mainImage || null,
+      transmission: booking.transmission || booking.vehicle?.transmission || 'Automatic',
+      seats: booking.seat || booking.seats || booking.vehicle?.seat || 4,
+      fuelType: booking.fuelType || booking.fuel_type || booking.vehicle?.fuel_type || '',
+      createdAt: booking.createdAt || booking.created_at || null
+    }
+  })
+})
+
+const displayBookings = computed(() => apiBookings.value)
+
+const completedCount = computed(() => displayBookings.value.filter(b => isCompleted(b.status)).length)
+const cancelledCount = computed(() => displayBookings.value.filter(b => isCancelled(b.status)).length)
 
 const filteredBookings = computed(() => {
   let list = [...displayBookings.value]
 
-  // Tab Filter
-  if (activeTab.value === 'Completed') {
-    list = list.filter(b => !isCancelled(b.status))
-  } else if (activeTab.value === 'Cancelled') {
-    list = list.filter(b => isCancelled(b.status))
+  if (activeTab.value === 'Completed') list = list.filter(b => isCompleted(b.status))
+  if (activeTab.value === 'Cancelled') list = list.filter(b => isCancelled(b.status))
+
+  if (selectedYear.value !== 'all') {
+    list = list.filter(b => getBookingYear(b) === String(selectedYear.value))
   }
 
-  // Search Filter
-  if (searchQuery.value.trim()) {
-    const query = searchQuery.value.toLowerCase()
-    list = list.filter(
-      b => b.vehicleName.toLowerCase().includes(query) || String(b.id).includes(query)
+  const query = searchQuery.value.trim().toLowerCase()
+  if (query) {
+    list = list.filter(b =>
+      String(b.id || '').toLowerCase().includes(query) ||
+      String(b.vehicleName || '').toLowerCase().includes(query) ||
+      String(b.brand || '').toLowerCase().includes(query)
     )
   }
 
-  // Sort
   if (sortBy.value === 'price') {
-    list.sort((a, b) => b.totalPrice - a.totalPrice)
+    list.sort((a, b) => Number(b.totalPrice) - Number(a.totalPrice))
   } else {
-    list.sort((a, b) => b.id - a.id)
+    list.sort((a, b) => Number(b.id || 0) - Number(a.id || 0))
   }
 
   return list
 })
 
-// Pagination Computed Properties
-const totalPages = computed(() => Math.ceil(filteredBookings.value.length / itemsPerPage.value) || 1)
-
+const totalPages = computed(() => Math.max(1, Math.ceil(filteredBookings.value.length / itemsPerPage.value)))
 const startIndex = computed(() => (currentPage.value - 1) * itemsPerPage.value)
-
 const endIndex = computed(() => Math.min(startIndex.value + itemsPerPage.value, filteredBookings.value.length))
-
-const paginatedBookings = computed(() =>
-  filteredBookings.value.slice(startIndex.value, endIndex.value)
-)
-
-// Reset to first page when filtering/searching changes
-watch([activeTab, searchQuery, itemsPerPage], () => {
-  currentPage.value = 1
-})
+const paginatedBookings = computed(() => filteredBookings.value.slice(startIndex.value, endIndex.value))
 
 const getTabCount = (tab) => {
   if (tab === 'Completed') return completedCount.value
-  if (tab === 'Cancelled') return displayBookings.value.length - completedCount.value
+  if (tab === 'Cancelled') return cancelledCount.value
   return displayBookings.value.length
 }
 
 const summary = computed(() => {
-  const totalSpent = displayBookings.value.reduce(
-    (sum, booking) => sum + Number(booking.totalPrice || 0),
-    0
-  )
-
-  const totalDays = displayBookings.value.reduce(
-    (sum, booking) => sum + Number(booking.totalDays || 0),
-    0
-  )
+  const totalRentals = displayBookings.value.length
+  const totalDays = displayBookings.value.reduce((sum, b) => sum + Number(b.totalDays || 0), 0)
+  const totalSpent = displayBookings.value.reduce((sum, b) => isCancelled(b.status) ? sum : sum + Number(b.totalPrice || 0), 0)
 
   return {
-    totalRentals: displayBookings.value.length,
-    totalSpent: totalSpent.toLocaleString('en-US'),
-    totalDays
+    totalRentals,
+    totalDays,
+    totalSpent: totalSpent.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })
   }
 })
 
-onMounted(() => {
-  bookingStore.fetchBookings()
+const completedPercentage = computed(() => {
+  const total = displayBookings.value.length
+  if (!total) return 0
+  return Math.round((completedCount.value / total) * 100)
+})
+
+const averageDays = computed(() => {
+  const total = displayBookings.value.length
+  if (!total) return '0.0'
+  return (summary.value.totalDays / total).toFixed(1)
+})
+
+// Navigation Actions
+const viewDetails = (bookingId) => {
+  if (bookingId) router.push(`/booking/detail/${bookingId}`)
+}
+
+const rebookVehicle = (booking) => {
+  if (booking?.vehicleId) router.push(`/booking/${booking.vehicleId}`)
+}
+
+const downloadReceipt = (bookingId) => {
+  alert(`Downloading statement for Booking #VR-${String(bookingId).padStart(5, '0')}`)
+}
+
+const downloadAnnualStatement = () => {
+  alert('Downloading annual tax and rental statement...')
+}
+
+watch([activeTab, searchQuery, selectedYear, sortBy, itemsPerPage], () => {
+  currentPage.value = 1
+})
+
+onMounted(async () => {
+  try {
+    if (typeof bookingStore.fetchBookings === 'function') {
+      await bookingStore.fetchBookings()
+    } else if (typeof bookingStore.getMyBookings === 'function') {
+      await bookingStore.getMyBookings()
+    }
+  } catch (error) {
+    console.error('Failed to fetch rental history:', error)
+  }
 })
 </script>

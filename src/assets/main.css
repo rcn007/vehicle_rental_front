@@ -142,7 +142,7 @@ img {
 .navbar {
   position: sticky;
   top: 0;
-  z-index: 20;
+  z-index: 50;
   height: 74px;
   display: flex;
   align-items: center;
@@ -1424,7 +1424,7 @@ td strong {
 
 .footer {
   color: #ffffff;
-  background: var(--primary);
+  
   padding-top: 62px;
 }
 

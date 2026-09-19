@@ -172,16 +172,18 @@
         </div>
       </section>
 
-      <!-- Category Section -->
-      <section class="py-20">
+    <!-- =========================================================
+     CATEGORY EXPLORE SECTION
+========================================================== -->
+ <section class="py-20 bg-slate-100/60 border-y border-slate-200/60">
         <div class="container mx-auto px-6 lg:px-8">
           <div class="flex flex-col sm:flex-row sm:items-end justify-between mb-12 gap-4">
             <div>
-              <span class="text-xs font-bold text-[#10B981] tracking-wider uppercase mb-1 block">Explore</span>
-              <h2 class="text-3xl font-extrabold text-slate-900 tracking-tight">Browse By Category</h2>
+            
+              <h2 class="text-3xl font-extrabold text-slate-900 tracking-tight">Explore Category</h2>
             </div>
             <RouterLink 
-              to="/categories" 
+              to="/vehicles" 
               class="inline-flex items-center gap-2 text-sm font-bold text-[#10B981] hover:text-[#0D9668] group transition-colors"
             >
               View All 
@@ -189,26 +191,25 @@
             </RouterLink>
           </div>
 
-          <div v-if="categories.length" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
-            <div
-              v-for="category in categories"
-              :key="category.id || category.categoryId || category.name"
-              class="group relative bg-white rounded-2xl p-6 border border-slate-100 shadow-sm hover:shadow-xl hover:shadow-slate-200/50 transition-all hover:-translate-y-1 cursor-pointer overflow-hidden"
-            >
-              <div class="w-14 h-14 rounded-xl bg-emerald-50 text-[#10B981] flex items-center justify-center mb-5 group-hover:bg-[#10B981] group-hover:text-white transition-colors duration-300">
-                <component :is="getCategoryIcon(category)" :size="28" />
-              </div>
-              <h3 class="text-lg font-bold text-slate-900 group-hover:text-[#10B981] transition-colors mb-1">
-                {{ getCategoryName(category) }}
-              </h3>
-              <p class="text-xs font-medium text-slate-400">
-                {{ getCategoryVehicleCount(category) }} vehicles available
-              </p>
-            </div>
+          <div v-if="vehicleStore.loading" class="text-center py-16 text-slate-400 text-sm">
+            Loading vehicles...
+          </div>
+
+         <div
+            v-if="randomCategories.length"
+            class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8"
+          >
+            <ExploreCategory
+              v-for="category in randomCategories"
+              :key="category.id || category.categoryId || category.category_id"
+              :category="category"
+              :image="getCategoryImage(category)"
+              :vehicle-count="getCategoryVehicleCount(category)"
+            />
           </div>
 
           <div v-else class="text-center py-16 bg-white rounded-2xl border border-dashed border-slate-200 text-slate-400 text-sm">
-            No categories available right now.
+            No vehicles available at the moment.
           </div>
         </div>
       </section>
@@ -235,14 +236,14 @@
           </div>
 
           <div v-else-if="featuredVehicles.length" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-            <VehicleCard
-              v-for="vehicle in featuredVehicles"
-              :key="vehicle.id"
-              :vehicle="vehicle"
-              :image="getVehicleImage(vehicle)"
-              class="transition-all hover:-translate-y-1 hover:shadow-xl"
-            />
-          </div>
+<VehicleCard
+  v-for="vehicle in featuredVehicles"
+  :key="vehicle.id"
+  :vehicle="vehicle"
+  :image="vehicle.mainImage"
+  :is-favorite="favoriteVehicleIds.has(String(vehicle.id))"
+  @favorite-changed="handleFavoriteChanged"
+/>     </div>
 
           <div v-else class="text-center py-16 bg-white rounded-2xl border border-dashed border-slate-200 text-slate-400 text-sm">
             No vehicles available at the moment.
@@ -276,15 +277,11 @@
     </div>
   </main>
 </template>
-
 <script setup>
-import { ref, computed, onMounted } from 'vue'
+import { ref, computed, onMounted} from 'vue'
 import {
   ArrowRight,
-  Bike,
-  Car,
   DollarSign,
-  Gem,
   Headphones,
   ShieldCheck,
   Zap
@@ -292,117 +289,198 @@ import {
 
 import VehicleCard from '../components/VehicleCard.vue'
 import { useVehicleStore } from '../stores/Vehicle'
-import { getCustomizerSettings, getCategories, getVehiclesImage } from '../api/home'
+import { getCustomizerSettings, getCategories } from '../api/home'
+import { getFavorites } from '../api/favorite'
+import ExploreCategory from '../components/ExploreCategory.vue'
 
-// --- Configuration & Constants ---
-const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || 'http://localhost:8080'
+// =========================================================
+// CONFIGURATION
+// =========================================================
+
+const API_BASE_URL =
+  import.meta.env.VITE_API_BASE_URL || 'http://localhost:8080'
+
+// =========================================================
+// BENEFITS
+// =========================================================
 
 const benefits = [
   {
     icon: ShieldCheck,
     title: 'Safe & Reliable',
-    description: 'Every vehicle is checked and maintained before rental.'
+    description:
+      'Every vehicle is checked and maintained before rental.'
   },
   {
     icon: DollarSign,
     title: 'Transparent Pricing',
-    description: 'No hidden fees. What you see is what you pay.'
+    description:
+      'No hidden fees. What you see is what you pay.'
   },
   {
     icon: Zap,
     title: 'Easy Booking',
-    description: 'Book your vehicle quickly and easily online.'
+    description:
+      'Book your vehicle quickly and easily online.'
   },
   {
     icon: Headphones,
     title: 'Customer Support',
-    description: 'Our team is ready to help whenever you need us.'
+    description:
+      'Our team is ready to help whenever you need us.'
   }
 ]
 
-// --- State ---
+// =========================================================
+// STATE
+// =========================================================
+
 const vehicleStore = useVehicleStore()
+
 const customizer = ref(null)
 const categories = ref([])
-const vehicleImages = ref([])
 const loading = ref(true)
 const error = ref(null)
+const favoriteVehicleIds = ref(new Set())
 
-// --- Helper Functions ---
+// =========================================================
+// HELPER FUNCTIONS
+// =========================================================
+
 const unwrapResponse = (res) => {
   if (!res) return []
-  if (Array.isArray(res)) return res
-  if (Array.isArray(res.data)) return res.data
-  if (Array.isArray(res.content)) return res.content
-  if (Array.isArray(res.data?.content)) return res.data.content
+
+  if (Array.isArray(res)) {
+    return res
+  }
+
+  if (Array.isArray(res.data)) {
+    return res.data
+  }
+
+  if (Array.isArray(res.content)) {
+    return res.content
+  }
+
+  if (Array.isArray(res.data?.content)) {
+    return res.data.content
+  }
+
   return []
 }
 
+// ---------------------------------------------------------
+// Format image URL
+// ---------------------------------------------------------
+
 const formatImageUrl = (rawPath) => {
   if (!rawPath) return null
-  if (/^(https?:\/\/|data:)/i.test(rawPath)) return rawPath
-  const cleanPath = rawPath.startsWith('/') ? rawPath : `/${rawPath}`
+
+  // Cloudinary / external URL
+  if (/^(https?:\/\/|data:)/i.test(rawPath)) {
+    return rawPath
+  }
+
+  const cleanPath =
+    rawPath.startsWith('/')
+      ? rawPath
+      : `/${rawPath}`
+
   return `${API_BASE_URL}${cleanPath}`
 }
 
+// ---------------------------------------------------------
+// Brand name
+// ---------------------------------------------------------
+
 const getBrandName = (vehicle) => {
-  if (vehicle?.brand && typeof vehicle.brand === 'object') {
-    return vehicle.brand.name || vehicle.brand.brandName || 'Vehicle'
+  if (
+    vehicle?.brand &&
+    typeof vehicle.brand === 'object'
+  ) {
+    return (
+      vehicle.brand.name ||
+      vehicle.brand.brandName ||
+      'Vehicle'
+    )
   }
-  return vehicle?.brandName || vehicle?.brand_name || vehicle?.brand || 'Vehicle'
+
+  return (
+    vehicle?.brandName ||
+    vehicle?.brand_name ||
+    vehicle?.brand ||
+    'Vehicle'
+  )
 }
+
+// ---------------------------------------------------------
+// Category name
+// ---------------------------------------------------------
 
 const getCategoryName = (category) => {
-  if (typeof category === 'string') return category
-  return category?.categoryName || category?.name || category?.category_name || 'Category'
+  if (typeof category === 'string') {
+    return category
+  }
+
+  return (
+    category?.categoryName ||
+    category?.name ||
+    category?.category_name ||
+    'Category'
+  )
 }
+
+// ---------------------------------------------------------
+// Category vehicle count
+// ---------------------------------------------------------
 
 const getCategoryVehicleCount = (category) => {
-  return category?.vehicleCount ?? category?.vehicle_count ?? category?.count ?? 0
+  return (
+    category?.vehicleCount ??
+    category?.vehicle_count ??
+    category?.count ??
+    0
+  )
 }
 
-const getCategoryIcon = (category) => {
-  const name = getCategoryName(category).toLowerCase()
-  if (name.includes('motor') || name.includes('bike')) return Bike
-  if (name.includes('luxury') || name.includes('premium')) return Gem
-  return Car
+
+const getCategoryImage = (category) => {
+  const categoryName = getCategoryName(category)
+    .trim()
+    .toLowerCase()
+
+  const vehicle = vehicleStore.vehicles.find((vehicle) => {
+    return (
+      String(vehicle?.category_name || '')
+        .trim()
+        .toLowerCase() === categoryName
+    )
+  })
+
+  console.log('Category:', categoryName)
+  console.log('Matched vehicle:', vehicle)
+  console.log('Vehicle image:', vehicle?.mainImage)
+
+  return vehicle?.mainImage || null
 }
+
+// =========================================================
+// VEHICLE IMAGE
+// Uses vehicle.mainImage ONLY
+// =========================================================
 
 const getVehicleImage = (vehicle) => {
-  if (!vehicle) return null
-
-  if (Array.isArray(vehicle.vehicleImages) && vehicle.vehicleImages.length > 0) {
-    const imgObj = vehicle.vehicleImages[0]
-    const raw = typeof imgObj === 'string' ? imgObj : (imgObj?.image || imgObj?.imageUrl || imgObj?.url || imgObj?.path)
-    if (raw) return formatImageUrl(raw)
+  if (!vehicle?.mainImage) {
+    return null
   }
 
-  const directPath = vehicle.image || vehicle.imageUrl
-  if (typeof directPath === 'string' && directPath) {
-    return formatImageUrl(directPath)
-  }
-
-  if (Array.isArray(vehicleImages.value) && vehicleImages.value.length > 0) {
-    const vehicleName = (vehicle.name || `${getBrandName(vehicle)} ${vehicle.model || ''}`).trim().toLowerCase()
-    
-    const match = vehicleImages.value.find((img) => {
-      const imgVehicleId = Number(img.vehicle_id ?? img.vehicleId)
-      if (imgVehicleId && imgVehicleId === Number(vehicle.id)) return true
-
-      const imgName = String(img.vehicle_name ?? img.vehicleName ?? img.name ?? '').trim().toLowerCase()
-      return imgName && imgName === vehicleName
-    })
-
-    if (match) {
-      const raw = match.image || match.imageUrl || match.url || match.path
-      if (raw) return formatImageUrl(raw)
-    }
-  }
-
-  return null
+  return vehicle.mainImage
 }
 
-// --- Computed Properties ---
+// =========================================================
+// COMPUTED
+// =========================================================
+
 const heroTitle = computed(() => {
   return (
     customizer.value?.title ||
@@ -434,6 +512,7 @@ const heroButtonLink = computed(() => {
     '/vehicles'
   )
 })
+
 const heroStyle = computed(() => {
   if (!heroImage.value) {
     return {
@@ -443,62 +522,179 @@ const heroStyle = computed(() => {
   }
 
   return {
-    backgroundImage: `url("${formatImageUrl(heroImage.value)}")`
+    backgroundImage:
+      `url("${formatImageUrl(heroImage.value)}")`
   }
 })
 
+// ---------------------------------------------------------
+// Available vehicle count
+// ---------------------------------------------------------
+
 const availableVehicleCount = computed(() => {
-  return vehicleStore.vehicles.filter((v) => {
-    const status = String(v?.status || '').toLowerCase()
-    return status === 'available' || status.includes('available')
+  return vehicleStore.vehicles.filter((vehicle) => {
+    const status =
+      String(vehicle?.status || '').toLowerCase()
+
+    return (
+      status === 'available' ||
+      status.includes('available')
+    )
   }).length
 })
 
-const featuredVehicles = computed(() => vehicleStore.vehicles.slice(0, 3))
+// ---------------------------------------------------------
+// Featured vehicles
+// ---------------------------------------------------------
+
+const featuredVehicles = computed(() => {
+  return vehicleStore.vehicles.slice(0, 3)
+})
+
+// ---------------------------------------------------------
+// Statistics
+// ---------------------------------------------------------
 
 const stats = computed(() => [
   {
-    value: customizer.value?.happyCustomers || '10,000+',
+    value:
+      customizer.value?.happyCustomers ||
+      '10,000+',
     label: 'Happy Customers'
   },
   {
-    value: vehicleStore.vehicles.length > 0 ? `${vehicleStore.vehicles.length}+` : '0',
+    value:
+      vehicleStore.vehicles.length > 0
+        ? `${vehicleStore.vehicles.length}+`
+        : '0',
     label: 'Vehicles Available'
   },
   {
-    value: customizer.value?.citiesCovered || '50+',
+    value:
+      customizer.value?.citiesCovered ||
+      '50+',
     label: 'Cities Covered'
   },
   {
-    value: customizer.value?.averageRating || '4.9★',
+    value:
+      customizer.value?.averageRating ||
+      '4.9★',
     label: 'Average Rating'
   }
 ])
 
-// --- Data Fetching ---
+const handleFavoriteChanged = ({
+  vehicleId,
+  isFavorite
+}) => {
+
+  const updated = new Set(
+    favoriteVehicleIds.value
+  )
+
+  if (isFavorite) {
+    updated.add(vehicleId)
+  } else {
+    updated.delete(vehicleId)
+  }
+
+  favoriteVehicleIds.value = updated
+}
+
+const loadFavorites = async () => {
+  try {
+    const response = await getFavorites()
+
+    console.log('Favorites from database:', response)
+
+    favoriteVehicleIds.value = new Set(
+      response
+        .map(favorite => favorite.vehicle?.id)
+        .filter(id => id != null)
+        .map(id => String(id))
+    )
+
+  } catch (error) {
+    console.error('Failed to load favorites:', error)
+
+    favoriteVehicleIds.value = new Set()
+  }
+}
+
+// =========================================================
+// DATA FETCHING
+// =========================================================
 const loadHomeData = async () => {
   loading.value = true
   error.value = null
 
   try {
-    const [customizerData, categoriesData, imagesData] = await Promise.all([
+    // ============================================
+    // Load customizer + categories
+    // ============================================
+    const [
+      customizerData,
+      categoriesData
+    ] = await Promise.all([
       getCustomizerSettings(),
-      getCategories(),
-      getVehiclesImage()
+      getCategories()
     ])
 
     customizer.value = customizerData
-    categories.value = unwrapResponse(categoriesData)
-    vehicleImages.value = unwrapResponse(imagesData)
 
+    categories.value = unwrapResponse(categoriesData)
+
+    // ============================================
+    // Load vehicles
+    // Vehicle API already contains mainImage
+    // ============================================
     await vehicleStore.fetchVehicles()
+    await loadFavorites()
+
+    // ============================================
+    // Select 3 random categories AFTER vehicles load
+    // ============================================
+    randomCategories.value = getRandomCategories(
+      categories.value,
+      3
+    )
+
   } catch (err) {
-    console.error('Failed to load home page:', err)
-    error.value = err.response?.data?.message || err.response?.data?.msg || err.message || 'Failed to load home page data.'
+    console.error(
+      'Failed to load home page:',
+      err
+    )
+
+    error.value =
+      err.response?.data?.message ||
+      err.response?.data?.msg ||
+      err.message ||
+      'Failed to load home page data.'
+
   } finally {
     loading.value = false
   }
 }
+const randomCategories = ref([])
+
+const getRandomCategories = (items, count = 3) => {
+  const shuffled = [...items]
+
+  for (let i = shuffled.length - 1; i > 0; i--) {
+    const j = Math.floor(Math.random() * (i + 1))
+
+    ;[shuffled[i], shuffled[j]] = [
+      shuffled[j],
+      shuffled[i]
+    ]
+  }
+
+  return shuffled.slice(0, count)
+}
+
+// =========================================================
+// MOUNT
+// =========================================================
 
 onMounted(loadHomeData)
 </script>

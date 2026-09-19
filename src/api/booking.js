@@ -52,3 +52,4 @@ export const deleteBooking = async (id) => {
 export const getMyBookings = () => {
   return api.get('/bookings/my')
 }
+// Cancel booking

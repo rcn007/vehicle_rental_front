@@ -9,26 +9,19 @@
       ========================================================== -->
       <header class="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
         <div>
-
-
           <h1 class="text-2xl sm:text-3xl font-extrabold text-[var(--text)] tracking-tight">
             My Bookings
           </h1>
-
           <p class="text-base sm:text-lg text-[var(--secondary)] mt-0.5">
             Manage your upcoming and active vehicle rentals.
           </p>
         </div>
-
-
       </header>
-
 
       <!-- =========================================================
             SUMMARY METRICS
       ========================================================== -->
       <section class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
-        <!-- Total -->
         <div
           class="bg-[var(--surface)] p-4 sm:p-5 rounded-[var(--radius-lg)] border border-[var(--border)] shadow-sm flex flex-col justify-between h-28 relative"
         >
@@ -43,7 +36,6 @@
           </div>
         </div>
 
-        <!-- Active -->
         <div
           class="bg-[var(--surface)] p-4 sm:p-5 rounded-[var(--radius-lg)] border border-[var(--border)] shadow-sm flex flex-col justify-between h-28 relative"
         >
@@ -63,7 +55,6 @@
           </div>
         </div>
 
-        <!-- Upcoming -->
         <div
           class="bg-[var(--surface)] p-4 sm:p-5 rounded-[var(--radius-lg)] border border-[var(--border)] shadow-sm flex flex-col justify-between h-28 relative"
         >
@@ -78,7 +69,6 @@
           </div>
         </div>
 
-        <!-- Payment Due -->
         <div
           class="bg-[var(--surface)] p-4 sm:p-5 rounded-[var(--radius-lg)] border border-[var(--border)] shadow-sm flex flex-col justify-between h-28 relative"
         >
@@ -99,14 +89,12 @@
         </div>
       </section>
 
-
       <!-- =========================================================
             FILTER & SEARCH
       ========================================================== -->
       <section
         class="bg-[var(--surface)] p-2.5 sm:p-3 rounded-[var(--radius-lg)] border border-[var(--border)] shadow-sm flex flex-col lg:flex-row lg:items-center justify-between gap-3"
       >
-        <!-- Tabs -->
         <div class="flex items-center gap-1 overflow-x-auto pb-1 lg:pb-0 no-scrollbar">
           <button
             v-for="tab in filterTabs"
@@ -123,21 +111,17 @@
           </button>
         </div>
 
-        <!-- Search / Sort -->
         <div class="flex items-center gap-2">
           <div class="relative flex-1 sm:w-72">
-           
             <input
               v-model="searchQuery"
               type="text"
               placeholder="Search booking ID, model..."
-              class="w-full pl-9 pr-3 py-1.5 bg-[var(--background)] border border-[var(--border)] rounded-[var(--radius-md)] text-sm text-[var(--text)] placeholder:text-[var(--muted)] focus:outline-none focus:border-[var(--accent)] transition-all"
+              class="w-full pl-3 pr-3 py-1.5 bg-[var(--background)] border border-[var(--border)] rounded-[var(--radius-md)] text-sm text-[var(--text)] placeholder:text-[var(--muted)] focus:outline-none focus:border-[var(--accent)] transition-all"
             />
           </div>
-
         </div>
       </section>
-
 
       <!-- =========================================================
             ACTIVE DEPLOYMENT SECTION
@@ -188,7 +172,6 @@
         <div
           class="max-w-full w-full border-t-4 border-[#10B981] bg-[var(--surface)] rounded-xl overflow-hidden shadow-sm grid grid-cols-1 lg:grid-cols-12 text-[var(--text)]"
         >
-          <!-- Left Section: Image & Key -->
           <div
             class="lg:col-span-5 p-5 flex flex-col justify-between border-b lg:border-b-0 lg:border-r border-[var(--border)] bg-[var(--background)] relative group"
           >
@@ -206,8 +189,6 @@
             </div>
 
             <div class="my-6 relative flex justify-center items-center min-h-[220px]">
-
-
               <img
                 :key="currentBooking.id"
                 :src="getVehicleImage(currentBooking)"
@@ -215,13 +196,9 @@
                 @error="handleImageError"
                 class="w-full max-w-sm h-[220px] object-contain rounded-lg mix-blend-multiply drop-shadow-md hover:scale-105 transition-transform duration-300 px-8"
               />
-
             </div>
-
- 
           </div>
 
-          <!-- Right Section: Details & Journey -->
           <div class="lg:col-span-7 p-6 flex flex-col justify-between">
             <div class="flex flex-col sm:flex-row justify-between items-start gap-4">
               <div>
@@ -269,7 +246,6 @@
               </div>
 
               <div class="grid grid-cols-1 md:grid-cols-3 gap-3">
-                <!-- Pickup -->
                 <div class="flex items-start gap-2.5">
                   <div class="p-1 rounded-full text-[#10B981] bg-emerald-100/60 mt-0.5">
                     <i class="fa-solid fa-circle-check w-4 h-4"></i>
@@ -283,7 +259,6 @@
                   </div>
                 </div>
 
-                <!-- In Transit -->
                 <div class="flex items-start gap-2.5">
                   <div class="p-1 rounded-full text-[#10B981] bg-emerald-100/60 mt-0.5">
                     <i class="fa-solid fa-location-crosshairs w-4 h-4"></i>
@@ -295,7 +270,6 @@
                   </div>
                 </div>
 
-                <!-- Return -->
                 <div class="flex items-start gap-2.5">
                   <div class="p-1 rounded-full text-[var(--muted)] bg-[var(--border)]/60 mt-0.5">
                     <i class="fa-regular fa-clock w-4 h-4"></i>
@@ -342,7 +316,6 @@
         </div>
       </section>
 
-
       <!-- =========================================================
             SCHEDULED & RECENT ACTIVITY
       ========================================================== -->
@@ -362,13 +335,11 @@
           </span>
         </div>
 
-        <!-- Loading -->
         <div v-if="loading" class="text-center py-12 text-[var(--muted)] text-sm">
           <i class="fa-solid fa-spinner animate-spin text-lg mb-2 block"></i>
           Loading your allocations...
         </div>
 
-        <!-- Error -->
         <div
           v-else-if="error"
           class="text-center py-8 text-[var(--danger)] text-sm bg-[var(--surface)] border border-[var(--border)] rounded-[var(--radius-lg)]"
@@ -376,7 +347,6 @@
           {{ error }}
         </div>
 
-        <!-- Empty -->
         <div
           v-else-if="filteredBookings.length === 0"
           class="text-center py-12 text-[var(--secondary)] text-sm bg-[var(--surface)] border border-[var(--border)] rounded-[var(--radius-lg)]"
@@ -471,31 +441,32 @@
             >
               <button
                 v-if="normalizeStatus(booking.status) !== 'CANCELLED'"
-                @click="viewBookingDetails(booking.id)"
-                class="py-2 px-3 bg-[var(--background)] hover:bg-[var(--surface)] border border-[var(--border)] text-[var(--text)] text-xs font-bold rounded-[var(--radius-md)] transition-all cursor-pointer text-center"
+                @click.stop="openCancelModal(booking)"
+                class="py-2 px-3 bg-[var(--background)] hover:bg-red-50 hover:text-[var(--danger)] hover:border-[var(--danger)]/30 border border-[var(--border)] text-[var(--text)] text-xs font-bold rounded-[var(--radius-md)] transition-all cursor-pointer text-center"
               >
                 Cancel
               </button>
 
               <button
-                @click="viewBookingDetails(booking.id)"
-                class="py-2 px-3 text-white text-xs font-bold rounded-[var(--radius-md)] transition-all cursor-pointer text-center"
-                :class="
-                  normalizeStatus(booking.status) === 'PENDING'
-                    ? 'col-span-2 bg-[var(--danger)] hover:bg-red-700'
-                    : 'bg-[var(--accent)] hover:bg-[var(--accent-hover)]'
-                "
+                v-if="normalizeStatus(booking.status) === 'PENDING'"
+                @click.stop="goToPayment(booking.id)"
+                class="col-span-2 py-2 px-3 bg-[var(--danger)] hover:bg-red-700 text-white text-xs font-bold rounded-[var(--radius-md)] transition-all cursor-pointer text-center"
               >
-                {{ normalizeStatus(booking.status) === 'PENDING' ? 'Complete Payment' : 'View Details' }}
+                Complete Payment
+              </button>
+
+              <button
+                v-else
+                @click.stop="viewBookingDetails(booking.id)"
+                class="py-2 px-3 bg-[var(--accent)] hover:bg-[var(--accent-hover)] text-white text-xs font-bold rounded-[var(--radius-md)] transition-all cursor-pointer text-center"
+              >
+                View Details
               </button>
             </div>
           </div>
         </div>
 
-
-        <!-- =========================================================
-              PAGINATION CONTROLS
-        ========================================================== -->
+        <!-- Pagination Controls -->
         <div
           v-if="filteredBookings.length > 0 && totalPages > 1"
           class="flex flex-col sm:flex-row items-center justify-between gap-4 pt-4 border-t border-[var(--border)] bg-[var(--surface)] p-4 rounded-[var(--radius-lg)] border"
@@ -507,7 +478,6 @@
           </div>
 
           <div class="flex items-center gap-1.5">
-            <!-- First Page -->
             <button
               @click="goToPage(1)"
               :disabled="currentPage === 1"
@@ -516,7 +486,6 @@
               <i class="fa-solid fa-angles-left"></i>
             </button>
 
-            <!-- Prev Page -->
             <button
               @click="goToPage(currentPage - 1)"
               :disabled="currentPage === 1"
@@ -525,7 +494,6 @@
               Prev
             </button>
 
-            <!-- Numeric Page Buttons -->
             <button
               v-for="page in visiblePageNumbers"
               :key="page"
@@ -540,7 +508,6 @@
               {{ page }}
             </button>
 
-            <!-- Next Page -->
             <button
               @click="goToPage(currentPage + 1)"
               :disabled="currentPage === totalPages"
@@ -549,7 +516,6 @@
               Next
             </button>
 
-            <!-- Last Page -->
             <button
               @click="goToPage(totalPages)"
               :disabled="currentPage === totalPages"
@@ -561,9 +527,59 @@
         </div>
       </section>
 
-
-
     </div>
+
+    <!-- =========================================================
+          CUSTOM CANCEL CONFIRMATION MODAL (POPUP BOX)
+    ========================================================== -->
+    <Teleport to="body">
+      <div
+        v-if="showCancelModal"
+        class="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/50 backdrop-blur-sm transition-opacity"
+      >
+        <div
+          class="bg-[var(--surface)] border border-[var(--border)] rounded-2xl shadow-xl max-w-md w-full p-6 space-y-4 animate-in fade-in zoom-in-95 duration-150"
+        >
+          <div class="flex items-center gap-3 text-red-500">
+            <div class="p-2.5 bg-red-100 rounded-full">
+              <i class="fa-solid fa-triangle-exclamation text-xl"></i>
+            </div>
+            <div>
+              <h3 class="text-lg font-bold text-[var(--text)]">Cancel Booking</h3>
+              <p class="text-xs text-[var(--secondary)]">VR-{{ String(selectedBookingToCancel?.id || 0).padStart(5, '0') }}</p>
+            </div>
+          </div>
+
+          <p class="text-sm text-[var(--secondary)]">
+            Are you sure you want to cancel the reservation for 
+            <strong class="text-[var(--text)]">{{ selectedBookingToCancel?.vehicleName || 'this vehicle' }}</strong>? 
+            This action cannot be undone.
+          </p>
+
+          <div class="flex justify-end gap-3 pt-2">
+            <button
+              type="button"
+              @click="closeCancelModal"
+              :disabled="cancelling"
+              class="px-4 py-2 bg-[var(--background)] hover:bg-[var(--border)] text-[var(--text)] text-xs font-bold rounded-lg transition-colors border border-[var(--border)]"
+            >
+              Keep Booking
+            </button>
+
+            <button
+              type="button"
+              @click="confirmCancelBooking"
+              :disabled="cancelling"
+              class="px-4 py-2 bg-red-600 hover:bg-red-700 text-white text-xs font-bold rounded-lg transition-colors flex items-center gap-2"
+            >
+              <i v-if="cancelling" class="fa-solid fa-spinner animate-spin"></i>
+              {{ cancelling ? 'Cancelling...' : 'Yes, Cancel' }}
+            </button>
+          </div>
+        </div>
+      </div>
+    </Teleport>
+
   </div>
 </template>
 
@@ -571,7 +587,7 @@
 import { computed, onMounted, ref, watch } from 'vue'
 import { useRouter } from 'vue-router'
 
-import { getMyBookings } from '../api/booking'
+import { getMyBookings, deleteBooking} from '../api/booking'
 import { getVehicles } from '../api/vehicle'
 
 const router = useRouter()
@@ -590,10 +606,17 @@ const searchQuery = ref('')
 const sortBy = ref('newest')
 
 /* =========================================================
+   POPUP MODAL STATE
+========================================================= */
+const showCancelModal = ref(false)
+const selectedBookingToCancel = ref(null)
+const cancelling = ref(false)
+
+/* =========================================================
    PAGINATION STATE
 ========================================================= */
 const currentPage = ref(1)
-const pageSize = ref(6) // Items per page
+const pageSize = ref(6)
 
 /* =========================================================
    CAROUSEL STATE
@@ -613,6 +636,41 @@ const prevBooking = () => {
   if (activeBookings.value.length === 0) return
   currentIndex.value =
     currentIndex.value === 0 ? activeBookings.value.length - 1 : currentIndex.value - 1
+}
+
+/* =========================================================
+   CANCEL MODAL HANDLERS
+========================================================= */
+const openCancelModal = (booking) => {
+  selectedBookingToCancel.value = booking
+  showCancelModal.value = true
+}
+
+const closeCancelModal = () => {
+  showCancelModal.value = false
+  selectedBookingToCancel.value = null
+}
+
+const confirmCancelBooking = async () => {
+  if (!selectedBookingToCancel.value?.id) return
+
+  cancelling.value = true
+  try {
+    await deleteBooking(selectedBookingToCancel.value.id)
+    closeCancelModal()
+    await loadBookings()
+  } catch (err) {
+    console.error('Failed to cancel booking:', err)
+    alert(err?.response?.data?.message || 'Failed to cancel the booking.')
+  } finally {
+    cancelling.value = false
+  }
+}
+
+const goToPayment = (bookingId) => {
+  if (bookingId) {
+    router.push(`/payment/${bookingId}`)
+  }
 }
 
 /* =========================================================
@@ -791,7 +849,6 @@ const cancelledBookings = computed(() => {
 const filteredBookings = computed(() => {
   let result = [...bookings.value]
 
-  // Tab Filtering
   if (activeTab.value !== 'All') {
     result = result.filter((booking) => {
       const status = normalizeStatus(booking.status)
@@ -803,7 +860,6 @@ const filteredBookings = computed(() => {
     })
   }
 
-  // Search Query
   const search = searchQuery.value.trim().toLowerCase()
   if (search) {
     result = result.filter((booking) => {
@@ -813,7 +869,6 @@ const filteredBookings = computed(() => {
     })
   }
 
-  // Sort
   if (sortBy.value === 'newest') {
     result.sort((a, b) => Number(b.id) - Number(a.id))
   } else if (sortBy.value === 'oldest') {
@@ -825,9 +880,7 @@ const filteredBookings = computed(() => {
   return result
 })
 
-// Pagination Computed Properties
 const totalPages = computed(() => Math.ceil(filteredBookings.value.length / pageSize.value) || 1)
-
 const startIndex = computed(() => (currentPage.value - 1) * pageSize.value)
 const endIndex = computed(() => startIndex.value + pageSize.value)
 
@@ -857,7 +910,6 @@ const goToPage = (page) => {
   }
 }
 
-// Reset page back to 1 when filters change
 watch([activeTab, searchQuery, sortBy], () => {
   currentPage.value = 1
 })

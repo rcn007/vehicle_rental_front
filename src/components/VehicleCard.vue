@@ -13,13 +13,29 @@
         @error="handleImageError"
       />
 
-      <!-- Availability -->
-      <span
-        class="status"
-        :class="availabilityClass"
+      <!-- Favorite Button -->
+      <button
+        type="button"
+        class="absolute top-3 left-3 z-20
+               flex items-center justify-center
+               w-10 h-10
+               rounded-full
+               bg-white/90 backdrop-blur-sm
+               shadow-md
+               active:scale-95
+               transition-all duration-200 ease-out 
+               hover:scale-105"
+        :class="localIsFavorite ? 'text-red-500 hover:bg-red-50' : 'text-gray-500 hover:text-red-500 hover:bg-white'"
+        :disabled="favoriteLoading"
+        @click.stop="toggleFavorite"
       >
-        {{ availabilityText }}
-      </span>
+        <Heart
+          :size="20"
+          :class="localIsFavorite ? 'text-red-500 fill-current' : 'text-gray-500 hover:text-red-500'"
+          :fill="localIsFavorite ? 'currentColor' : 'none'"
+          :stroke-width="2.5"
+        />
+      </button>
 
       <!-- Price -->
       <span class="price-badge">
@@ -49,10 +65,6 @@
         <h3>
           {{ vehicleName }}
         </h3>
-
-        <span class="rating">
-          ★ {{ rating }}
-        </span>
 
       </div>
 
@@ -105,17 +117,23 @@
 
 <script setup>
 
-import { computed } from 'vue'
+import { computed, ref, watch } from 'vue'
 
 import {
   Fuel,
   Settings,
-  User
+  User,
+  Heart
 } from '@lucide/vue'
+
+import {
+  addFavorite,
+  removeFavorite
+} from '../api/favorite'
 
 
 // ============================================================
-// PROPS
+// PROPS & EMITS
 // ============================================================
 
 const props = defineProps({
@@ -128,10 +146,74 @@ const props = defineProps({
   image: {
     type: String,
     default: null
+  },
+
+  isFavorite: {
+    type: Boolean,
+    default: false
   }
 
 })
 
+const emit = defineEmits(['favorite-changed'])
+
+
+// ============================================================
+// LOCAL FAVORITE STATE MANAGEMENT
+// ============================================================
+
+// Reactive local state controlling the red fill
+const localIsFavorite = ref(Boolean(props.isFavorite))
+const favoriteLoading = ref(false)
+
+// Keep local state synced if parent changes or re-fetches from DB
+watch(
+  () => props.isFavorite,
+  (newVal) => {
+    localIsFavorite.value = Boolean(newVal)
+  },
+  { immediate: true }
+)
+
+const toggleFavorite = async () => {
+  if (favoriteLoading.value) return
+
+  const vehicleId = props.vehicle?.id
+  if (!vehicleId) {
+    console.error('Vehicle ID not found')
+    return
+  }
+
+  // Preserve initial state in case API call fails
+  const previousState = localIsFavorite.value
+  const targetState = !previousState
+
+  // 1. Immediately toggle red fill locally (Optimistic update)
+  localIsFavorite.value = targetState
+  favoriteLoading.value = true
+
+  try {
+    if (previousState) {
+      // Unfavorite -> DELETE from database table
+      await removeFavorite(vehicleId)
+    } else {
+      // Favorite -> INSERT into database table
+      await addFavorite(vehicleId)
+    }
+
+    // 2. Notify parent so state persists across component updates
+    emit('favorite-changed', {
+      vehicleId,
+      isFavorite: targetState
+    })
+  } catch (error) {
+    // 3. Rollback UI color if backend/DB operation failed
+    localIsFavorite.value = previousState
+    console.error('Database favorite sync failed:', error)
+  } finally {
+    favoriteLoading.value = false
+  }
+}
 
 // ============================================================
 // VEHICLE NAME
@@ -338,7 +420,6 @@ const handleImageError = (event) => {
     event.target.src
   )
 
-  // Prevent infinite error loop
   if (
     event.target.src.includes(
       '/images/vehicle-placeholder.jpg'
@@ -349,6 +430,9 @@ const handleImageError = (event) => {
 
   event.target.src =
     '/images/vehicle-placeholder.jpg'
+
 }
+// Reactive local state controlling the red fill
+
 
 </script>

@@ -1,27 +1,35 @@
 <template>
-  <header class="navbar">
+  <header class="navbar ">
     <div class="container nav-content">
 
       <!-- Logo / Website Name -->
-      <RouterLink to="/" class="logo" @click="closeMenu">
+<RouterLink
+  to="/"
+  class="group flex items-center gap-3 no-underline"
+  @click="closeMenu"
+>
+  <span
+    class="flex h-11 w-11 shrink-0 items-center justify-center rounded-xl bg-white p-1.5 shadow-sm ring-1 ring-slate-200 transition-all duration-300 group-hover:-translate-y-0.5 group-hover:shadow-md group-hover:ring-slate-300"
+  >
+    <img
+      v-if="logoUrl"
+      :src="logoUrl"
+      :alt="websiteName"
+      class="h-full w-full object-contain transition-transform duration-300 group-hover:scale-105"
+      @error="handleLogoError"
+    />
+    <CarFront
+      v-else
+      :size="21"
+      :stroke-width="2"
+      class="text-slate-800"
+    />
+  </span>
 
-        <span class="logo-mark">
-          <img
-            v-if="logoUrl"
-            :src="logoUrl"
-            :alt="websiteName"
-            class="website-logo"
-            @error="handleLogoError"
-          />
-
-          <CarFront
-            v-else
-            :size="18"
-          />
-        </span>
-
-        {{ websiteName }}
-      </RouterLink>
+  <span class="text-lg font-extrabold tracking-tight text-slate-900">
+    {{ websiteName }}
+  </span>
+</RouterLink>
 
 
       <!-- Desktop Navigation -->
@@ -29,9 +37,16 @@
         <RouterLink to="/">Home</RouterLink>
         <RouterLink to="/vehicles">Vehicles</RouterLink>
         <RouterLink to="/my-bookings">My Bookings</RouterLink>
-        <RouterLink to="/rental-history">Rental History</RouterLink>
+        <!-- <RouterLink to="/rental-history">Rental History</RouterLink> -->
         <RouterLink to="/locations">Locations</RouterLink>
         <RouterLink to="/contact">Contact</RouterLink>
+        <RouterLink
+  to="/favorites"
+  class="flex items-center gap-2"
+>
+  <Heart :size="18" />
+  My Favorites
+</RouterLink>
       </nav>
 
 
@@ -86,15 +101,12 @@
               {{ getInitial() }}
             </span>
 
-            <span class="profile-name">
-              {{ auth.user?.name || auth.user?.username || 'Profile' }}
-            </span>
 
           </RouterLink>
 
 
           <button
-            class="btn btn-outline"
+            class="btn  bg-slate-900 text-white "
             type="button"
             @click="logout"
           >
@@ -162,12 +174,12 @@
         My Bookings
       </RouterLink>
 
-      <RouterLink
+      <!-- <RouterLink
         to="/rental-history"
         @click="closeMenu"
       >
         Rental History
-      </RouterLink>
+      </RouterLink> -->
 
       <RouterLink
         to="/locations"
@@ -269,7 +281,7 @@ import {
   CarFront,
   Menu,
   UserRound,
-  X
+  X, Heart 
 } from '@lucide/vue'
 
 import { useRouter } from 'vue-router'

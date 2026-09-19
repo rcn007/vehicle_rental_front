@@ -55,8 +55,8 @@
               <QrCode :size="26" />
             </span>
             <span>
-              <strong>Bakong KHQR</strong>
-              <small>Scan and pay with Bakong</small>
+              <strong>Pay by Scan QR</strong>
+             
             </span>
             <CircleCheck :size="23" class="method-check" />
           </button>
@@ -402,7 +402,7 @@ const banks = [
     key: 'bakong',
     name: 'Bakong',
     className: 'bakong',
-    logo: 'https://play-lh.googleusercontent.com/Q27JPO0Plka8m3_-h2yw3Xu22Wedt3NJcxl1NPgMlaI6VRNcmSEPArvAcmnK1_TpmMBUlTsxjS1ycy0rRDFrmA=s0-br30',
+    logo: 'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcS1vfdr-UXi-M8Ip7zTbHlNW8fPuLmHJ6lao5fV8WwW3w&s=10',
   },
   {
     key: 'aba',

@@ -43,6 +43,8 @@ import UpdateUser from '../components/user/UpdateUser.vue'
 import DetailUser from '../components/user/DetailUser.vue'
 import Profile from '../pages/Profile.vue'
 import ResetPassword from '../views/auth/ResetPassword.vue'
+import Favorites from '../views/Favorites.vue'
+import RecieptView from '../views/RecieptView.vue'
 
 const routes = [
   // -------------------------------------------------------------
@@ -85,7 +87,7 @@ const routes = [
       component: BookingView,
       meta: {
         requiresAuth: true,
-        roles: ['CLIENT']
+        roles: ['CLIENT','ADMIN']
       }
     },
     {
@@ -94,7 +96,16 @@ const routes = [
       component: PaymentView,
       meta: {
         requiresAuth: true,
-        roles: ['CLIENT']
+        roles: ['CLIENT','ADMIN']
+      }
+    },
+    {
+      path: '/receipt/:bookingId',
+      name: 'receipt',
+      component: RecieptView,
+      meta: {
+        requiresAuth: true,
+        roles: ['CLIENT','ADMIN']
       }
     },
     {
@@ -103,7 +114,7 @@ const routes = [
       component: MyBookingsView,
       meta: {
         requiresAuth: true,
-        roles: ['CLIENT']
+        roles: ['CLIENT','ADMIN']
       }
     },
     {
@@ -112,7 +123,7 @@ const routes = [
       component: MyBookingsView,
       meta: {
         requiresAuth: true,
-        roles: ['CLIENT']
+        roles: ['CLIENT','ADMIN']
       }
     },
     {
@@ -121,7 +132,7 @@ const routes = [
       component: RentalHistoryView,
       meta: {
         requiresAuth: true,
-        roles: ['CLIENT']
+        roles: ['CLIENT','ADMIN']
       }
     },
     {
@@ -142,7 +153,16 @@ const routes = [
         requiresAuth: true,
         roles: ['CLIENT', 'ADMIN']
       }
-    }
+    },
+    {
+        path: '/favorites',
+        name: 'Favorites',
+        component: Favorites,
+        meta: {
+          requiresAuth: true,
+           roles: ['CLIENT', 'ADMIN']
+        }
+      }
   ]
 },
 

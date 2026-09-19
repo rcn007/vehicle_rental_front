@@ -1,6 +1,6 @@
 <template>
   <aside
-    class="w-64 h-screen fixed left-0 top-0 z-20 flex flex-col justify-between border-r border-gray-800 bg-gray-900 text-white select-none transition-all duration-200"
+    class="w-64 h-screen fixed left-0 top-0 z-20 flex flex-col justify-between border-r border-gray-800 bg-[#0f172a] text-white select-none transition-all duration-200"
   >
     
     <!-- Branding Header -->
@@ -16,7 +16,7 @@
               v-if="logoUrl"
               :src="logoUrl"
               :alt="siteName"
-              class="w-full h-full object-contain"
+              class="w-full h-full object-contain "
             />
 
             <i
