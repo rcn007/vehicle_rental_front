@@ -1,5 +1,5 @@
 <template>
-  <div class="auth-split-page">
+  <div class="auth-split-page auth-register-page">
     <section class="auth-visual">
       <div>
         <div class="auth-hero-icon">
@@ -7,8 +7,8 @@
         </div>
         <h1>Your Journey Starts Here</h1>
         <p>
-          Create your account and book premium vehicles with transparent pricing
-          and a simple rental experience.
+          Access 500+ premium vehicles. Seamless booking, transparent pricing,
+          zero hidden fees.
         </p>
 
         <div class="auth-stats">
@@ -32,16 +32,16 @@
         DriveEase
       </RouterLink>
 
-      <h1>Create account</h1>
-      <p>Register to start booking your vehicle</p>
+      <h1>Create your account</h1>
+      <p>Join DriveEase and start your journey today</p>
 
       <form @submit.prevent="register">
         <div class="form-group">
-          <label>Name</label>
+          <label>Full Name</label>
           <input
             v-model="form.name"
             type="text"
-            placeholder="Your name"
+            placeholder="Enter Your Name"
             required
           />
         </div>
@@ -51,7 +51,7 @@
           <input
             v-model="form.email"
             type="email"
-            placeholder="you@email.com"
+            placeholder="Enter Your Email"
             required
           />
         </div>
@@ -60,9 +60,9 @@
           <label>Password</label>
           <div class="password-field">
             <input
-              v-model="form.password"
+              v-model="form.pwd"
               :type="showPassword ? 'text' : 'password'"
-              placeholder="Password"
+              placeholder="Enter Your Password"
               required
             />
             <button type="button" @click="showPassword = !showPassword">
@@ -72,55 +72,18 @@
           </div>
         </div>
 
-        <div class="form-group">
-          <label>Phone Number</label>
-          <input
-            v-model="form.phoneNumber"
-            type="text"
-            placeholder="Phone number"
-          />
-        </div>
-
         <div v-if="auth.error" class="error-message">
           {{ auth.error }}
         </div>
 
-        <button
-          class="btn btn-primary btn-full"
-          :disabled="auth.loading"
-        >
+        <button class="btn btn-primary btn-full" :disabled="auth.loading">
           {{ auth.loading ? 'Creating...' : 'Create Account' }}
         </button>
       </form>
 
-      <div class="auth-divider">
-        <span>or continue with</span>
-      </div>
-
-      <div class="social-actions">
-        <button type="button" class="btn btn-outline">
-          <img
-            class="brand-icon"
-            src="/src/assets/google-icon.svg"
-            alt=""
-          />
-          Google
-        </button>
-        <button type="button" class="btn btn-outline">
-          <img
-            class="brand-icon"
-            src="/src/assets/facebook-icon.svg"
-            alt=""
-          />
-          Facebook
-        </button>
-      </div>
-
       <p class="auth-bottom">
         Already have an account?
-        <RouterLink to="/auth/login">
-          Sign In
-        </RouterLink>
+        <RouterLink to="/auth/login"> Sign In </RouterLink>
       </p>
     </section>
   </div>
@@ -128,12 +91,7 @@
 
 <script setup>
 import { reactive, ref } from 'vue'
-import {
-  ArrowLeft,
-  CarFront,
-  Eye,
-  EyeOff,
-} from '@lucide/vue'
+import { ArrowLeft, CarFront, Eye, EyeOff } from '@lucide/vue'
 import { useRouter } from 'vue-router'
 import { useAuthStore } from '../../stores/Auth'
 
@@ -143,19 +101,24 @@ const router = useRouter()
 const form = reactive({
   name: '',
   email: '',
-  password: '',
-  phoneNumber: '',
+  pwd: '',
+  phoneNumber: ''
 })
 
 const showPassword = ref(false)
 
 async function register() {
   try {
-    await auth.register(form)
+    await auth.register({
+      name: form.name,
+      email: form.email,
+      pwd: form.pwd,
+      phoneNumber: form.phoneNumber
+    })
 
     router.push({
       name: 'verify-otp',
-      query: { email: form.email },
+      query: { email: form.email }
     })
   } catch {
     // Error is stored in auth store.
