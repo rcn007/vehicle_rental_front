@@ -146,33 +146,42 @@
 
             <!-- ACTION AREA -->
             <div class="pt-6 border-t border-(--border)">
-<!-- Inside VEHICLE INFORMATION -> ACTION AREA -->
-<button
-  type="button"
-  @click="scrollToRentalSchedule"
-  class="w-full h-12 rounded-xl
-         bg-[#141226] text-white
-         font-bold text-sm
-         flex items-center justify-center gap-2
-         
-         hover:bg-[#1E1B3A]
-         active:scale-[0.99]"
->
-  <i class="fa-solid fa-calendar-days"></i>
-  Book This Vehicle
-</button>
+                      <!-- Inside VEHICLE INFORMATION -> ACTION AREA -->
+                      <button
+                        type="button"
+                        @click="scrollToRentalSchedule"
+                        class="w-full h-12 rounded-xl
+                              bg-[#141226] text-white
+                              font-bold text-sm
+                              flex items-center justify-center gap-2
+                              
+                              hover:bg-[#1E1B3A]
+                              active:scale-[0.99]"
+                      >
+                        <i class="fa-solid fa-calendar-days"></i>
+                        Book This Vehicle
+                      </button>
 
 
 
               <div class="grid grid-cols-2 gap-3 mt-3">
-                <a
-                  href="https://t.me/my_vehicle_rental_bot"
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  class="h-11 rounded-xl bg-[var(--background)] border border-[var(--border)] hover:border-[var(--border-hover)] hover:bg-[var(--surface-card)] flex items-center justify-center gap-2 text-xs font-bold text-[var(--text)] transition-all"
-                >
-                  <i class="fa-brands fa-telegram text-sm"></i> Telegram
-                </a>
+              <button
+                      type="button"
+                      @click="handleTelegramConnect"
+                      class="h-11 rounded-xl
+                            bg-[var(--background)]
+                            border border-[var(--border)]
+                            hover:border-[#229ED9]
+                            hover:bg-[#229ED9]/5
+                            flex items-center justify-center
+                            gap-2
+                            text-xs font-bold
+                            text-[var(--text)]
+                            transition-all"
+                    >
+                      <i class="fa-brands fa-telegram text-sm text-[#229ED9]"></i>
+                      Telegram
+                    </button>
                 <a
                   href="tel:+85512345678"
                   class="h-11 rounded-xl bg-[var(--background)] border border-[var(--border)] hover:border-[var(--border-hover)] hover:bg-[var(--surface-card)] flex items-center justify-center gap-2 text-xs font-bold text-[var(--text)] transition-all"
@@ -461,6 +470,7 @@ import { useAuthStore } from '../stores/Auth'
 // Assets & API
 import heroImage from '../assets/hero.png'
 import { getVehiclesImage } from '../api/vehicle.js'
+import { connectTelegram } from '../api/telegram.js'
 
 const route = useRoute()
 const router = useRouter()
@@ -1080,6 +1090,164 @@ async function fetchVehicleImages() {
     galleryImages.value = []
   }
 }
+
+/* =========================================================
+   TELEGRAM CONNECTION
+========================================================= */
+/* =========================================================
+   TELEGRAM CONNECTION
+========================================================= */
+async function handleTelegramConnect() {
+  try {
+    let userId = Number(authStore.user?.id)
+
+    // Fallback to localStorage
+    if (!userId) {
+      const storedUser = localStorage.getItem('user')
+
+      if (storedUser) {
+        try {
+          const parsedUser = JSON.parse(storedUser)
+          userId = Number(parsedUser?.id)
+        } catch (error) {
+          console.error('Invalid stored user:', error)
+        }
+      }
+    }
+
+    // Check login
+    if (!Number.isInteger(userId) || userId <= 0) {
+      alert('Please login first to connect Telegram.')
+
+      router.push({
+        name: 'login',
+        query: {
+          redirect: route.fullPath
+        }
+      })
+
+      return
+    }
+
+    console.log('Telegram user ID:', userId)
+
+    // Call backend
+    const response = await connectTelegram(userId)
+
+    console.log('=================================')
+    console.log('TELEGRAM RESPONSE:', response)
+    console.log('RESPONSE DATA:', response?.data)
+    console.log('=================================')
+
+    /*
+     * Support all possible response formats:
+     *
+     * 1. response = "https://t.me/..."
+     *
+     * 2. response = {
+     *      data: "https://t.me/..."
+     *    }
+     *
+     * 3. response = {
+     *      data: {
+     *        telegramUrl: "https://t.me/..."
+     *      }
+     *    }
+     *
+     * 4. response = {
+     *      telegramUrl: "https://t.me/..."
+     *    }
+     */
+
+    let telegramUrl = null
+
+    if (typeof response === 'string') {
+      telegramUrl = response
+    }
+
+    else if (typeof response?.data === 'string') {
+      telegramUrl = response.data
+    }
+
+    else if (typeof response?.data?.telegramUrl === 'string') {
+      telegramUrl = response.data.telegramUrl
+    }
+
+    else if (typeof response?.data?.url === 'string') {
+      telegramUrl = response.data.url
+    }
+
+    else if (typeof response?.data?.link === 'string') {
+      telegramUrl = response.data.link
+    }
+
+    else if (typeof response?.telegramUrl === 'string') {
+      telegramUrl = response.telegramUrl
+    }
+
+    else if (typeof response?.url === 'string') {
+      telegramUrl = response.url
+    }
+
+    else if (typeof response?.link === 'string') {
+      telegramUrl = response.link
+    }
+
+    console.log('FINAL TELEGRAM URL:', telegramUrl)
+    console.log('FINAL URL TYPE:', typeof telegramUrl)
+
+    // Validate URL
+    if (
+      typeof telegramUrl !== 'string' ||
+      !telegramUrl.trim()
+    ) {
+      console.error(
+        'Telegram URL was not found in backend response:',
+        response
+      )
+
+      alert('Could not generate Telegram connection link.')
+      return
+    }
+
+    if (!telegramUrl.startsWith('https://t.me/')) {
+      console.error(
+        'Invalid Telegram URL:',
+        telegramUrl
+      )
+
+      alert('Invalid Telegram connection link.')
+      return
+    }
+
+    console.log('Opening Telegram:', telegramUrl)
+
+    // Open Telegram
+    window.open(
+      telegramUrl,
+      '_blank',
+      'noopener,noreferrer'
+    )
+
+  } catch (error) {
+    console.error(
+      'Telegram connection error:',
+      error
+    )
+
+    console.error(
+      'Backend error response:',
+      error?.response?.data
+    )
+
+    alert(
+      error?.response?.data?.message ||
+      error?.response?.data?.msg ||
+      error?.message ||
+      'Failed to connect Telegram.'
+    )
+  }
+}
 /* =========================================================
    CREATE BOOKING
 ========================================================= */
@@ -1182,6 +1350,7 @@ async function createBooking() {
   }
 }
 
+
 /* =========================================================
    BACK
 ========================================================= */
@@ -1193,6 +1362,11 @@ function goBack() {
    ON MOUNT
 ========================================================= */
 onMounted(async () => {
+  console.log('==============================')
+  console.log('ROUTE PARAMS:', route.params)
+  console.log('VEHICLE ID:', vehicleId.value)
+  console.log('==============================')
+
   if (
     !Number.isInteger(vehicleId.value) ||
     vehicleId.value <= 0
@@ -1207,11 +1381,16 @@ onMounted(async () => {
 
   try {
     await Promise.all([
-      vehicleStore.fetchVehicle(
-        vehicleId.value
-      ),
+      vehicleStore.fetchVehicle(vehicleId.value),
       fetchVehicleImages()
     ])
+
+    console.log('==============================')
+    console.log('VEHICLE AFTER FETCH:', vehicle.value)
+    console.log('VEHICLE STORE ERROR:', vehicleStore.error)
+    console.log('VEHICLE STORE LOADING:', vehicleStore.loading)
+    console.log('==============================')
+
   } catch (error) {
     console.error(
       'Failed to fetch vehicle detail:',

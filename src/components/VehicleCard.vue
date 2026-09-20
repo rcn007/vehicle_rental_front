@@ -93,8 +93,13 @@
       <!-- Actions -->
       <div class="vehicle-actions">
 
-        <RouterLink
-          :to="`/vehicles/${vehicle.id}`"
+      <RouterLink
+          :to="{
+            name: 'vehicle-detail',
+            params: {
+              vehicleId: vehicle.id
+            }
+          }"
           class="btn btn-outline"
         >
           Details

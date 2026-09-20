@@ -360,29 +360,42 @@
             v-for="booking in paginatedBookings"
             :key="booking.id"
             class="bg-[var(--surface)] rounded-[var(--radius-lg)] border p-5 shadow-sm flex flex-col justify-between space-y-4 transition-all"
-            :class="
-              normalizeStatus(booking.status) === 'PENDING'
-                ? 'border-2 border-[var(--danger)]/30 hover:border-[var(--danger)]'
-                : 'border-[var(--border)] hover:border-[var(--accent)]'
-            "
+:class="
+  isPaymentPending(booking)
+    ? 'border-2 border-[var(--danger)]/30 hover:border-[var(--danger)]'
+    : 'border-[var(--border)] hover:border-[var(--accent)]'
+"
           >
             <div class="space-y-2">
               <div class="flex items-center justify-between">
                 <span
                   class="px-2 py-0.5 rounded-[var(--radius-sm)] text-[10px] font-extrabold uppercase"
                   :class="
-                    normalizeStatus(booking.status) === 'PENDING'
-                      ? 'bg-[var(--danger)]/10 border border-[var(--danger)]/20 text-[var(--danger)]'
-                      : 'bg-[var(--background)] border border-[var(--border)] text-[var(--muted)]'
-                  "
+  isPaymentPending(booking)
+    ? 'bg-[var(--danger)]/10 border border-[var(--danger)]/20 text-[var(--danger)]'
+    : 'bg-[var(--background)] border border-[var(--border)] text-[var(--muted)]'
+"
                 >
-                  {{ normalizeStatus(booking.status) }} #VR-{{ String(booking.id).padStart(5, '0') }}
+                  {{ isPaymentPaid(booking) ? 'PAID' : normalizeStatus(booking.status) }}
+#VR-{{ String(booking.id).padStart(5, '0') }}
                 </span>
 
-                <span class="text-[11px] font-bold flex items-center gap-1" :class="getStatusClass(booking.status)">
-                  <span class="w-1.5 h-1.5 rounded-full bg-current"></span>
-                  {{ formatStatus(booking.status) }}
-                </span>
+                <span
+  v-if="isPaymentPaid(booking)"
+  class="text-[11px] font-bold flex items-center gap-1 text-[var(--success)]"
+>
+  <span class="w-1.5 h-1.5 rounded-full bg-current"></span>
+  Payment Paid
+</span>
+
+<span
+  v-else
+  class="text-[11px] font-bold flex items-center gap-1"
+  :class="getStatusClass(booking.status)"
+>
+  <span class="w-1.5 h-1.5 rounded-full bg-current"></span>
+  {{ formatStatus(booking.status) }}
+</span>
               </div>
 
               <div>
@@ -410,7 +423,9 @@
                   </span>
                   <span
                     class="font-bold"
-                    :class="normalizeStatus(booking.status) === 'PENDING' ? 'text-[var(--danger)]' : 'text-[var(--success)]'"
+                   :class="isPaymentPending(booking)
+  ? 'text-[var(--danger)]'
+  : 'text-[var(--success)]'"
                   >
                     ${{ formatPrice(booking.totalPrice) }}
                   </span>
@@ -426,18 +441,19 @@
                 </div>
               </div>
 
-              <div
-                v-if="normalizeStatus(booking.status) === 'PENDING'"
-                class="bg-[var(--danger)]/10 text-[var(--danger)] p-2 rounded-[var(--radius-md)] text-[11px] font-bold flex items-center justify-center gap-1.5"
-              >
-                <i class="fa-solid fa-hourglass-half text-[10px]"></i> Payment required
-              </div>
+           <div
+  v-if="isPaymentPending(booking)"
+  class="bg-[var(--danger)]/10 text-[var(--danger)] p-2 rounded-[var(--radius-md)] text-[11px] font-bold flex items-center justify-center gap-1.5"
+>
+  <i class="fa-solid fa-hourglass-half text-[10px]"></i>
+  Payment required
+</div>
             </div>
 
             <!-- Actions -->
             <div
               class="grid gap-2 pt-2 border-t border-[var(--border)]"
-              :class="normalizeStatus(booking.status) === 'PENDING' ? 'grid-cols-3' : 'grid-cols-2'"
+              :class="isPaymentPending(booking) ? 'grid-cols-3' : 'grid-cols-2'"
             >
               <button
                 v-if="normalizeStatus(booking.status) !== 'CANCELLED'"
@@ -447,13 +463,13 @@
                 Cancel
               </button>
 
-              <button
-                v-if="normalizeStatus(booking.status) === 'PENDING'"
-                @click.stop="goToPayment(booking.id)"
-                class="col-span-2 py-2 px-3 bg-[var(--danger)] hover:bg-red-700 text-white text-xs font-bold rounded-[var(--radius-md)] transition-all cursor-pointer text-center"
-              >
-                Complete Payment
-              </button>
+           <button
+  v-if="isPaymentPending(booking)"
+  @click.stop="goToPayment(booking.id)"
+  class="col-span-2 py-2 px-3 bg-[var(--danger)] hover:bg-red-700 text-white text-xs font-bold rounded-[var(--radius-md)] transition-all cursor-pointer text-center"
+>
+  Complete Payment
+</button>
 
               <button
                 v-else
@@ -819,6 +835,27 @@ const loadBookings = async () => {
 ========================================================= */
 const normalizeStatus = (status) => String(status || '').toUpperCase()
 
+const normalizePaymentStatus = (status) => {
+  return String(status || '').trim().toUpperCase()
+}
+
+const getPaymentStatus = (booking) => {
+  return normalizePaymentStatus(
+    booking?.paymentStatus ??
+    booking?.payment_status ??
+    booking?.payment?.paymentStatus ??
+    booking?.payment?.payment_status ??
+    booking?.payment?.status
+  )
+}
+
+const isPaymentPaid = (booking) => {
+  return getPaymentStatus(booking) === 'PAID'
+}
+
+const isPaymentPending = (booking) => {
+  return !isPaymentPaid(booking)
+}
 const formatStatus = (status) => {
   return normalizeStatus(status)
     .toLowerCase()
@@ -849,9 +886,10 @@ const upcomingBookings = computed(() => {
 })
 
 const pendingBookings = computed(() => {
-  return bookings.value.filter((b) => normalizeStatus(b.status) === 'PENDING')
+  return bookings.value.filter(
+    (b) => isPaymentPending(b)
+  )
 })
-
 const cancelledBookings = computed(() => {
   return bookings.value.filter((b) => normalizeStatus(b.status) === 'CANCELLED')
 })
