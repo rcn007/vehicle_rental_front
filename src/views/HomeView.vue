@@ -1,249 +1,716 @@
 <template>
-  <div class="home-page">
-    <section class="hero-customer">
-      <div class="container hero-inner">
-        <div class="hero-copy">
-          <div class="availability-pill">
-            <span></span>
-            500+ Vehicles Available Now
-          </div>
-
-          <h1>
-            Rent Your Perfect
-            <span>Vehicle</span> Anywhere
-          </h1>
-
-          <p class="hero-description">
-            Premium vehicles at your fingertips. Book online in minutes, drive
-            with confidence. No hidden fees, full transparency.
-          </p>
-
-          <form class="hero-search" @submit.prevent="searchVehicles">
-            <label>
-              Vehicle Category
-              <select v-model="search.category">
-                <option>All Categories</option>
-                <option>Sedan</option>
-                <option>SUV</option>
-                <option>Motorcycle</option>
-                <option>Luxury</option>
-              </select>
-            </label>
-
-            <label>
-              Pickup Date
-              <input v-model="search.pickupDate" type="date" />
-            </label>
-
-            <label>
-              Return Date
-              <input v-model="search.returnDate" type="date" />
-            </label>
-
-            <button class="btn btn-primary" type="submit">
-              <Search :size="19" />
-              Search Available Vehicles
-            </button>
-          </form>
+  <main class="min-h-screen bg-slate-50 text-slate-800 antialiased selection:bg-[#10B981] selection:text-white">
+    <!-- State: Loading -->
+    <div v-if="loading" class="min-h-screen flex items-center justify-center bg-slate-50">
+      <div class="text-center">
+        <div class="relative w-12 h-12 mx-auto mb-4">
+          <div class="absolute inset-0 rounded-full border-4 border-slate-200" />
+          <div class="absolute inset-0 rounded-full border-4 border-t-[#10B981] animate-spin" />
         </div>
+        <p class="text-sm font-medium text-slate-500 tracking-wide uppercase">Loading experience...</p>
       </div>
-    </section>
+    </div>
 
-    <section class="stats-band">
-      <div class="container stats-row">
-        <div v-for="stat in stats" :key="stat.label">
-          <strong>{{ stat.value }}</strong>
-          <span>{{ stat.label }}</span>
-        </div>
+    <!-- State: Error -->
+    <div v-else-if="error" class="min-h-screen flex items-center justify-center px-6">
+      <div class="text-center bg-white rounded-2xl shadow-xl shadow-slate-200/60 p-8 max-w-md border border-slate-100">
+        <div class="w-12 h-12 bg-red-50 text-red-500 rounded-full flex items-center justify-center mx-auto mb-4 font-bold text-xl">!</div>
+        <h2 class="text-xl font-bold text-slate-900 mb-2">Unable to load home page</h2>
+        <p class="text-sm text-slate-500 mb-6 leading-relaxed">{{ error }}</p>
+        <button
+          class="px-6 py-2.5 rounded-xl bg-[#10B981] hover:bg-[#0D9668] text-white font-semibold transition-all shadow-lg shadow-[#10B981]/25 active:scale-95"
+          @click="loadHomeData"
+        >
+          Try Again
+        </button>
       </div>
-    </section>
+    </div>
 
-    <section class="section categories-section">
-      <div class="container">
-        <div class="section-header">
-          <div>
-            <p class="section-label">BROWSE BY TYPE</p>
-            <h2>Popular Categories</h2>
-          </div>
-          <RouterLink to="/vehicles" class="view-link">
-            View all <ArrowRight :size="18" />
-          </RouterLink>
-        </div>
+    <!-- State: Ready -->
+    <div v-else>
+      <!-- Hero Section -->
+<!-- Hero Section -->
+<section
+  class="relative min-h-[620px] lg:min-h-[680px] bg-slate-950 text-white overflow-hidden bg-cover bg-center"
+  :style="heroStyle"
+>
+  <!-- Background overlay -->
+  <div class="absolute inset-0 bg-slate-950/60" />
 
-        <div class="category-grid">
-          <RouterLink
-            v-for="category in categories"
-            :key="category.name"
-            to="/vehicles"
-            class="category-card"
-          >
-            <img :src="category.image" :alt="category.name" />
-            <div>
-              <component :is="category.icon" :size="30" />
-              <h3>{{ category.name }}</h3>
-              <p>{{ category.copy }}</p>
-            </div>
-          </RouterLink>
-        </div>
-      </div>
-    </section>
+  <!-- Stronger left-side gradient for readable text -->
+  <div
+    class="absolute inset-0 bg-gradient-to-r from-slate-950/95 via-slate-950/75 to-slate-950/20"
+  />
 
-    <section class="section">
-      <div class="container">
-        <div class="section-header">
-          <div>
-            <p class="section-label">TOP PICKS</p>
-            <h2>Featured Vehicles</h2>
-          </div>
-          <RouterLink to="/vehicles" class="view-link">
-            View all <ArrowRight :size="18" />
-          </RouterLink>
-        </div>
+  <!-- Bottom fade -->
+  <div
+    class="absolute inset-x-0 bottom-0 h-32 bg-gradient-to-t from-slate-950/40 to-transparent"
+  />
 
-        <div class="vehicle-grid">
-          <VehicleCard
-            v-for="vehicle in featuredVehicles"
-            :key="vehicle.id"
-            :vehicle="vehicle"
+  <div
+    class="container relative z-10 mx-auto px-6 lg:px-8 min-h-[620px] lg:min-h-[680px] flex items-center"
+  >
+    <div class="max-w-3xl py-20 sm:py-24 lg:py-28">
+
+    
+
+      <!-- Hero Title -->
+      <h1
+        class="text-4xl sm:text-5xl lg:text-4xl xl:text-5xl
+               font-extrabold tracking-tight
+               text-white leading-[1.05]
+               mb-6 max-w-3xl"
+      >
+        {{ heroTitle }}
+      </h1>
+
+      <!-- Hero Description -->
+      <p
+        class="text-base sm:text-lg lg:text-xl
+               text-slate-300
+               leading-relaxed
+               max-w-2xl
+               mb-9"
+      >
+        {{ heroDescription }}
+      </p>
+
+      <!-- Hero Buttons -->
+      <div class="flex flex-wrap items-center gap-4">
+
+        <!-- Dynamic Customizer Button -->
+        <RouterLink
+          :to="heroButtonLink"
+          class="inline-flex items-center justify-center gap-2
+                 px-7 py-3.5
+                 rounded-xl
+                 bg-[#10B981]
+                 hover:bg-[#0D9668]
+                 text-white
+                 font-semibold
+                 shadow-xl shadow-[#10B981]/25
+                 transition-all duration-200
+                 hover:-translate-y-0.5
+                 active:translate-y-0"
+        >
+          {{ heroButtonText }}
+
+          <ArrowRight
+            :size="18"
+            class="transition-transform group-hover:translate-x-1"
           />
+        </RouterLink>
+
+        <!-- Secondary Button -->
+        <RouterLink
+          to="/about"
+          class="inline-flex items-center justify-center
+                 px-7 py-3.5
+                 rounded-xl
+                 bg-white/10
+                 hover:bg-white/20
+                 backdrop-blur-md
+                 border border-white/20
+                 text-white
+                 font-semibold
+                 transition-all duration-200
+                 hover:-translate-y-0.5
+                 active:translate-y-0"
+        >
+          Learn More
+        </RouterLink>
+
+      </div>
+
+      <!-- Small trust information -->
+      <div
+        class="flex flex-wrap items-center gap-x-6 gap-y-3
+               mt-10 text-sm text-slate-300"
+      >
+        <div class="flex items-center gap-2">
+          <ShieldCheck
+            :size="17"
+            class="text-emerald-400"
+          />
+          <span>Safe & Reliable</span>
+        </div>
+
+        <div class="hidden sm:block w-1 h-1 rounded-full bg-slate-500" />
+
+        <div class="flex items-center gap-2">
+          <Zap
+            :size="17"
+            class="text-emerald-400"
+          />
+          <span>Easy Booking</span>
+        </div>
+
+        <div class="hidden sm:block w-1 h-1 rounded-full bg-slate-500" />
+
+        <div class="flex items-center gap-2">
+          <Headphones
+            :size="17"
+            class="text-emerald-400"
+          />
+          <span>24/7 Support</span>
         </div>
       </div>
-    </section>
 
-    <section class="section benefits-section">
-      <div class="container">
-        <div class="center-heading">
-          <p class="section-label">WHY CHOOSE US</p>
-          <h2>Everything You Need</h2>
-          <p>We make vehicle rental simple, affordable, and worry-free.</p>
-        </div>
+    </div>
+  </div>
+</section>
 
-        <div class="benefit-grid">
-          <article v-for="benefit in benefits" :key="benefit.title">
-            <component :is="benefit.icon" :size="36" />
-            <h3>{{ benefit.title }}</h3>
-            <p>{{ benefit.copy }}</p>
-          </article>
-        </div>
-      </div>
-    </section>
-
-    <section class="section cta-section">
-      <div class="container">
-        <div class="cta-panel">
-          <h2>Ready to Hit the Road?</h2>
-          <p>
-            Join thousands of satisfied customers. Your perfect vehicle is just
-            a few clicks away.
-          </p>
-          <div>
-            <RouterLink to="/vehicles" class="btn btn-primary">
-              Browse Vehicles
-            </RouterLink>
-            <RouterLink to="/auth/register" class="btn btn-soft">
-              Create Account
-            </RouterLink>
+      <!-- Stats Band -->
+      <section class="bg-white border-y border-slate-100 py-10 shadow-sm">
+        <div class="container mx-auto px-6 lg:px-8">
+          <div class="grid grid-cols-2 md:grid-cols-4 gap-8 text-center divide-x-0 md:divide-x divide-slate-100">
+            <div v-for="stat in stats" :key="stat.label" class="px-4">
+              <div class="text-3xl sm:text-4xl font-black text-slate-900 tracking-tight mb-1">{{ stat.value }}</div>
+              <div class="text-xs font-semibold text-slate-400 uppercase tracking-wider">{{ stat.label }}</div>
+            </div>
           </div>
         </div>
-      </div>
-    </section>
-  </div>
-</template>
+      </section>
 
+    <!-- =========================================================
+     CATEGORY EXPLORE SECTION
+========================================================== -->
+ <section class="py-20 bg-slate-100/60 border-y border-slate-200/60">
+        <div class="container mx-auto px-6 lg:px-8">
+          <div class="flex flex-col sm:flex-row sm:items-end justify-between mb-12 gap-4">
+            <div>
+            
+              <h2 class="text-3xl font-extrabold text-slate-900 tracking-tight">Explore Category</h2>
+            </div>
+            <RouterLink 
+              to="/vehicles" 
+              class="inline-flex items-center gap-2 text-sm font-bold text-[#10B981] hover:text-[#0D9668] group transition-colors"
+            >
+              View All 
+              <ArrowRight :size="16" class="transition-transform group-hover:translate-x-1" />
+            </RouterLink>
+          </div>
+
+          <div v-if="vehicleStore.loading" class="text-center py-16 text-slate-400 text-sm">
+            Loading vehicles...
+          </div>
+
+         <div
+            v-if="randomCategories.length"
+            class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8"
+          >
+            <ExploreCategory
+              v-for="category in randomCategories"
+              :key="category.id || category.categoryId || category.category_id"
+              :category="category"
+              :image="getCategoryImage(category)"
+              :vehicle-count="getCategoryVehicleCount(category)"
+            />
+          </div>
+
+          <div v-else class="text-center py-16 bg-white rounded-2xl border border-dashed border-slate-200 text-slate-400 text-sm">
+            No vehicles available at the moment.
+          </div>
+        </div>
+      </section>
+
+      <!-- Featured Vehicles Section -->
+      <section class="py-20 bg-slate-100/60 border-y border-slate-200/60">
+        <div class="container mx-auto px-6 lg:px-8">
+          <div class="flex flex-col sm:flex-row sm:items-end justify-between mb-12 gap-4">
+            <div>
+              <span class="text-xs font-bold text-[#10B981] tracking-wider uppercase mb-1 block">Our Fleet</span>
+              <h2 class="text-3xl font-extrabold text-slate-900 tracking-tight">Featured Vehicles</h2>
+            </div>
+            <RouterLink 
+              to="/vehicles" 
+              class="inline-flex items-center gap-2 text-sm font-bold text-[#10B981] hover:text-[#0D9668] group transition-colors"
+            >
+              View All 
+              <ArrowRight :size="16" class="transition-transform group-hover:translate-x-1" />
+            </RouterLink>
+          </div>
+
+          <div v-if="vehicleStore.loading" class="text-center py-16 text-slate-400 text-sm">
+            Loading vehicles...
+          </div>
+
+          <div v-else-if="featuredVehicles.length" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+<VehicleCard
+  v-for="vehicle in featuredVehicles"
+  :key="vehicle.id"
+  :vehicle="vehicle"
+  :image="vehicle.mainImage"
+  :is-favorite="favoriteVehicleIds.has(String(vehicle.id))"
+  @favorite-changed="handleFavoriteChanged"
+/>     </div>
+
+          <div v-else class="text-center py-16 bg-white rounded-2xl border border-dashed border-slate-200 text-slate-400 text-sm">
+            No vehicles available at the moment.
+          </div>
+        </div>
+      </section>
+
+      <!-- Benefits Section -->
+      <section class="py-24">
+        <div class="container mx-auto px-6 lg:px-8">
+          <div class="max-w-xl mx-auto text-center mb-16">
+            <span class="text-xs font-bold text-[#10B981] tracking-wider uppercase mb-1 block">Why Choose Us</span>
+            <h2 class="text-3xl sm:text-4xl font-extrabold text-slate-900 tracking-tight">Rental Made Simple</h2>
+          </div>
+
+          <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-8">
+            <div 
+              v-for="benefit in benefits" 
+              :key="benefit.title" 
+              class="bg-white rounded-2xl p-8 border border-slate-100 shadow-sm hover:shadow-md transition-shadow"
+            >
+              <div class="w-12 h-12 rounded-xl bg-slate-900 text-white flex items-center justify-center mb-6">
+                <component :is="benefit.icon" :size="24" />
+              </div>
+              <h3 class="text-base font-bold text-slate-900 mb-2">{{ benefit.title }}</h3>
+              <p class="text-xs font-normal text-slate-500 leading-relaxed">{{ benefit.description }}</p>
+            </div>
+          </div>
+        </div>
+      </section>
+    </div>
+  </main>
+</template>
 <script setup>
-import { computed, onMounted, reactive } from 'vue'
-import { useRouter } from 'vue-router'
+import { ref, computed, onMounted} from 'vue'
 import {
   ArrowRight,
-  Bike,
-  Car,
   DollarSign,
-  Gem,
   Headphones,
-  Search,
   ShieldCheck,
-  Zap,
+  Zap
 } from '@lucide/vue'
+
 import VehicleCard from '../components/VehicleCard.vue'
 import { useVehicleStore } from '../stores/Vehicle'
+import { getCustomizerSettings, getCategories } from '../api/home'
+import { getFavorites } from '../api/favorite'
+import ExploreCategory from '../components/ExploreCategory.vue'
 
-const router = useRouter()
-const vehicleStore = useVehicleStore()
+// =========================================================
+// CONFIGURATION
+// =========================================================
 
-const search = reactive({
-  category: 'All Categories',
-  pickupDate: '',
-  returnDate: '',
-})
+const API_BASE_URL =
+  import.meta.env.VITE_API_BASE_URL || 'http://localhost:8080'
 
-const stats = [
-  { value: '10,000+', label: 'Happy Customers' },
-  { value: '500+', label: 'Vehicles Available' },
-  { value: '50+', label: 'Cities Covered' },
-  { value: '4.9★', label: 'Average Rating' },
-]
-
-const categories = [
-  {
-    name: 'Sedan',
-    copy: '120+ cars · From $45/day',
-    icon: Car,
-    image:
-      'https://images.unsplash.com/photo-1492144534655-ae79c964c9d7?auto=format&fit=crop&w=900&q=80',
-  },
-  {
-    name: 'SUV',
-    copy: '85+ vehicles · From $65/day',
-    icon: Car,
-    image:
-      'https://images.unsplash.com/photo-1533473359331-0135ef1b58bf?auto=format&fit=crop&w=900&q=80',
-  },
-  {
-    name: 'Motorcycle',
-    copy: '60+ bikes · From $25/day',
-    icon: Bike,
-    image:
-      'https://images.unsplash.com/photo-1558981806-ec527fa84c39?auto=format&fit=crop&w=900&q=80',
-  },
-  {
-    name: 'Luxury',
-    copy: '30+ cars · From $150/day',
-    icon: Gem,
-    image:
-      'https://images.unsplash.com/photo-1525609004556-c46c7d6cf023?auto=format&fit=crop&w=900&q=80',
-  },
-]
+// =========================================================
+// BENEFITS
+// =========================================================
 
 const benefits = [
   {
-    title: 'Secure Booking',
-    copy: 'SSL-encrypted transactions and verified vehicles for your peace of mind.',
     icon: ShieldCheck,
+    title: 'Safe & Reliable',
+    description:
+      'Every vehicle is checked and maintained before rental.'
   },
   {
-    title: '24/7 Support',
-    copy: 'Round-the-clock customer support via chat, phone, or email.',
-    icon: Headphones,
-  },
-  {
-    title: 'Affordable Price',
-    copy: 'Transparent pricing with no hidden fees. Best rates guaranteed.',
     icon: DollarSign,
+    title: 'Transparent Pricing',
+    description:
+      'No hidden fees. What you see is what you pay.'
   },
   {
-    title: 'Easy Booking',
-    copy: 'Book your vehicle in under 3 minutes with our streamlined process.',
     icon: Zap,
+    title: 'Easy Booking',
+    description:
+      'Book your vehicle quickly and easily online.'
   },
+  {
+    icon: Headphones,
+    title: 'Customer Support',
+    description:
+      'Our team is ready to help whenever you need us.'
+  }
 ]
 
-const featuredVehicles = computed(() => vehicleStore.vehicles.slice(0, 3))
+// =========================================================
+// STATE
+// =========================================================
 
-function searchVehicles() {
-  router.push('/vehicles')
+const vehicleStore = useVehicleStore()
+
+const customizer = ref(null)
+const categories = ref([])
+const loading = ref(true)
+const error = ref(null)
+const favoriteVehicleIds = ref(new Set())
+
+// =========================================================
+// HELPER FUNCTIONS
+// =========================================================
+
+const unwrapResponse = (res) => {
+  if (!res) return []
+
+  if (Array.isArray(res)) {
+    return res
+  }
+
+  if (Array.isArray(res.data)) {
+    return res.data
+  }
+
+  if (Array.isArray(res.content)) {
+    return res.content
+  }
+
+  if (Array.isArray(res.data?.content)) {
+    return res.data.content
+  }
+
+  return []
 }
 
-onMounted(() => {
-  vehicleStore.fetchVehicles()
+// ---------------------------------------------------------
+// Format image URL
+// ---------------------------------------------------------
+
+const formatImageUrl = (rawPath) => {
+  if (!rawPath) return null
+
+  // Cloudinary / external URL
+  if (/^(https?:\/\/|data:)/i.test(rawPath)) {
+    return rawPath
+  }
+
+  const cleanPath =
+    rawPath.startsWith('/')
+      ? rawPath
+      : `/${rawPath}`
+
+  return `${API_BASE_URL}${cleanPath}`
+}
+
+// ---------------------------------------------------------
+// Brand name
+// ---------------------------------------------------------
+
+const getBrandName = (vehicle) => {
+  if (
+    vehicle?.brand &&
+    typeof vehicle.brand === 'object'
+  ) {
+    return (
+      vehicle.brand.name ||
+      vehicle.brand.brandName ||
+      'Vehicle'
+    )
+  }
+
+  return (
+    vehicle?.brandName ||
+    vehicle?.brand_name ||
+    vehicle?.brand ||
+    'Vehicle'
+  )
+}
+
+// ---------------------------------------------------------
+// Category name
+// ---------------------------------------------------------
+
+const getCategoryName = (category) => {
+  if (typeof category === 'string') {
+    return category
+  }
+
+  return (
+    category?.categoryName ||
+    category?.name ||
+    category?.category_name ||
+    'Category'
+  )
+}
+
+// ---------------------------------------------------------
+// Category vehicle count
+// ---------------------------------------------------------
+
+const getCategoryVehicleCount = (category) => {
+  return (
+    category?.vehicleCount ??
+    category?.vehicle_count ??
+    category?.count ??
+    0
+  )
+}
+
+
+const getCategoryImage = (category) => {
+  const categoryName = getCategoryName(category)
+    .trim()
+    .toLowerCase()
+
+  const vehicle = vehicleStore.vehicles.find((vehicle) => {
+    return (
+      String(vehicle?.category_name || '')
+        .trim()
+        .toLowerCase() === categoryName
+    )
+  })
+
+  console.log('Category:', categoryName)
+  console.log('Matched vehicle:', vehicle)
+  console.log('Vehicle image:', vehicle?.mainImage)
+
+  return vehicle?.mainImage || null
+}
+
+// =========================================================
+// VEHICLE IMAGE
+// Uses vehicle.mainImage ONLY
+// =========================================================
+
+const getVehicleImage = (vehicle) => {
+  if (!vehicle?.mainImage) {
+    return null
+  }
+
+  return vehicle.mainImage
+}
+
+// =========================================================
+// COMPUTED
+// =========================================================
+
+const heroTitle = computed(() => {
+  return (
+    customizer.value?.title ||
+    'Rent Your Perfect Vehicle Anywhere'
+  )
 })
+
+const heroDescription = computed(() => {
+  return (
+    customizer.value?.description ||
+    'Premium vehicles at your fingertips. Book online in minutes, drive with confidence.'
+  )
+})
+
+const heroImage = computed(() => {
+  return customizer.value?.heroImage || null
+})
+
+const heroButtonText = computed(() => {
+  return (
+    customizer.value?.buttonText ||
+    'Browse Vehicles'
+  )
+})
+
+const heroButtonLink = computed(() => {
+  return (
+    customizer.value?.buttonLink ||
+    '/vehicles'
+  )
+})
+
+const heroStyle = computed(() => {
+  if (!heroImage.value) {
+    return {
+      backgroundImage:
+        'linear-gradient(135deg, #0f172a 0%, #1e293b 100%)'
+    }
+  }
+
+  return {
+    backgroundImage:
+      `url("${formatImageUrl(heroImage.value)}")`
+  }
+})
+
+// ---------------------------------------------------------
+// Available vehicle count
+// ---------------------------------------------------------
+
+const availableVehicleCount = computed(() => {
+  return vehicleStore.vehicles.filter((vehicle) => {
+    const status =
+      String(vehicle?.status || '').toLowerCase()
+
+    return (
+      status === 'available' ||
+      status.includes('available')
+    )
+  }).length
+})
+
+// ---------------------------------------------------------
+// Featured vehicles
+// ---------------------------------------------------------
+
+const featuredVehicles = computed(() => {
+  return vehicleStore.vehicles.slice(0, 3)
+})
+
+// ---------------------------------------------------------
+// Statistics
+// ---------------------------------------------------------
+
+const stats = computed(() => [
+  {
+    value:
+      customizer.value?.happyCustomers ||
+      '10,000+',
+    label: 'Happy Customers'
+  },
+  {
+    value:
+      vehicleStore.vehicles.length > 0
+        ? `${vehicleStore.vehicles.length}+`
+        : '0',
+    label: 'Vehicles Available'
+  },
+  {
+    value:
+      customizer.value?.citiesCovered ||
+      '50+',
+    label: 'Cities Covered'
+  },
+  {
+    value:
+      customizer.value?.averageRating ||
+      '4.9★',
+    label: 'Average Rating'
+  }
+])
+
+const handleFavoriteChanged = ({
+  vehicleId,
+  isFavorite
+}) => {
+
+  const updated = new Set(
+    favoriteVehicleIds.value
+  )
+
+  if (isFavorite) {
+    updated.add(vehicleId)
+  } else {
+    updated.delete(vehicleId)
+  }
+
+  favoriteVehicleIds.value = updated
+}
+
+const loadFavorites = async () => {
+  // =====================================================
+  // GUEST USER → DO NOT CALL FAVORITES API
+  // =====================================================
+
+  const token = localStorage.getItem('token')
+  const user = localStorage.getItem('user')
+
+  if (!token || !user) {
+    favoriteVehicleIds.value = new Set()
+    return
+  }
+
+  try {
+    const response = await getFavorites()
+
+    console.log('Favorites from database:', response)
+
+    const favorites = Array.isArray(response)
+      ? response
+      : response?.data || []
+
+    favoriteVehicleIds.value = new Set(
+      favorites
+        .map(favorite => favorite.vehicle?.id)
+        .filter(id => id != null)
+        .map(id => String(id))
+    )
+
+  } catch (error) {
+    console.error('Failed to load favorites:', error)
+
+    favoriteVehicleIds.value = new Set()
+  }
+}
+
+// =========================================================
+// DATA FETCHING
+// =========================================================
+const loadHomeData = async () => {
+  loading.value = true
+  error.value = null
+
+  try {
+    // ============================================
+    // Load customizer + categories
+    // ============================================
+    const [
+      customizerData,
+      categoriesData
+    ] = await Promise.all([
+      getCustomizerSettings(),
+      getCategories()
+    ])
+
+    customizer.value = customizerData
+
+    categories.value = unwrapResponse(categoriesData)
+
+    // ============================================
+    // Load vehicles
+    // Vehicle API already contains mainImage
+    // ============================================
+    await vehicleStore.fetchVehicles()
+    await loadFavorites()
+
+    // ============================================
+    // Select 3 random categories AFTER vehicles load
+    // ============================================
+    randomCategories.value = getRandomCategories(
+      categories.value,
+      3
+    )
+
+  } catch (err) {
+    console.error(
+      'Failed to load home page:',
+      err
+    )
+
+    error.value =
+      err.response?.data?.message ||
+      err.response?.data?.msg ||
+      err.message ||
+      'Failed to load home page data.'
+
+  } finally {
+    loading.value = false
+  }
+}
+const randomCategories = ref([])
+
+const getRandomCategories = (items, count = 3) => {
+  const shuffled = [...items]
+
+  for (let i = shuffled.length - 1; i > 0; i--) {
+    const j = Math.floor(Math.random() * (i + 1))
+
+    ;[shuffled[i], shuffled[j]] = [
+      shuffled[j],
+      shuffled[i]
+    ]
+  }
+
+  return shuffled.slice(0, count)
+}
+
+// =========================================================
+// MOUNT
+// =========================================================
+
+onMounted(loadHomeData)
 </script>
