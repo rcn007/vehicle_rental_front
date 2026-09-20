@@ -363,32 +363,65 @@ const formatImageUrl = (rawPath) => {
 const getVehicleImage = (v) => {
   if (!v) return null
 
-  // 1. Direct Vehicle Object Image Array / Props (if present)
-  if (Array.isArray(v.vehicleImages) && v.vehicleImages.length > 0) {
-    const imgObj = v.vehicleImages[0]
-    const raw = typeof imgObj === 'string' ? imgObj : imgObj?.image || imgObj?.imageUrl || imgObj?.url
-    if (raw) return formatImageUrl(raw)
+  // 1. Use vehicle main image first
+  const mainImage =
+    v.mainImage ||
+    v.main_image ||
+    v.image ||
+    v.imageUrl
+
+  if (mainImage) {
+    return formatImageUrl(mainImage)
   }
-  if (typeof v.image === 'string' && v.image) return formatImageUrl(v.image)
-  if (typeof v.imageUrl === 'string' && v.imageUrl) return formatImageUrl(v.imageUrl)
 
-  // 2. Match with standalone vehicleImages payload by vehicle_name / name
-  if (Array.isArray(vehicleImages.value) && vehicleImages.value.length > 0) {
-    const vehicleName = (v.name || `${getBrandName(v)} ${v.model || ''}`).trim().toLowerCase()
-    
+  // 2. If no main image, use vehicleImages from vehicle response
+  if (
+    Array.isArray(v.vehicleImages) &&
+    v.vehicleImages.length > 0
+  ) {
+    const image = v.vehicleImages[0]
+
+    const raw =
+      typeof image === 'string'
+        ? image
+        : image?.imageUrl ||
+          image?.image_url ||
+          image?.image ||
+          image?.url ||
+          image?.path
+
+    if (raw) {
+      return formatImageUrl(raw)
+    }
+  }
+
+  // 3. Find gallery image using vehicle_id ONLY
+  if (Array.isArray(vehicleImages.value)) {
+    const vehicleId = Number(v.id)
+
     const match = vehicleImages.value.find(img => {
-      // Match by exact vehicle_name or name property
-      const imgVehicleName = String(img.vehicle_name || img.vehicleName || img.name || '').trim().toLowerCase()
-      if (imgVehicleName && imgVehicleName === vehicleName) return true
+      const imageVehicleId =
+        img.vehicle_id ??
+        img.vehicleId ??
+        img.vehicle?.id
 
-      // Fallback: match by ID if backend supports it
-      const imgVehicleId = Number(img.vehicle_id ?? img.vehicleId ?? img.id)
-      return imgVehicleId === Number(v.id)
+      return (
+        imageVehicleId != null &&
+        Number(imageVehicleId) === vehicleId
+      )
     })
 
     if (match) {
-      const raw = match.image || match.imageUrl || match.url || match.path
-      if (raw) return formatImageUrl(raw)
+      const raw =
+        match.imageUrl ||
+        match.image_url ||
+        match.image ||
+        match.url ||
+        match.path
+
+      if (raw) {
+        return formatImageUrl(raw)
+      }
     }
   }
 

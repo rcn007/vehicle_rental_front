@@ -16,11 +16,77 @@ export const useAuthStore = defineStore('auth', {
     error: null
   }),
 
-  getters: {
-    isAuthenticated: (state) => !!state.token
-  },
+getters: {
+  isAuthenticated: (state) => {
+
+    if (!state.token) {
+      return false
+    }
+
+    try {
+
+      const payload = JSON.parse(
+        atob(state.token.split('.')[1])
+      )
+
+      // JWT exp is in seconds
+      if (
+        !payload.exp ||
+        payload.exp * 1000 <= Date.now()
+      ) {
+        return false
+      }
+
+      return true
+
+    } catch (error) {
+
+      return false
+    }
+  }
+},
 
   actions: {
+     // ================================
+  // Check Token
+  // ================================
+  checkToken() {
+
+    if (!this.token) {
+      return false
+    }
+
+    try {
+
+      const payload = JSON.parse(
+        atob(this.token.split('.')[1])
+      )
+
+      const expired =
+        !payload.exp ||
+        payload.exp * 1000 <= Date.now()
+
+      if (expired) {
+
+        console.log('JWT token expired.')
+
+        this.logout()
+
+        return false
+      }
+
+      return true
+
+    } catch (error) {
+
+      console.log('Invalid JWT token.')
+
+      this.logout()
+
+      return false
+    }
+  },
+
     // ================================
     // Login
     // ================================

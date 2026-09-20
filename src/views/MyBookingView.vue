@@ -462,6 +462,14 @@
               >
                 View Details
               </button>
+              <button
+                v-if="normalizeStatus(booking.status) !== 'CANCELLED'"
+                @click.stop="goToReceipt(booking.id)"
+                class="py-2 px-3 bg-[var(--background)] hover:bg-[var(--surface)] border border-[var(--border)] text-[var(--text)] text-xs font-bold rounded-[var(--radius-md)] transition-all cursor-pointer text-center flex items-center justify-center gap-1.5"
+              >
+                <i class="fa-solid fa-receipt text-[10px]"></i>
+                Receipt
+              </button>
             </div>
           </div>
         </div>
@@ -636,6 +644,11 @@ const prevBooking = () => {
   if (activeBookings.value.length === 0) return
   currentIndex.value =
     currentIndex.value === 0 ? activeBookings.value.length - 1 : currentIndex.value - 1
+}
+const goToReceipt = (bookingId) => {
+  if (bookingId) {
+    router.push(`/receipt/${bookingId}`)
+  }
 }
 
 /* =========================================================
@@ -909,6 +922,13 @@ const goToPage = (page) => {
     currentPage.value = page
   }
 }
+
+// Ensure currentPage stays within valid boundary if items list changes
+watch(totalPages, (newTotalPages) => {
+  if (currentPage.value > newTotalPages) {
+    currentPage.value = newTotalPages
+  }
+})
 
 watch([activeTab, searchQuery, sortBy], () => {
   currentPage.value = 1

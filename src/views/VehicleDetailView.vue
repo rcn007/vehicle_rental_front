@@ -145,7 +145,7 @@
             </div>
 
             <!-- ACTION AREA -->
-            <div class="pt-6 border-t border-[var(--border)]">
+            <div class="pt-6 border-t border-(--border)">
 <!-- Inside VEHICLE INFORMATION -> ACTION AREA -->
 <button
   type="button"
@@ -154,7 +154,7 @@
          bg-[#141226] text-white
          font-bold text-sm
          flex items-center justify-center gap-2
-         transition-all duration-200
+         
          hover:bg-[#1E1B3A]
          active:scale-[0.99]"
 >
@@ -162,13 +162,7 @@
   Book This Vehicle
 </button>
 
-<!-- ================= RENTAL SCHEDULE ================= -->
-<section
-  ref="rentalScheduleSection"
-  class="bg-[var(--surface)] border border-[var(--border)] rounded-3xl p-6 sm:p-7 shadow-xl space-y-6 scroll-mt-24"
->
-  <!-- Rental Schedule Content -->
-</section>
+
 
               <div class="grid grid-cols-2 gap-3 mt-3">
                 <a
@@ -488,28 +482,29 @@ const vehicleSpecs = computed(() => [
    STATIC GALLERY
    Later replace this with vehicle_image API data
 ========================================================= */
-const galleryImages = ref([
-  {
-    id: 1,
-    url: 'https://images.unsplash.com/photo-1552519507-da3b142c6e3d?auto=format&fit=crop&w=1200&q=85',
-    label: 'Front View'
-  },
-  {
-    id: 2,
-    url: 'https://images.unsplash.com/photo-1542282088-72c9c27ed0cd?auto=format&fit=crop&w=1200&q=85',
-    label: 'Side View'
-  },
-  {
-    id: 3,
-    url: 'https://images.unsplash.com/photo-1503376780353-7e6692767b70?auto=format&fit=crop&w=1200&q=85',
-    label: 'Exterior'
-  },
-  {
-    id: 4,
-    url: 'https://images.unsplash.com/photo-1494976388531-d1058494cdd8?auto=format&fit=crop&w=1200&q=85',
-    label: 'Interior'
-  }
-])
+// const galleryImages = ref([
+//   {
+//     id: 1,
+//     url: 'https://images.unsplash.com/photo-1552519507-da3b142c6e3d?auto=format&fit=crop&w=1200&q=85',
+//     label: 'Front View'
+//   },
+//   {
+//     id: 2,
+//     url: 'https://images.unsplash.com/photo-1542282088-72c9c27ed0cd?auto=format&fit=crop&w=1200&q=85',
+//     label: 'Side View'
+//   },
+//   {
+//     id: 3,
+//     url: 'https://images.unsplash.com/photo-1503376780353-7e6692767b70?auto=format&fit=crop&w=1200&q=85',
+//     label: 'Exterior'
+//   },
+//   {
+//     id: 4,
+//     url: 'https://images.unsplash.com/photo-1494976388531-d1058494cdd8?auto=format&fit=crop&w=1200&q=85',
+//     label: 'Interior'
+//   }
+// ])
+const galleryImages = ref([])
 
 const selectedGalleryImage = ref(null)
 
@@ -985,30 +980,106 @@ function handleImageError(event) {
 ========================================================= */
 async function fetchVehicleImages() {
   try {
-    const response =
-      await getVehiclesImage()
+    const response = await getVehiclesImage()
 
+    console.log('=================================')
+    console.log('VEHICLE IMAGE API RESPONSE:', response)
+    console.log('CURRENT VEHICLE ID:', vehicleId.value)
+    console.log('=================================')
+
+    /*
+     * Your API helper may already return response.data,
+     * so support all common response structures.
+     */
     const data =
-      response?.data ?? response
+      response?.data?.data ??
+      response?.data ??
+      response
 
-    vehicleImages.value =
-      Array.isArray(data)
-        ? data
-        : (
-            Array.isArray(data?.data)
-              ? data.data
-              : []
-          )
+    const images = Array.isArray(data)
+      ? data
+      : Array.isArray(data?.data)
+        ? data.data
+        : []
+
+    console.log('ALL VEHICLE IMAGE ROWS:', images)
+
+    const currentVehicleId = Number(vehicleId.value)
+
+    const matchedImages = images.filter(image => {
+      const imageVehicleId =
+        image?.vehicle_id ??
+        image?.vehicleId ??
+        image?.vehicle?.id ??
+        image?.vehicle?.vehicleId
+
+      console.log('Checking vehicle image:', {
+        imageId: image?.id,
+        imageVehicleId,
+        currentVehicleId
+      })
+
+      return (
+        imageVehicleId != null &&
+        Number(imageVehicleId) === currentVehicleId
+      )
+    })
+
+    console.log(
+      'MATCHED IMAGES FOR VEHICLE:',
+      matchedImages
+    )
+
+    galleryImages.value = matchedImages
+      .slice(0, 4)
+      .map((image, index) => {
+        const rawImage =
+          image?.image_url ??
+          image?.imageUrl ??
+          image?.image ??
+          image?.url ??
+          image?.path ??
+          image?.imagePath
+
+        const imageUrl = formatImageUrl(rawImage)
+
+        console.log('MAPPING GALLERY IMAGE:', {
+          id: image?.id,
+          rawImage,
+          imageUrl
+        })
+
+        if (!imageUrl) {
+          return null
+        }
+
+        return {
+          id: image.id,
+          url: imageUrl,
+          label: [
+            'Front View',
+            'Side View',
+            'Exterior',
+            'Interior'
+          ][index] || `Vehicle Photo ${index + 1}`
+        }
+      })
+      .filter(Boolean)
+
+    console.log(
+      'FINAL DETAIL GALLERY:',
+      galleryImages.value
+    )
+
   } catch (error) {
     console.error(
-      'Failed to fetch vehicle images:',
+      'FAILED TO FETCH VEHICLE GALLERY:',
       error
     )
 
-    vehicleImages.value = []
+    galleryImages.value = []
   }
 }
-
 /* =========================================================
    CREATE BOOKING
 ========================================================= */

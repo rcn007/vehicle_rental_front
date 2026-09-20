@@ -274,7 +274,8 @@
 import {
   ref,
   computed,
-  onMounted
+  onMounted,
+   onUnmounted
 } from 'vue'
 
 import {
@@ -293,6 +294,7 @@ const auth = useAuthStore()
 const router = useRouter()
 
 const menuOpen = ref(false)
+let authCheckInterval = null
 
 
 // =========================================================
@@ -470,7 +472,13 @@ function handleProfileImageError(event) {
 function closeMenu() {
   menuOpen.value = false
 }
+// =========================================================
+// CHECK AUTHENTICATION
+// =========================================================
 
+function checkAuthentication() {
+  auth.checkToken()
+}
 
 // =========================================================
 // LOGOUT
@@ -499,7 +507,27 @@ function mobileLogout() {
 // =========================================================
 
 onMounted(() => {
+
+  // Load website settings
   fetchCustomizer()
+
+  // Check authentication immediately
+  checkAuthentication()
+
+  // Check authentication every 30 seconds
+  authCheckInterval = setInterval(() => {
+    checkAuthentication()
+  }, 30000)
+})
+
+onUnmounted(() => {
+
+  if (authCheckInterval) {
+
+    clearInterval(authCheckInterval)
+
+    authCheckInterval = null
+  }
 })
 </script>
 

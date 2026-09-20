@@ -245,5 +245,23 @@ export const usePaymentStore = defineStore('payment', {
 
       return this.payments
     },
+        // =========================
+    // Get Payment By Booking ID
+    // =========================
+    async fetchPaymentByBookingId(bookingId) {
+      try {
+        const response = await api.get(
+          `/payments/booking/${bookingId}`
+        )
+
+        return response.data?.data || response.data
+      } catch (error) {
+        if (isNotFound(error)) {
+          return null
+        }
+
+        throw error
+      }
+    },
   },
 })

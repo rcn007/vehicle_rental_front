@@ -602,13 +602,29 @@ const handleFavoriteChanged = ({
 }
 
 const loadFavorites = async () => {
+  // =====================================================
+  // GUEST USER → DO NOT CALL FAVORITES API
+  // =====================================================
+
+  const token = localStorage.getItem('token')
+  const user = localStorage.getItem('user')
+
+  if (!token || !user) {
+    favoriteVehicleIds.value = new Set()
+    return
+  }
+
   try {
     const response = await getFavorites()
 
     console.log('Favorites from database:', response)
 
+    const favorites = Array.isArray(response)
+      ? response
+      : response?.data || []
+
     favoriteVehicleIds.value = new Set(
-      response
+      favorites
         .map(favorite => favorite.vehicle?.id)
         .filter(id => id != null)
         .map(id => String(id))

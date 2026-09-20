@@ -1,10 +1,11 @@
 <template>
   <div
-    class="min-h-screen bg-gray-100 flex flex-col items-center justify-center p-4 font-mono"
+    class="receipt-page min-h-screen bg-gray-100 flex flex-col items-center justify-center p-4 font-mono"
   >
     <!-- Loading -->
     <div
       v-if="loading"
+      
       class="w-full max-w-md bg-white p-8 text-center rounded-sm shadow-md"
     >
       <i class="fa-solid fa-spinner fa-spin text-xl"></i>
@@ -39,6 +40,7 @@
     <template v-else>
       <!-- Action Controls -->
       <div
+     
         class="w-full max-w-md mb-4 flex justify-end print:hidden"
       >
         <button
@@ -53,23 +55,41 @@
 
       <!-- Receipt Container -->
       <div
+       id="receipt"
         class="w-full max-w-md bg-white p-8 rounded-sm shadow-md border border-gray-200 text-gray-900 text-sm leading-relaxed print:shadow-none print:border-none print:p-0"
       >
         <!-- Header -->
-        <div class="text-center space-y-1 mb-6">
-          <h1
-            class="text-3xl font-extrabold tracking-tighter uppercase font-sans"
+<!-- Header -->
+        <div class="text-center space-y-2 mb-6">
+
+          <!-- Logo -->
+          <div
+            v-if="customizer.logo"
+            class="flex justify-center items-center"
           >
-            Vehicle Rental
+            <img
+              :src="customizer.logo"
+              :alt="customizer.websiteName"
+              class="max-h-16 max-w-[180px] object-contain"
+              @error="customizer.logo = ''"
+            />
+          </div>
+
+          <!-- Website Name -->
+          <h1
+            class="text-2xl sm:text-3xl font-extrabold tracking-tight uppercase font-sans"
+          >
+            {{ customizer.websiteName }}
           </h1>
 
           <p class="font-semibold text-base">
             Rental Receipt
           </p>
 
-          <p>
+          <p class="text-gray-600">
             Thank you for choosing our service
           </p>
+
         </div>
 
         <!-- Metadata -->
@@ -271,12 +291,15 @@ import { useRoute } from 'vue-router'
 
 import { useBookingStore } from '../stores/Booking'
 import { usePaymentStore } from '../stores/Payment'
-
+import { getCustomizerSettings } from '../api/customizer'
 const route = useRoute()
 
 const bookingStore = useBookingStore()
 const paymentStore = usePaymentStore()
-
+const customizer = ref({
+  logo: '',
+  websiteName: 'ChuolTov',
+})
 const loading = ref(true)
 const error = ref('')
 
@@ -384,6 +407,15 @@ async function loadReceipt() {
         'Invalid booking ID.'
       )
     }
+    // Fetch customizer settings
+const customizerData = await getCustomizerSettings()
+
+customizer.value = {
+  logo: customizerData?.logo || '',
+  websiteName:
+    customizerData?.websiteName ||
+    'ChuolTov',
+}
 
     /*
      * Fetch booking
@@ -492,6 +524,10 @@ async function loadReceipt() {
   }
 }
 
+
+
+
+
 function printReceipt() {
   window.print()
 }
@@ -501,14 +537,84 @@ onMounted(() => {
 })
 </script>
 
-<style scoped>
+<style>
+/* =========================================
+   PRINT RECEIPT ONLY
+   ========================================= */
+
 @media print {
-  body {
-    background-color: white;
+
+  /* Hide everything first */
+  body * {
+    visibility: hidden !important;
   }
 
-  .payment-page {
+  /* Show only receipt */
+  #receipt,
+  #receipt * {
+    visibility: visible !important;
+  }
+
+  /* Put receipt at the top-left of the printed page */
+  #receipt {
+    position: absolute !important;
+    left: 0 !important;
+    top: 0 !important;
+
+    width: 100% !important;
+    max-width: 100% !important;
+
+    margin: 0 !important;
+    padding: 20px !important;
+
     background: white !important;
+    border: none !important;
+    box-shadow: none !important;
+
+    color: #000 !important;
+  }
+
+  /* Hide navbar, footer and other layout elements */
+  nav,
+  header,
+  footer,
+  .navbar,
+  .footer,
+  .site-navbar,
+  .site-footer {
+    display: none !important;
+  }
+
+  /* Remove page background */
+  html,
+  body {
+    margin: 0 !important;
+    padding: 0 !important;
+    background: white !important;
+  }
+
+  /* Remove receipt page spacing */
+  .receipt-page {
+    min-height: auto !important;
+    padding: 0 !important;
+    margin: 0 !important;
+    background: white !important;
+  }
+
+  /* Don't print buttons */
+  button,
+  .print\:hidden {
+    display: none !important;
+  }
+}
+
+/* =========================================
+   SCREEN
+   ========================================= */
+
+@media screen {
+  .receipt-page {
+    min-height: 100vh;
   }
 }
 </style>
