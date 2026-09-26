@@ -4,6 +4,7 @@ import api from '../api/axios'
 export const useBookingStore = defineStore('booking', {
   state: () => ({
     bookings: [],
+    vehicleBookings: [],
     booking: null,
     loading: false,
     error: null,
@@ -45,10 +46,32 @@ async fetchBookings() {
 
       return this.booking
     },
+    async fetchVehicleAvailability(vehicleId) {
+  try {
+    const response = await api.get(
+      `/bookings/vehicle/${vehicleId}/availability`
+    )
+
+    this.vehicleBookings =
+      response.data?.data || response.data || []
+
+    return this.vehicleBookings
+  } catch (error) {
+    console.error(
+      'Failed to fetch vehicle availability:',
+      error
+    )
+
+    this.vehicleBookings = []
+
+    throw error
+  }
+},
 
     async deleteBooking(id) {
       const response = await api.put(`/bookings/${id}/cancel`)
       return response.data
     },
+    
   },
 })

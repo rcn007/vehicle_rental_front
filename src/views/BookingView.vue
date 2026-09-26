@@ -247,7 +247,9 @@
               <input
                 v-model="form.pickupDate"
                 type="date"
+                :min="today"
                 required
+                  @change="validateSelectedDates"
               />
             </div>
 
@@ -256,9 +258,13 @@
               <input
                 v-model="form.returnDate"
                 type="date"
+                :min="form.pickupDate || today"
                 required
+                  @change="validateSelectedDates"
               />
             </div>
+
+
 
             <div class="booking-summary">
               <h3>Total Days</h3>
@@ -269,6 +275,14 @@
               <h3>Total Price</h3>
               <strong>${{ totalPrice }}</strong>
             </div>
+              <VehicleAvailability
+              ref="vehicleAvailabilityRef"
+              :bookings="bookingStore.vehicleBookings"
+              :pickup-date="form.pickupDate"
+              :return-date="form.returnDate"
+              @select-dates="handleAvailableDates"
+              class=" "
+            />
 
             <button
               type="submit"
@@ -281,7 +295,9 @@
 
 
         </div>
+        
       </div>
+      
 
       <!-- NOT FOUND STATE -->
       <div
@@ -301,13 +317,205 @@
         </button>
       </div>
     </div>
+    <!-- UNAVAILABLE DATE MODAL -->
+<Teleport to="body">
+  <Transition name="booking-modal">
+    <div
+      v-if="showUnavailableModal"
+      class="fixed inset-0 z-[9999]
+             flex items-center justify-center p-4"
+      @click.self="closeUnavailableModal"
+    >
+      <!-- BACKDROP -->
+      <div
+        class="absolute inset-0
+               bg-black/70 backdrop-blur-sm"
+      ></div>
+
+      <!-- MODAL -->
+      <div
+        :class="[
+          'relative z-10 w-full max-w-md',
+          'rounded-3xl overflow-hidden shadow-2xl',
+          isLambo
+            ? 'bg-[#17120F] border border-amber-500/20'
+            : 'bg-white border border-slate-200'
+        ]"
+      >
+
+        <!-- HEADER -->
+        <div class="p-6 pb-4 text-center">
+
+          <div
+            :class="[
+              'w-16 h-16 mx-auto rounded-2xl',
+              'flex items-center justify-center',
+              isLambo
+                ? 'bg-amber-500/10 text-amber-400'
+                : 'bg-rose-500/10 text-rose-500'
+            ]"
+          >
+            <i
+              class="fa-solid fa-calendar-xmark text-2xl"
+            ></i>
+          </div>
+
+          <h3
+            :class="[
+              'text-xl font-black mt-4',
+              isLambo
+                ? 'text-white'
+                : 'text-slate-900'
+            ]"
+          >
+            Dates Unavailable
+          </h3>
+
+          <p
+            :class="[
+              'text-sm leading-6 mt-2',
+              isLambo
+                ? 'text-slate-400'
+                : 'text-slate-500'
+            ]"
+          >
+            The rental dates you selected are
+            currently unavailable for this vehicle.
+          </p>
+
+          <p
+            :class="[
+              'text-xs leading-5 mt-2',
+              isLambo
+                ? 'text-slate-500'
+                : 'text-slate-400'
+            ]"
+          >
+            Please choose another period or search
+            for the next available rental dates.
+          </p>
+
+        </div>
+
+        <!-- SELECTED PERIOD -->
+        <div
+          :class="[
+            'mx-6 mb-5 p-4 rounded-2xl border',
+            isLambo
+              ? 'bg-black/20 border-amber-500/10'
+              : 'bg-slate-50 border-slate-200'
+          ]"
+        >
+          <p
+            :class="[
+              'text-[9px] uppercase tracking-wider font-bold',
+              isLambo
+                ? 'text-slate-500'
+                : 'text-slate-400'
+            ]"
+          >
+            Your selected period
+          </p>
+
+          <div
+            class="flex items-center justify-center gap-3 mt-2"
+          >
+            <span
+              :class="[
+                'text-sm font-bold',
+                isLambo
+                  ? 'text-white'
+                  : 'text-slate-800'
+              ]"
+            >
+              {{ formatDisplayDate(form.pickupDate) }}
+            </span>
+
+            <i
+              :class="[
+                'fa-solid fa-arrow-right text-[10px]',
+                isLambo
+                  ? 'text-slate-600'
+                  : 'text-slate-400'
+              ]"
+            ></i>
+
+            <span
+              :class="[
+                'text-sm font-bold',
+                isLambo
+                  ? 'text-white'
+                  : 'text-slate-800'
+              ]"
+            >
+              {{ formatDisplayDate(form.returnDate) }}
+            </span>
+          </div>
+        </div>
+
+        <!-- ACTIONS -->
+        <div
+          :class="[
+            'px-6 py-4 border-t',
+            isLambo
+              ? 'border-amber-500/10'
+              : 'border-slate-200'
+          ]"
+        >
+
+          <div class="flex flex-col gap-3">
+
+            <!-- FIND AVAILABLE -->
+            <button
+              type="button"
+              @click="openAvailableDates"
+              :class="[
+                'w-full h-12 rounded-2xl',
+                'text-sm font-bold',
+                'transition flex items-center justify-center gap-2',
+                isLambo
+                  ? 'bg-amber-500 text-black hover:bg-amber-400'
+                  : 'bg-slate-900 text-white hover:bg-slate-800'
+              ]"
+            >
+              <i
+                class="fa-solid fa-magnifying-glass"
+              ></i>
+
+              Find Available Dates
+            </button>
+
+            <!-- CHANGE DATES -->
+            <button
+              type="button"
+              @click="closeUnavailableModal"
+              :class="[
+                'w-full h-12 rounded-2xl',
+                'text-sm font-bold transition',
+                isLambo
+                  ? 'bg-white/5 border border-white/10 text-slate-300 hover:bg-white/10'
+                  : 'bg-slate-50 border border-slate-200 text-slate-700 hover:bg-slate-100'
+              ]"
+            >
+              Change Dates
+            </button>
+
+          </div>
+
+        </div>
+
+      </div>
+    </div>
+  </Transition>
+</Teleport>
   </section>
 </template>
 
 <script setup>
 import { computed, onMounted, reactive, ref } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
-
+import VehicleAvailability from '../components/vehicles/VehicleAvailability.vue'
+import { useBookingStore } from '../stores/Booking'
 // Stores
 import { useVehicleStore } from '../stores/Vehicle'
 import { useAuthStore } from '../stores/Auth'
@@ -323,12 +531,42 @@ const router = useRouter()
 const vehicleStore = useVehicleStore()
 const authStore = useAuthStore()
 
+const bookingStore = useBookingStore()
+
+const vehicleAvailabilityRef = ref(null)
+const showUnavailableModal = ref(false)
+
 const vehicleImages = ref([])
 const bookingLoading = ref(false)
 
+
+function handleAvailableDates({
+  pickupDate,
+  returnDate
+}) {
+  form.pickupDate = pickupDate
+  form.returnDate = returnDate
+}
+
+function localDate(offset = 0) {
+  const date = new Date()
+
+  date.setDate(
+    date.getDate() + offset
+  )
+
+  return [
+    date.getFullYear(),
+    String(date.getMonth() + 1).padStart(2, '0'),
+    String(date.getDate()).padStart(2, '0')
+  ].join('-')
+}
+
+const today = localDate()
+
 const form = reactive({
-  pickupDate: '',
-  returnDate: ''
+  pickupDate: localDate(1),
+  returnDate: localDate(4)
 })
 
 const vehicleId = computed(() => Number(route.params.vehicleId))
@@ -414,6 +652,67 @@ const totalPrice = computed(() => {
   return totalDays.value * price
 })
 
+const hasDateOverlap = computed(() => {
+  if (
+    !form.pickupDate ||
+    !form.returnDate ||
+    totalDays.value < 1
+  ) {
+    return false
+  }
+
+  return bookingStore.vehicleBookings.some(booking => {
+    if (
+      !booking.pickupDate ||
+      !booking.returnDate
+    ) {
+      return false
+    }
+
+    return (
+      booking.pickupDate < form.returnDate &&
+      booking.returnDate > form.pickupDate
+    )
+  })
+})
+
+function validateSelectedDates() {
+  if (
+    form.pickupDate &&
+    form.returnDate &&
+    totalDays.value >= 1 &&
+    hasDateOverlap.value
+  ) {
+    showUnavailableModal.value = true
+  }
+}
+
+function formatDisplayDate(dateString) {
+  if (!dateString) {
+    return ''
+  }
+
+  const date = new Date(
+    `${dateString}T00:00:00`
+  )
+
+  return new Intl.DateTimeFormat('en-US', {
+    month: 'short',
+    day: 'numeric',
+    year: 'numeric'
+  }).format(date)
+}
+
+function closeUnavailableModal() {
+  showUnavailableModal.value = false
+}
+
+function openAvailableDates() {
+  showUnavailableModal.value = false
+
+  vehicleAvailabilityRef.value?.openSearch()
+}
+
 // Reliable User ID extraction across Pinia & localStorage
 function getLoggedInUserId() {
   let id = authStore.user?.id || authStore.user?.userId || authStore.user?._id
@@ -448,23 +747,73 @@ async function fetchVehicleImages() {
 }
 
 async function submitBooking() {
+  /*
+   * Basic date validation
+   */
+  if (
+    !form.pickupDate ||
+    !form.returnDate
+  ) {
+    return
+  }
+
+  if (form.pickupDate < today) {
+    alert('Pickup date cannot be in the past.')
+    return
+  }
+
   if (totalDays.value <= 0) {
     alert('Return date must be after pickup date.')
     return
   }
 
-  const userId = getLoggedInUserId()
-  const currentVehicleId = Number(
-    vehicleStore.vehicle?.id ?? vehicleStore.vehicle?.vehicleId ?? vehicleId.value
-  )
-
-  if (!Number.isInteger(userId) || userId <= 0) {
-    alert('User information is missing. Please login again.')
-    router.push('/login')
+  /*
+   * Check currently loaded availability.
+   *
+   * This is only a frontend check.
+   * The backend remains the final authority.
+   */
+  if (hasDateOverlap.value) {
+    showUnavailableModal.value = true
     return
   }
 
-  if (!Number.isInteger(currentVehicleId) || currentVehicleId <= 0) {
+  const userId = getLoggedInUserId()
+
+  const currentVehicleId = Number(
+    vehicleStore.vehicle?.id ??
+    vehicleStore.vehicle?.vehicleId ??
+    vehicleId.value
+  )
+
+  /*
+   * Check user
+   */
+  if (
+    !Number.isInteger(userId) ||
+    userId <= 0
+  ) {
+    alert(
+      'User information is missing. Please login again.'
+    )
+
+    router.push({
+      path: '/login',
+      query: {
+        redirect: route.fullPath
+      }
+    })
+
+    return
+  }
+
+  /*
+   * Check vehicle
+   */
+  if (
+    !Number.isInteger(currentVehicleId) ||
+    currentVehicleId <= 0
+  ) {
     alert('Vehicle information is invalid.')
     return
   }
@@ -472,7 +821,6 @@ async function submitBooking() {
   bookingLoading.value = true
 
   try {
-    // Calling createBooking directly from ../api/booking.js
     const response = await createBookingApi({
       userId,
       vehicleId: currentVehicleId,
@@ -480,28 +828,69 @@ async function submitBooking() {
       returnDate: form.returnDate
     })
 
-    const booking = response?.data ?? response
-    const bookingId = booking?.id ?? booking?.bookingId
+    const booking =
+      response?.data ?? response
+
+    const bookingId =
+      booking?.id ??
+      booking?.bookingId
 
     if (!bookingId) {
-      throw new Error('Booking was created, but booking ID was not returned.')
+      throw new Error(
+        'Booking was created, but booking ID was not returned.'
+      )
     }
 
-    router.push(`/payment/${bookingId}`)
+    /*
+     * Booking successful
+     */
+    router.push(
+      `/payment/${bookingId}`
+    )
+
   } catch (error) {
-  console.error('Create booking error:', error)
+    console.error(
+      'Create booking error:',
+      error
+    )
 
-  console.error('Backend response:', error.response?.data)
+    console.error(
+      'Backend response:',
+      error?.response?.data
+    )
 
-  alert(
-    error.response?.data?.message ||
-    error.response?.data?.error ||
-    error.message ||
-    'Failed to create booking.'
-  )
-} finally {
-  bookingLoading.value = false
-}
+    const status =
+      error?.response?.status
+
+    const message =
+      error?.response?.data?.message ||
+      error?.response?.data?.error ||
+      error?.message ||
+      ''
+
+    /*
+     * Another customer may have booked
+     * the vehicle after this page loaded.
+     */
+    const unavailable =
+      status === 409 ||
+      /unavailable|already booked|overlap|booking/i.test(
+        message
+      )
+
+    if (unavailable) {
+      showUnavailableModal.value = true
+      return
+    }
+
+    alert(
+      message ||
+      'Failed to create booking.'
+    )
+
+  } finally {
+    bookingLoading.value = false
+  }
 }
 
 onMounted(async () => {
@@ -513,7 +902,8 @@ onMounted(async () => {
   try {
     await Promise.all([
       vehicleStore.fetchVehicle(vehicleId.value),
-      fetchVehicleImages()
+      fetchVehicleImages(),
+       bookingStore.fetchVehicleAvailability(vehicleId.value)
     ])
   } catch (error) {
     console.error('Failed to load vehicle details:', error)
@@ -640,5 +1030,27 @@ onMounted(async () => {
   .form-card {
     padding: 20px 16px;
   }
+}
+.booking-modal-enter-active,
+.booking-modal-leave-active {
+  transition: opacity 0.2s ease;
+}
+
+.booking-modal-enter-active > div:last-child,
+.booking-modal-leave-active > div:last-child {
+  transition:
+    transform 0.2s ease,
+    opacity 0.2s ease;
+}
+
+.booking-modal-enter-from,
+.booking-modal-leave-to {
+  opacity: 0;
+}
+
+.booking-modal-enter-from > div:last-child,
+.booking-modal-leave-to > div:last-child {
+  transform: scale(0.95) translateY(10px);
+  opacity: 0;
 }
 </style>

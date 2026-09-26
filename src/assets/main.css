@@ -140,6 +140,7 @@ img {
 }
 
 .navbar {
+  font-family: var(--font-heading);
   position: sticky;
   top: 0;
   z-index: 50;

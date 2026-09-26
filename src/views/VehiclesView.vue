@@ -2,7 +2,7 @@
   <section class="vehicles-page">
     <div class="container">
       <div class="page-header">
-        <h1>Browse Vehicles</h1>
+        <h1 style="font-family: var(--font-heading);" class="font-bold">Browse Vehicles</h1>
         <p>{{ filteredVehicles.length }} vehicles found</p>
       </div>
 

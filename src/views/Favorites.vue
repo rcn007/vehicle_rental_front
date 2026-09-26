@@ -4,7 +4,7 @@
 
       <!-- Header -->
       <div class="mb-8">
-        <h1 class="text-3xl font-bold text-[var(--text)]">My Favorites</h1>
+        <h1 class="text-4xl font-bold text-[var(--text)]">My Favorites</h1>
         <p class="mt-2 text-gray-500">Vehicles you have saved for later.</p>
       </div>
 

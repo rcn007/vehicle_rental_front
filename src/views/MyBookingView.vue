@@ -9,7 +9,7 @@
       ========================================================== -->
       <header class="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
         <div>
-          <h1 class="text-2xl sm:text-3xl font-extrabold text-[var(--text)] tracking-tight">
+          <h1 class="text-2xl sm:text-4xl font-bold text-[var(--text)] tracking-tight">
             My Bookings
           </h1>
           <p class="text-base sm:text-lg text-[var(--secondary)] mt-0.5">
@@ -611,7 +611,7 @@
 import { computed, onMounted, ref, watch } from 'vue'
 import { useRouter } from 'vue-router'
 
-import { getMyBookings, deleteBooking} from '../api/booking'
+import { getMyBookings, cancelBooking} from '../api/booking'
 import { getVehicles } from '../api/vehicle'
 
 const router = useRouter()
@@ -685,7 +685,7 @@ const confirmCancelBooking = async () => {
 
   cancelling.value = true
   try {
-    await deleteBooking(selectedBookingToCancel.value.id)
+    await cancelBooking(selectedBookingToCancel.value.id)
     closeCancelModal()
     await loadBookings()
   } catch (err) {
@@ -903,19 +903,39 @@ const filteredBookings = computed(() => {
   if (activeTab.value !== 'All') {
     result = result.filter((booking) => {
       const status = normalizeStatus(booking.status)
-      if (activeTab.value === 'Active') return status === 'ACTIVE' || status === 'RENTED'
-      if (activeTab.value === 'Upcoming') return status === 'CONFIRMED'
-      if (activeTab.value === 'Pending') return status === 'PENDING'
-      if (activeTab.value === 'Cancelled') return status === 'CANCELLED'
+
+      if (activeTab.value === 'Active') {
+        return status === 'ACTIVE' || status === 'RENTED'
+      }
+
+      if (activeTab.value === 'Upcoming') {
+        return status === 'CONFIRMED'
+      }
+
+      if (activeTab.value === 'Pending') {
+        return status === 'PENDING'
+      }
+
+      if (activeTab.value === 'Cancelled') {
+        return status === 'CANCELLED'
+      }
+
       return true
     })
+  } else {
+    // Hide cancelled bookings from "All"
+    result = result.filter(
+      (booking) => normalizeStatus(booking.status) !== 'CANCELLED'
+    )
   }
 
   const search = searchQuery.value.trim().toLowerCase()
+
   if (search) {
     result = result.filter((booking) => {
       const id = String(booking.id || '').toLowerCase()
       const vehicle = String(booking.vehicleName || '').toLowerCase()
+
       return id.includes(search) || vehicle.includes(search)
     })
   }
@@ -925,7 +945,9 @@ const filteredBookings = computed(() => {
   } else if (sortBy.value === 'oldest') {
     result.sort((a, b) => Number(a.id) - Number(b.id))
   } else if (sortBy.value === 'price') {
-    result.sort((a, b) => Number(b.totalPrice || 0) - Number(a.totalPrice || 0))
+    result.sort(
+      (a, b) => Number(b.totalPrice || 0) - Number(a.totalPrice || 0)
+    )
   }
 
   return result

@@ -45,11 +45,24 @@ export const getVehicles = async () => {
 // Delete booking
 
 export const deleteBooking = async (id) => {
-  const response = await api.delete(`/bookings/${id}`)
+  const response = await api.put(`/bookings/${id}`)
   return response.data
 }
+export const cancelBooking = async (id) => {
+  const response = await api.put(`/bookings/${id}/cancel`);
+
+  return response.data;
+};
+
 
 export const getMyBookings = () => {
   return api.get('/bookings/my')
 }
-// Cancel booking
+// Get vehicle booked/rented dates
+export const getVehicleAvailability = async (vehicleId) => {
+  const response = await api.get(
+    `/bookings/vehicle/${vehicleId}/availability`
+  );
+
+  return response.data;
+};

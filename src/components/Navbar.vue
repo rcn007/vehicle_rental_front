@@ -1,6 +1,7 @@
 <template>
   <header class="navbar ">
-    <div class="container nav-content">
+    <div class="container nav-content"
+    style="font-family: var(--font-heading);">
 
       <!-- Logo / Website Name -->
 <RouterLink
@@ -40,6 +41,7 @@
         <!-- <RouterLink to="/rental-history">Rental History</RouterLink> -->
         <RouterLink to="/locations">Locations</RouterLink>
         <RouterLink to="/contact">Contact</RouterLink>
+         
         <RouterLink
   to="/favorites"
   class="flex items-center gap-2"
@@ -194,6 +196,10 @@
       >
         Contact
       </RouterLink>
+       <RouterLink to="/favorite"
+        @click="closeMenu">
+        
+        My Favorite</RouterLink>
 
 
       <!-- Mobile Auth -->

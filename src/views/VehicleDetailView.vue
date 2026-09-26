@@ -236,6 +236,155 @@
           </div>
         </section>
 
+        <!-- ================= UNAVAILABLE DATE MODAL ================= -->
+<Teleport to="body">
+  <Transition name="fade">
+    <div
+      v-if="showUnavailableModal"
+      class="fixed inset-0 z-[9999] flex items-center justify-center p-4"
+      @click.self="closeUnavailableModal"
+    >
+      <!-- Backdrop -->
+      <div class="absolute inset-0 bg-black/70 backdrop-blur-sm"></div>
+
+      <!-- Modal -->
+      <div
+        class="relative z-10 w-full max-w-md
+               bg-[var(--surface)]
+               border border-[var(--border)]
+               rounded-3xl
+               shadow-2xl
+               overflow-hidden"
+      >
+        <!-- Header -->
+        <div class="p-6 pb-4 text-center">
+
+          <div
+            class="w-16 h-16 mx-auto rounded-2xl
+                   bg-rose-500/10
+                   border border-rose-500/20
+                   text-rose-400
+                   flex items-center justify-center"
+          >
+            <i class="fa-solid fa-calendar-xmark text-2xl"></i>
+          </div>
+
+          <h3
+            class="text-lg font-black
+                   text-[var(--text)] mt-4"
+          >
+            Dates Unavailable
+          </h3>
+
+          <p
+            class="text-xs text-[var(--secondary)]
+                   leading-6 mt-2"
+          >
+            The rental dates you selected are currently
+            unavailable for this vehicle.
+          </p>
+
+          <p
+            class="text-[10px] text-[var(--muted)]
+                   leading-5 mt-2"
+          >
+            Please choose another period or use
+            <span class="font-bold text-[var(--accent)]">
+              Find Available Dates
+            </span>
+            to find a free rental period.
+          </p>
+        </div>
+
+        <!-- Selected Period -->
+        <div
+          class="mx-6 mb-5 p-4 rounded-2xl
+                 bg-[var(--background)]
+                 border border-[var(--border)]"
+        >
+          <p
+            class="text-[9px]
+                   uppercase
+                   tracking-wider
+                   font-bold
+                   text-[var(--muted)]"
+          >
+            Your selected period
+          </p>
+
+          <div
+            class="flex items-center
+                   justify-center
+                   gap-3 mt-2"
+          >
+            <span
+              class="text-xs
+                     font-bold
+                     text-[var(--text)]"
+            >
+              {{ formatDisplayDate(form.pickupDate) }}
+            </span>
+
+            <i
+              class="fa-solid
+                     fa-arrow-right
+                     text-[var(--muted)]
+                     text-[10px]"
+            ></i>
+
+            <span
+              class="text-xs
+                     font-bold
+                     text-[var(--text)]"
+            >
+              {{ formatDisplayDate(form.returnDate) }}
+            </span>
+          </div>
+        </div>
+
+        <!-- Actions -->
+        <div
+          class="px-6 py-4
+                 border-t border-[var(--border)]
+                 flex flex-col sm:flex-row gap-3"
+        >
+          <button
+            type="button"
+            @click="openAvailableDates"
+            class="flex-1 h-11 rounded-xl
+                   bg-[var(--accent)]
+                   text-white
+                   text-xs
+                   font-bold
+                   hover:bg-[var(--accent-hover)]
+                   transition
+                   flex items-center
+                   justify-center gap-2"
+          >
+            <i class="fa-solid fa-magnifying-glass"></i>
+            Find Available Dates
+          </button>
+
+          <button
+            type="button"
+            @click="closeUnavailableModal"
+            class="h-11 px-5 rounded-xl
+                   bg-[var(--background)]
+                   border border-[var(--border)]
+                   text-[var(--text)]
+                   text-xs
+                   font-bold
+                   hover:bg-white/5
+                   transition"
+          >
+            Change Dates
+          </button>
+        </div>
+      </div>
+    </div>
+  </Transition>
+</Teleport>
+
         <!-- RENTAL SCHEDULE -->
         <section id="book" class="bg-[var(--surface)] border border-[var(--border)] rounded-3xl p-6 sm:p-7 shadow-xl space-y-6">
           <div class="flex items-center justify-between gap-4 pb-4 border-b border-[var(--border)]">
@@ -262,6 +411,7 @@
                   type="date"
                   v-model="form.pickupDate"
                   :min="today"
+                    @change="validateSelectedDates"
                   class="w-full h-12 bg-[var(--background)] border border-[var(--border)] text-[var(--text)] rounded-xl pl-11 pr-4 text-sm font-semibold focus:outline-none focus:border-[var(--accent)] transition-all"
                 />
               </div>
@@ -274,16 +424,24 @@
                   type="date"
                   v-model="form.returnDate"
                   :min="form.pickupDate || today"
+                    @change="validateSelectedDates"
                   class="w-full h-12 bg-[var(--background)] border border-[var(--border)] text-[var(--text)] rounded-xl pl-11 pr-4 text-sm font-semibold focus:outline-none focus:border-[var(--accent)] transition-all"
                 />
               </div>
             </div>
           </div>
+            <VehicleAvailability
+              ref="vehicleAvailabilityRef"
+              :bookings="bookingStore.vehicleBookings"
+              :pickup-date="form.pickupDate"
+              :return-date="form.returnDate"
+              @select-dates="handleAvailableDates"
+            />
 
-          <div v-if="scheduleError" class="p-4 bg-rose-500/10 border border-rose-500/20 text-rose-400 rounded-xl text-xs font-semibold flex items-center gap-3">
+          <!-- <div v-if="scheduleError" class="p-4 bg-rose-500/10 border border-rose-500/20 text-rose-400 rounded-xl text-xs font-semibold flex items-center gap-3">
             <i class="fa-solid fa-circle-exclamation"></i>
             <span>{{ scheduleError }}</span>
-          </div>
+          </div> -->
 
           <div class="p-4 bg-[var(--background)] rounded-2xl border border-[var(--border)] flex items-center justify-between gap-4">
             <div class="flex items-center gap-3 min-w-0">
@@ -461,7 +619,7 @@ import {
   useRoute,
   useRouter
 } from 'vue-router'
-
+import VehicleAvailability from '../components/vehicles/VehicleAvailability.vue'
 // Stores
 import { useVehicleStore } from '../stores/Vehicle'
 import { useBookingStore } from '../stores/Booking'
@@ -481,12 +639,25 @@ const authStore = useAuthStore()
 
 const vehicleImages = ref([])
 
+const vehicleAvailabilityRef = ref(null)
+const showUnavailableModal = ref(false)
+
+
+
 const vehicleSpecs = computed(() => [
   { label: 'Gearbox', value: transmission.value, icon: 'fa-solid fa-gears' },
   { label: 'Engine', value: fuelType.value, icon: 'fa-solid fa-gas-pump' },
   { label: 'Capacity', value: `${seats.value} Seats`, icon: 'fa-solid fa-users' },
   { label: 'Class', value: vehicleCategory.value, icon: 'fa-solid fa-shield-halved' },
 ])
+
+function handleAvailableDates({
+  pickupDate,
+  returnDate
+}) {
+  form.pickupDate = pickupDate
+  form.returnDate = returnDate
+}
 
 /* =========================================================
    STATIC GALLERY
@@ -565,6 +736,8 @@ function localDate(offset = 0) {
   ].join('-')
 }
 
+
+
 const today = localDate()
 
 const form = reactive({
@@ -627,6 +800,30 @@ function scrollToRentalSchedule() {
     behavior: 'smooth',
     block: 'start'
   })
+}
+
+function formatDisplayDate(dateString) {
+  if (!dateString) {
+    return ''
+  }
+
+  const date = new Date(`${dateString}T00:00:00`)
+
+  return new Intl.DateTimeFormat('en-US', {
+    month: 'short',
+    day: 'numeric',
+    year: 'numeric'
+  }).format(date)
+}
+
+function closeUnavailableModal() {
+  showUnavailableModal.value = false
+}
+
+function openAvailableDates() {
+  showUnavailableModal.value = false
+
+  vehicleAvailabilityRef.value?.openSearch()
 }
 
 const vehicleCategory = computed(() => {
@@ -755,6 +952,54 @@ const rentalDays = computed(() => {
     : 0
 })
 
+const selectedDatesAvailable = computed(() => {
+  if (
+    !form.pickupDate ||
+    !form.returnDate ||
+    rentalDays.value < 1
+  ) {
+    return false
+  }
+
+  return !bookingStore.vehicleBookings.some(booking => {
+    if (
+      !booking.pickupDate ||
+      !booking.returnDate
+    ) {
+      return false
+    }
+
+    return (
+      booking.pickupDate < form.returnDate &&
+      booking.returnDate > form.pickupDate
+    )
+  })
+})
+
+const hasDateOverlap = computed(() => {
+  if (
+    !form.pickupDate ||
+    !form.returnDate ||
+    rentalDays.value < 1
+  ) {
+    return false
+  }
+
+  return bookingStore.vehicleBookings.some(booking => {
+    if (
+      !booking.pickupDate ||
+      !booking.returnDate
+    ) {
+      return false
+    }
+
+    return (
+      booking.pickupDate < form.returnDate &&
+      booking.returnDate > form.pickupDate
+    )
+  })
+})
+
 const scheduleError = computed(() => {
   if (
     !form.pickupDate ||
@@ -771,8 +1016,42 @@ const scheduleError = computed(() => {
     return 'Return date must be after pickup date.'
   }
 
+  const overlappingBooking =
+    bookingStore.vehicleBookings.find(
+      booking => {
+
+        if (
+          !booking.pickupDate ||
+          !booking.returnDate
+        ) {
+          return false
+        }
+
+        return (
+          booking.pickupDate < form.returnDate &&
+          booking.returnDate > form.pickupDate
+        )
+      }
+    )
+
+  if (overlappingBooking) {
+    return 'The selected rental dates are unavailable. Please choose another period.'
+  }
+
   return ''
 })
+
+function validateSelectedDates() {
+  if (
+    form.pickupDate &&
+    form.returnDate &&
+    rentalDays.value >= 1 &&
+    hasDateOverlap.value
+  ) {
+    showUnavailableModal.value = true
+  }
+}
+
 
 const total = computed(() => {
   return (
@@ -1336,18 +1615,39 @@ async function createBooking() {
       `/payment/${bookingId}`
     )
 
-  } catch (error) {
-    console.error(
-      'Create booking error:',
-      error
-    )
+} catch (error) {
+  console.error(
+    'Create booking error:',
+    error
+  )
 
-    alert(
-      error?.response?.data?.message ||
-      error?.message ||
-      'Failed to create booking'
-    )
+  console.error(
+    'Backend error response:',
+    error?.response?.data
+  )
+
+  const status = error?.response?.status
+
+  const message =
+    error?.response?.data?.message ||
+    error?.response?.data?.msg ||
+    error?.message ||
+    ''
+
+  const unavailable =
+    status === 409 ||
+    /unavailable|already booked|overlap|booking/i.test(message)
+
+  if (unavailable) {
+    showUnavailableModal.value = true
+    return
   }
+
+  alert(
+    message ||
+    'Failed to create booking'
+  )
+}
 }
 
 
@@ -1382,7 +1682,8 @@ onMounted(async () => {
   try {
     await Promise.all([
       vehicleStore.fetchVehicle(vehicleId.value),
-      fetchVehicleImages()
+      fetchVehicleImages(),
+        bookingStore.fetchVehicleAvailability(vehicleId.value)
     ])
 
     console.log('==============================')
